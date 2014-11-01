@@ -81,11 +81,18 @@ evar_map   = {}
 #mva_muon_endcap = 0.054
 #mva_electron_endcap = 0.097
 
-mva_muon_barrel = 0.0833
-mva_electron_barrel = 0.0599
+mva_muon_barrel = -0.0671
+mva_electron_barrel = 0.0461
 
-mva_muon_endcap = 0.0851
-mva_electron_endcap = 0.0801
+mva_muon_endcap = -0.1205
+mva_electron_endcap = 0.0495
+
+
+#mva_muon_barrel = -2
+#mva_electron_barrel = -2
+
+#mva_muon_endcap = -2
+#mva_electron_endcap = -2
 
     
 # for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
@@ -624,14 +631,38 @@ if __name__ == '__main__':
                     matchany = 2
 
 
-
-                mva_mvar_map['bdt_muon_dxy'][0] = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-                mva_mvar_map['bdt_muon_dz'][0] = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_dxy'][0] = mchain.muon_dxy
+#                mva_mvar_map['bdt_muon_dz'][0] = mchain.muon_dz
                 mva_mvar_map['bdt_muon_mva_ch_iso'][0] = mchain.muon_mva_ch_iso
                 mva_mvar_map['bdt_muon_mva_neu_iso'][0] = mchain.muon_mva_neu_iso
-                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-                mva_mvar_map['bdt_muon_mva_ptratio'][0] = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = mchain.muon_mva_jet_dr
+#                mva_mvar_map['bdt_muon_mva_ptratio'][0] = mchain.muon_mva_ptratio
                 mva_mvar_map['bdt_muon_mva_csv'][0] = mchain.muon_mva_csv
+
+
+                cor_dxy = mchain.muon_mva_dxy
+                cor_dz = mchain.muon_mva_dz
+                cor_jet_dr = mchain.muon_mva_jet_dr
+                cor_ptratio = mchain.muon_mva_ptratio
+
+                if pname != 'data':
+                    cor_dxy = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_dz = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_jet_dr = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_ptratio = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                
+                mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
+                mva_mvar_map['bdt_muon_dz'][0] = cor_dz
+                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
+                mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
+#
+#                mva_mvar_map['bdt_muon_dxy'][0] = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_dz'][0] = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_mva_ch_iso'][0] = mchain.muon_mva_ch_iso
+#                mva_mvar_map['bdt_muon_mva_neu_iso'][0] = mchain.muon_mva_neu_iso
+#                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_mva_ptratio'][0] = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                mva_mvar_map['bdt_muon_mva_csv'][0] = mchain.muon_mva_csv
                 
                 mva_iso_muon = mva_muonreader.EvaluateMVA('mva_muon_data')
 
@@ -674,9 +705,11 @@ if __name__ == '__main__':
                                      mchain.muon_reliso,
                                      mchain.muon_MT,
 #                                     mchain.muon_dxy,
-                                     ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+#                                     ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     cor_dxy,
 #                                     mchain.muon_dz,
-                                     ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+#                                     ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     cor_dz,
                                      mchain.muon_dB3D,
                                      mchain.muon_jetcsv,
                                      mchain.muon_jetcsv_10,
@@ -684,9 +717,11 @@ if __name__ == '__main__':
                                      mchain.muon_mva_ch_iso,
                                      mchain.muon_mva_neu_iso,
 #                                     mchain.muon_mva_jet_dr,
-                                     ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+#                                     ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     cor_jet_dr,
 #                                     mchain.muon_mva_ptratio,
-                                     ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+#                                     ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     cor_ptratio,
                                      mchain.muon_mva_csv,
                                      mva_iso_muon
                                     )
@@ -751,12 +786,32 @@ if __name__ == '__main__':
 #                mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
 
 
+#                mva_evar_map['bdt_electron_mva_score'][0] = echain.electron_mva_score
+#                mva_evar_map['bdt_electron_mva_ch_iso'][0] = echain.electron_mva_ch_iso
+#                mva_evar_map['bdt_electron_mva_neu_iso'][0] = echain.electron_mva_neu_iso
+#                mva_evar_map['bdt_electron_mva_jet_dr'][0] = ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+#                mva_evar_map['bdt_electron_mva_ptratio'][0] = ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+#                mva_evar_map['bdt_electron_mva_csv'][0] = echain.electron_mva_csv
+
                 mva_evar_map['bdt_electron_mva_score'][0] = echain.electron_mva_score
                 mva_evar_map['bdt_electron_mva_ch_iso'][0] = echain.electron_mva_ch_iso
                 mva_evar_map['bdt_electron_mva_neu_iso'][0] = echain.electron_mva_neu_iso
-                mva_evar_map['bdt_electron_mva_jet_dr'][0] = ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
-                mva_evar_map['bdt_electron_mva_ptratio'][0] = ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                 mva_evar_map['bdt_electron_mva_csv'][0] = echain.electron_mva_csv
+
+
+                cor_jet_dr = echain.electron_mva_jet_dr
+                cor_ptratio = echain.electron_mva_ptratio
+
+#                print 'before', cor_jet_dr
+                if pname != 'data':
+                    cor_jet_dr = ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+                    cor_ptratio = ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+#                print 'after', cor_jet_dr
+                                
+                
+                mva_evar_map['bdt_electron_mva_jet_dr'][0] = cor_jet_dr
+                mva_evar_map['bdt_electron_mva_ptratio'][0] = cor_ptratio
+
 
                 mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
 
@@ -828,9 +883,11 @@ if __name__ == '__main__':
                                          echain.electron_mva_ch_iso,
                                          echain.electron_mva_neu_iso,
  #                                         echain.electron_mva_jet_dr,
-                                         ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
+#                                         ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
+                                         cor_jet_dr,
 #                                         echain.electron_mva_ptratio,
-                                         ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
+#                                         ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
+                                         cor_ptratio,
                                          echain.electron_mva_csv,
                                          echain.electron_mva_score,
                                          echain.electron_mva_numberOfHits,
