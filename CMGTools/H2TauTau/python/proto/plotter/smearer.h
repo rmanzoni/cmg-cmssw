@@ -9,7 +9,8 @@ inline double smearMC(double x, double mu, double sigma) {
     return x + gSmearer_->Gaus(mu,sigma); 
 }
 inline double logSmearMC(double x, double mu, double sigma) { 
-    return std::exp(std::log(x) + gSmearer_->Gaus(mu,sigma)); 
+  return std::exp(std::log(x) + gSmearer_->Gaus(mu,sigma));
+  //return std::log(std::exp(x) + gSmearer_->Gaus(mu,sigma)); 
 }
 inline double shiftMC(double x, double delta) { 
     return x + delta; 
