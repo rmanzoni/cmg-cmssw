@@ -7,13 +7,13 @@
 #GEN -*-*-*-*-*-*-*-*-*-*-*- general info -*-*-*-*-*-*-*-*-*-*-*-
 
 Method         : KNN::KNN50
-TMVA Release   : 4.1.2         [262402]
-ROOT Release   : 5.32/00       [335872]
-Creator        : steggema
-Date           : Tue Oct  7 17:03:34 2014
-Host           : Linux cmsdev02.cern.ch 2.6.32-431.11.2.el6.x86_64 #1 SMP Wed Mar 26 09:39:43 CET 2014 x86_64 x86_64 x86_64 GNU/Linux
-Dir            : /afs/cern.ch/work/s/steggema/Yuta/CMSSW_5_3_19/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/kNN_training
-Training events: 17130
+TMVA Release   : 4.2.0         [262656]
+ROOT Release   : 5.34/20       [336404]
+Creator        : ytakahas
+Date           : Mon Nov  3 12:30:37 2014
+Host           : Linux buildvm-13.phx2.fedoraproject.org 3.15.6-200.fc20.x86_64 #1 SMP Fri Jul 18 02:36:27 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+Dir            : /afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/kNN_training
+Training events: 21871
 Analysis type  : [Classification]
 
 
@@ -42,8 +42,8 @@ UseLDA: "False" [Use local linear discriminant - experimental feature]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 2
-lepton_pt                     lepton_pt                     lepton_pt                     lepton_pt                                                       'F'    [10.0048294067,311.218017578]
-evt_njet                      evt_njet                      evt_njet                      evt_njet                                                        'F'    [0,13]
+lepton_pt                     lepton_pt                     lepton_pt                     lepton_pt                                                       'F'    [10.0019540787,369.342407227]
+evt_njet                      evt_njet                      evt_njet                      evt_njet                                                        'F'    [0,11]
 NSpec 0
 
 
@@ -114,10 +114,10 @@ class ReadKNN50 : public IClassifierReader {
       }
 
       // initialize min and max vectors (for normalisation)
-      fVmin[0] = 10.0048294067383;
-      fVmax[0] = 311.218017578125;
+      fVmin[0] = 0;
+      fVmax[0] = 0;
       fVmin[1] = 0;
-      fVmax[1] = 13;
+      fVmax[1] = 0;
 
       // initialize input variable types
       fType[0] = 'F';
@@ -185,6 +185,7 @@ class ReadKNN50 : public IClassifierReader {
          if (IsNormalised()) {
             // normalise variables
             std::vector<double> iV;
+            iV.reserve(inputValues.size());
             int ivar = 0;
             for (std::vector<double>::const_iterator varIt = inputValues.begin();
                  varIt != inputValues.end(); varIt++, ivar++) {

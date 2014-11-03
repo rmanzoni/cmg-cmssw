@@ -57,12 +57,25 @@ filedict = db.returnFile()
 #mva_muon_endcap = -0.0113
 #mva_electron_endcap = 0.0327
 
-mva_muon_barrel = -0.0671
-mva_electron_barrel = 0.0461
+#mva_muon_barrel = -0.0671
+#mva_electron_barrel = 0.0461
 
-mva_muon_endcap = -0.1205
-mva_electron_endcap = 0.0495
+#mva_muon_endcap = -0.1205
+#mva_electron_endcap = 0.0495
 
+##################################
+mva_muon_barrel = -0.0383
+mva_electron_barrel = 0.0557
+
+mva_muon_endcap =  -0.0891
+mva_electron_endcap =  0.0523
+##################################
+
+#mva_muon_barrel = 0.0657
+#mva_electron_barrel = 0.0149
+
+#mva_muon_endcap = 0.0557
+#mva_electron_endcap = 0.05229
 
 
 mva_muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
@@ -266,56 +279,25 @@ if __name__ == '__main__':
                                      mchain.muon_iso,
                                      mchain.muon_reliso,
                                      mchain.muon_MT,
-#                                     mchain.muon_dxy,
-#                                     ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
                                      cor_dxy,
-#                                     mchain.muon_dz,
-#                                     ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     mchain.muon_mva_dxy,
                                      cor_dz,
+                                     mchain.muon_mva_dz,
                                      mchain.muon_dB3D,
                                      mchain.muon_jetcsv,
                                      mchain.muon_jetcsv_10,
                                      mchain.muon_mva,
                                      mchain.muon_mva_ch_iso,
                                      mchain.muon_mva_neu_iso,
-#                                     mchain.muon_mva_jet_dr,
-#                                     ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
                                      cor_jet_dr,
-#                                     mchain.muon_mva_ptratio,
-#                                     ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany),
+                                     mchain.muon_mva_jet_dr,
                                      cor_ptratio,
+                                     mchain.muon_mva_ptratio,
                                      mchain.muon_mva_csv,
                                      mva_iso_muon
                                     )
-#
-#
-#                    muon = tool.mobj(mchain.muon_pt,
-#                                     mchain.muon_eta,
-#                                     mchain.muon_phi,
-#                                     mchain.muon_mass,
-#                                     mchain.muon_jetpt,
-#                                     mchain.muon_njet,
-#                                     mchain.muon_charge,
-#                                     mchain.muon_trigmatch,
-#                                     mchain.muon_trig_weight,
-#                                     mchain.muon_id_weight,
-#                                     mchain.muon_id,
-#                                     mchain.muon_iso,
-#                                     mchain.muon_reliso,
-#                                     mchain.muon_MT,
-#                                     mchain.muon_dxy,
-#                                     mchain.muon_dz,
-#                                     mchain.muon_dB3D,
-#                                     mchain.muon_jetcsv,
-#                                     mchain.muon_jetcsv_10,
-#                                     mchain.muon_mva,
-#                                     mchain.muon_mva_ch_iso,
-#                                     mchain.muon_mva_neu_iso,
-#                                     mchain.muon_mva_jet_dr,
-#                                     mchain.muon_mva_ptratio,
-#                                     mchain.muon_mva_csv,
-#                                     mva_iso_muon
-#                                    )
+
+
 
                         
                     signal_muon.append(muon)
@@ -399,7 +381,9 @@ if __name__ == '__main__':
                                          echain.electron_iso,
                                          echain.electron_reliso,
                                          echain.electron_MT,
+                                         cor_dxy,
                                          echain.electron_mva_dxy,
+                                         cor_dz,
                                          echain.electron_mva_dz,
                                          echain.electron_dB3D,
                                          echain.electron_jetcsv,
@@ -407,64 +391,17 @@ if __name__ == '__main__':
                                          echain.electron_mva,
                                          echain.electron_mva_ch_iso,
                                          echain.electron_mva_neu_iso,
- #                                         echain.electron_mva_jet_dr,
-#                                         ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
                                          cor_jet_dr,
-#                                         echain.electron_mva_ptratio,
-#                                         ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany),
+                                         echain.electron_mva_jet_dr,
                                          cor_ptratio,
+                                         echain.electron_mva_ptratio,
                                          echain.electron_mva_csv,
                                          echain.electron_mva_score,
                                          echain.electron_mva_numberOfHits,
                                          mva_iso_electron
                                    )
 
-#                    electron = tool.eobj(echain.electron_pt,
-#                                         echain.electron_eta,
-#                                         echain.electron_phi,
-#                                         echain.electron_mass,
-#                                         echain.electron_jetpt,
-#                                         echain.electron_njet,
-#                                         echain.electron_charge,
-#                                         echain.electron_trigmatch,
-#                                         echain.electron_trig_weight,
-#                                         echain.electron_id_weight,
-#                                         echain.electron_id,
-#                                         echain.electron_iso,
-#                                         echain.electron_reliso,
-#                                         echain.electron_MT,
-#                                         echain.electron_dxy,
-#                                         echain.electron_dz,
-#                                         echain.electron_dB3D,
-#                                         echain.electron_jetcsv,
-#                                         echain.electron_jetcsv_10,
-#                                         echain.electron_mva,
-#                                         echain.electron_mva_ch_iso,
-#                                         echain.electron_mva_neu_iso,
-#                                         echain.electron_mva_jet_dr,
-#                                         echain.electron_mva_ptratio,
-#                                         echain.electron_mva_csv,
-#                                         echain.electron_mva_score,
-#                                         echain.electron_mva_numberOfHits,
-#                                         mva_iso_electron
-#                                         )
 
-#                    electron = tool.obj(echain.electron_pt,
-#                                   echain.electron_eta,
-#                                   echain.electron_phi,
-#                                   echain.electron_mass,
-#                                   echain.electron_jetpt,
-#                                   echain.electron_njet,
-#                                   echain.electron_charge,
-#                                   echain.electron_trigmatch,
-#                                   echain.electron_trig_weight,
-#                                   echain.electron_id_weight,
-#                                   echain.electron_id,
-#                                   echain.electron_iso,
-#                                   echain.electron_reliso,
-#                                   echain.electron_MT                                   
-#                                   )
-                    
                     signal_electron.append(electron)
 
 
