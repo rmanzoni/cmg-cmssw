@@ -4,11 +4,11 @@
     <Info name="TMVA Release" value="4.1.2 [262402]"/>
     <Info name="ROOT Release" value="5.32/00 [335872]"/>
     <Info name="Creator" value="ytakahas"/>
-    <Info name="Date" value="Fri Oct 31 11:05:02 2014"/>
+    <Info name="Date" value="Mon Nov  3 11:53:39 2014"/>
     <Info name="Host" value="Linux lxbuild168.cern.ch 2.6.18-308.16.1.el5 #1 SMP Thu Oct 4 14:02:28 CEST 2012 x86_64 x86_64 x86_64 GNU/Linux"/>
     <Info name="Dir" value="/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/training"/>
     <Info name="Training events" value="1096"/>
-    <Info name="TrainingTime" value="1.57040095e+00"/>
+    <Info name="TrainingTime" value="1.06173205e+00"/>
     <Info name="AnalysisType" value="Classification"/>
   </GeneralInfo>
   <Options>

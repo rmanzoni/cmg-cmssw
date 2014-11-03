@@ -10,7 +10,7 @@ Method         : BDT::BDT
 TMVA Release   : 4.1.2         [262402]
 ROOT Release   : 5.32/00       [335872]
 Creator        : ytakahas
-Date           : Fri Oct 31 11:05:02 2014
+Date           : Mon Nov  3 11:53:40 2014
 Host           : Linux lxbuild168.cern.ch 2.6.18-308.16.1.el5 #1 SMP Thu Oct 4 14:02:28 CEST 2012 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/training
 Training events: 1096
