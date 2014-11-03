@@ -36,8 +36,11 @@ print '[INFO] Select the event list = ', options.select
 #mva_muon_barrel = 0.0425
 #mva_muon_endcap = -0.0113
 
-mva_muon_barrel = -0.0671
-mva_muon_endcap = -0.1205
+#mva_muon_barrel = -0.0671
+#mva_muon_endcap = -0.1205
+
+mva_muon_barrel = 0.0657
+mva_muon_endcap = 0.0557
 
 #mva_muon_barrel = -2.
 #mva_muon_endcap = -2.
