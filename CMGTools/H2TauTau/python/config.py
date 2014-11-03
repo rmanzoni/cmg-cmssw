@@ -145,8 +145,6 @@ class ReadFile:
             tmp = self.file[key]
             return tmp[3]
 
-
-
 ### Classes
 class mobj:
 
@@ -194,8 +192,6 @@ class mobj:
         dr = deta*deta + dphi*dphi
         return math.sqrt(dr)
 
-
-
 class eobj:
 
     def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dz, dB3D, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_ptratio, mva_csv, mva_score, mva_nhit, new_mva):
@@ -242,7 +238,6 @@ class eobj:
         dphi = deltaPhi(obj1.phi, self.phi)        
         dr = deta*deta + dphi*dphi
         return math.sqrt(dr)
-
 
 class jetobj:
 
@@ -320,7 +315,6 @@ class easyobj:
 #        print 'min_dR = ', min_dr
         return min_dr
 
-
 class easyobj_bjet:
 
     def __init__(self, pt, eta, phi, mva):
@@ -355,7 +349,6 @@ class easyobj_bjet:
 #        print 'min_dR = ', min_dr
         return min_dr
 
-
 class easyobj_gen:
 
     def __init__(self, pt, eta, phi, pdgid):
@@ -388,8 +381,6 @@ class easyobj_gen:
                 min_dr = math.sqrt(dr)
             
         return min_dr
-
-
 
 class tauobj:
 
@@ -441,8 +432,6 @@ class tauobj:
             
 #        print 'min_dR = ', min_dr
         return min_dr
-
-
 
 class diobj:
     
