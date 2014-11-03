@@ -32,7 +32,7 @@ variables = {
     'bdt_muon_mva_csv': {'nbin':nbin, 'xtitle':'muon MVA CSV', 'xmin':0, 'xmax':1},
     'bdt_muon_mva_jet_dr': {'nbin':nbin, 'xtitle':'muon MVA jet dR', 'xmin':0, 'xmax':0.4},
     'bdt_muon_mva_ptratio': {'nbin':nbin, 'xtitle':'muon MVA p_{T} ratio', 'xmin':0, 'xmax':1.5},
-    'bdt_muon_new_mva': {'nbin':nbin, 'xtitle':'muon new MVA', 'xmin':0, 'xmax':1.},
+    'bdt_yuta_muon_mva': {'nbin':nbin, 'xtitle':'muon new MVA', 'xmin':-1, 'xmax':1.},
     'bdt_muon_mva': {'nbin':nbin, 'xtitle':'muon MVA', 'xmin':0, 'xmax':1.},
     
     'bdt_electron_pt': {'nbin':nbin, 'xtitle':'electron pT (GeV)', 'xmin':0, 'xmax':200},
@@ -47,11 +47,12 @@ variables = {
     'bdt_electron_mva_ptratio': {'nbin':nbin, 'xtitle':'electron MVA p_{T} ratio', 'xmin':0, 'xmax':1.5},
     'bdt_electron_mva': {'nbin':nbin, 'xtitle':'electron MVA', 'xmin':0, 'xmax':1.},
     'bdt_electron_mva_score': {'nbin':nbin, 'xtitle':'electron MVA score', 'xmin':0, 'xmax':1.},
-    'bdt_electron_new_mva': {'nbin':nbin, 'xtitle':'electron new MVA', 'xmin':0, 'xmax':1.},
+    'bdt_yuta_electron_mva': {'nbin':nbin, 'xtitle':'electron new MVA', 'xmin':-1, 'xmax':1.},
     
     'bdt_tau_pdg': {'nbin':40, 'xtitle':'tau PDG', 'xmin':-20, 'xmax':20},
     'bdt_tau_pt': {'nbin':nbin, 'xtitle':'tau pT (GeV)', 'xmin':0, 'xmax':200},
 
+    'bdt_evt_missing_et': {'nbin':nbin, 'xtitle':'missing E_{T}', 'xmin':0, 'xmax':200},
     'bdt_evt_nbjet': {'nbin':5, 'xtitle':'Number of bjet', 'xmin':0, 'xmax':5},
     'bdt_evt_centrality': {'nbin':10, 'xtitle':'Centrality', 'xmin':0, 'xmax':1},
     'bdt_evt_LT': {'nbin':nbin, 'xtitle':'M(#tau, sub leading lepton)', 'xmin':0, 'xmax':400},
@@ -150,7 +151,7 @@ def makePlotsVars(tree, isSignal=False):
             
         print cname
         c.Print(cname)
-
+        c.Print(cname.replace('gif','pdf'))
 
 if __name__ == '__main__':
 

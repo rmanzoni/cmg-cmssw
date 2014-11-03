@@ -16,7 +16,7 @@ import optparse
 process_dict = {'WW':0,
                 'WZ':1,
                 'ZZ':2,
-                'tt0l':3,
+#                'tt0l':3,
                 'tt1l':4,
                 'tt2l':5,
                 'DY':6,
@@ -24,12 +24,12 @@ process_dict = {'WW':0,
                 'DY2':8,
                 'DY3':9,
                 'DY4':10,
-                # 'Wjet':11,
+                'Wjet':11,
                 'W1jet':12,
                 'W2jet':13,
                 'W3jet':14,
                 'W4jet':15,
-                # 'tH_YtMinus1':16,
+                'tH_YtMinus1':16,
                 'TTW':17,
                 'TTZ':18,
                 'TTH':19,
@@ -42,7 +42,7 @@ process_dict = {'WW':0,
 process = ['WW',
            'WZ',
            'ZZ',
-           'tt0l',
+#           'tt0l',
            'tt1l',
            'tt2l',
            'DY',
@@ -50,12 +50,12 @@ process = ['WW',
            'DY2',
            'DY3',
            'DY4',
-           # 'Wjet',
+           'Wjet',
            'W1jet',
            'W2jet',
            'W3jet',
            'W4jet',
-           # 'tH_YtMinus1',
+           'tH_YtMinus1',
            'TTW',
            'TTZ',
            'TTH',
@@ -146,9 +146,10 @@ for index, pn in enumerate(process):
     mvar_map   = {}
     evar_map   = {}
 
-    
-    for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
-    # for var in ['lepton_pt', 'evt_njet']:
+
+    for var in ['lepton_pt', 'evt_njet']:
+#    for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
+
         mvar_map[var] = array.array('f',[0])
         muonreader[index].AddVariable(var, mvar_map[var])
         
@@ -684,7 +685,7 @@ for rindex, iregion in enumerate(region):
             if iregion=='antiMu' or iregion=='antiEMu':
 
                 mvar_map['lepton_pt'][0] = main.muon_pt
-                mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
+#                mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
                 mvar_map['evt_njet'][0] = main.evt_njet + 1
                 
                 mvaname = 'muon_' + iprocess
@@ -694,7 +695,7 @@ for rindex, iregion in enumerate(region):
             if iregion=='antiE' or iregion=='antiEMu':
 
                 evar_map['lepton_pt'][0] = main.electron_pt
-                evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
+#                evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
                 evar_map['evt_njet'][0] = main.evt_njet + 1
                 
                 mvaname = 'electron_' + iprocess

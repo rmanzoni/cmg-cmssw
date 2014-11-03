@@ -64,18 +64,19 @@ filedict = db.returnFile()
 #mva_electron_endcap = 0.0495
 
 ##################################
-mva_muon_barrel = -0.0383
-mva_electron_barrel = 0.0557
+# 93% eff. point
+#mva_muon_barrel = -0.0383
+#mva_electron_barrel = 0.0557
 
-mva_muon_endcap =  -0.0891
-mva_electron_endcap =  0.0523
+#mva_muon_endcap =  -0.0891
+#mva_electron_endcap =  0.0523
 ##################################
 
-#mva_muon_barrel = 0.0657
-#mva_electron_barrel = 0.0149
+mva_muon_barrel = 0.0337
+mva_electron_barrel = -0.0003
 
-#mva_muon_endcap = 0.0557
-#mva_electron_endcap = 0.05229
+mva_muon_endcap = -0.0171
+mva_electron_endcap = -0.0037
 
 
 mva_muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")

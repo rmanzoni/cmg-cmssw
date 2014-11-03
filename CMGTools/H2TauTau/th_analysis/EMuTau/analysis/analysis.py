@@ -20,7 +20,7 @@ scan_width = 0.2
 
 region = ['signal','antiE','antiMu','antiEMu']
 
-directory = 'root_process'
+directory = 'root_process_inc'
 
 
 ### For options
@@ -197,14 +197,20 @@ t.Branch('n_max',n_max,'n_max/F')
 
 
 
-for ie in range(0, nstep+1):
-    for im in range(0, nstep+1):
+for ie in range(0, 1):
+    for im in range(0, 1):
 
-        ie_barrel = _electron_barrel_ - scan_width + 2*ie*scan_width/nstep
-        ie_endcap = _electron_endcap_ - scan_width + 2*ie*scan_width/nstep
+        ie_barrel = -0.0003
+        ie_endcap = -0.0037
+        im_barrel = 0.0337
+        im_endcap = -0.0171
+#        ie_barrel = _electron_barrel_ - scan_width + 2*ie*scan_width/nstep
+#        ie_endcap = _electron_endcap_ - scan_width + 2*ie*scan_width/nstep
+#
+#        im_barrel = _muon_barrel_ - scan_width + 2*im*scan_width/nstep
+#        im_endcap = _muon_endcap_ - scan_width + 2*im*scan_width/nstep
 
-        im_barrel = _muon_barrel_ - scan_width + 2*im*scan_width/nstep
-        im_endcap = _muon_endcap_ - scan_width + 2*im*scan_width/nstep
+
 
         print 'scanning (ie, im) = (', ie, ',', im, ') : th for (e_barrel, e_endcap, mu_barrel, mu_endcap) = ', ie_barrel, ie_endcap, im_barrel, im_endcap
 
@@ -321,8 +327,10 @@ for ie in range(0, nstep+1):
 
 
                 if iprocess=='data':
+                    print iprocess, total
                     nevent_data[rindex] += total
                 else:
+                    print iprocess, total
                     nevent_mc[rindex] += total
 
             sf = 1.
@@ -330,7 +338,8 @@ for ie in range(0, nstep+1):
                 print '[WARNING] 0 division = ', rindex, iregion, '(Data, MC) = ', nevent_data[rindex], nevent_mc[rindex]
             else:
                 sf = Double((nevent_data[rindex] - nevent_mc[rindex])/(nevent_data[rindex]))
-
+                print rindex, iregion, '(Data, MC) = ', nevent_data[rindex], nevent_mc[rindex]
+                
             nsf[rindex] = sf
 
 

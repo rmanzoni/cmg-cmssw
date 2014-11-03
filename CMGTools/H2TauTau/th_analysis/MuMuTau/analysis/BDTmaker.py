@@ -8,7 +8,7 @@ import optparse
 process_dict = {'WW':0,
                 'WZ':1,
                 'ZZ':2,
-                'tt0l':3,
+#                'tt0l':3,
                 'tt1l':4,
                 'tt2l':5,
                 'DY':6,
@@ -28,15 +28,15 @@ process_dict = {'WW':0,
                 'redbkg':20,
                 'tW':21,
                 'tbW':22,
-                't_tchan':23,
-                'tbar_tchan':24,
+#                't_tchan':23,
+#                'tbar_tchan':24,
                 'data':100};
 
 
 process = ['WW',
            'WZ',
            'ZZ',
-           'tt0l',
+#           'tt0l',
            'tt1l',
            'tt2l',
            'DY',
@@ -55,8 +55,8 @@ process = ['WW',
            'TTH',
            'tW',
            'tbW',
-           't_tchan',
-           'tbar_tchan',
+#           't_tchan',
+#           'tbar_tchan',
            'data']
 
 
@@ -439,8 +439,8 @@ for rindex, iregion in enumerate(region):
             bdt_muon_charge [0] = main.muon_charge
             bdt_muon_dpt [0] = main.muon_dpt
             bdt_muon_pdg [0] = main.muon_pdg
-            bdt_muon_dxy [0] = math.log(abs(main.muon_dxy))
-            bdt_muon_dz [0] = math.log(abs(main.muon_dz))
+            bdt_muon_dxy [0] = main.muon_dxy
+            bdt_muon_dz [0] = main.muon_dz
             bdt_muon_dB3D [0] = main.muon_dB3D
             bdt_muon_mva [0] = main.muon_mva
             bdt_muon_mva_ch_iso [0] = main.muon_mva_ch_iso
@@ -464,8 +464,8 @@ for rindex, iregion in enumerate(region):
             bdt_smuon_charge [0] = main.smuon_charge
             bdt_smuon_dpt [0] = main.smuon_dpt
             bdt_smuon_pdg [0] = main.smuon_pdg
-            bdt_smuon_dxy [0] = math.log(abs(main.smuon_dxy))
-            bdt_smuon_dz [0] = math.log(abs(main.smuon_dz))
+            bdt_smuon_dxy [0] = main.smuon_dxy
+            bdt_smuon_dz [0] = main.smuon_dz
             bdt_smuon_dB3D [0] = main.smuon_dB3D
             bdt_smuon_mva [0] = main.smuon_mva
             bdt_smuon_mva_ch_iso [0] = main.smuon_mva_ch_iso
@@ -660,6 +660,8 @@ for rindex, iregion in enumerate(region):
             kNN_weight = returnkNN(iregion, iprocess, weight_muon, weight_smuon, main.muon_flag, main.smuon_flag)
 
             weight_total = main.evt_weight*kNN_weight*nsf[rindex]
+            print 'region, process, weight_muon, weight_smuon, flag, sflag, total = ', iregion, iprocess, weight_muon, weight_smuon, main.muon_flag, main.smuon_flag, weight_total
+            
             if iregion=='antiMuMu':
                 weight_total *= -1.
 
@@ -680,8 +682,8 @@ for rindex, iregion in enumerate(region):
             bdt_muon_charge [0] = main.muon_charge
             bdt_muon_dpt [0] = main.muon_dpt
             bdt_muon_pdg [0] = main.muon_pdg
-            bdt_muon_dxy [0] = math.log(abs(main.muon_dxy))
-            bdt_muon_dz [0] = math.log(abs(main.muon_dz))
+            bdt_muon_dxy [0] = main.muon_dxy
+            bdt_muon_dz [0] = main.muon_dz
             bdt_muon_dB3D [0] = main.muon_dB3D
             bdt_muon_mva [0] = main.muon_mva
             bdt_muon_new_mva [0] = main.muon_new_mva
@@ -705,8 +707,8 @@ for rindex, iregion in enumerate(region):
             bdt_smuon_charge [0] = main.smuon_charge
             bdt_smuon_dpt [0] = main.smuon_dpt
             bdt_smuon_pdg [0] = main.smuon_pdg
-            bdt_smuon_dxy [0] = math.log(abs(main.smuon_dxy))
-            bdt_smuon_dz [0] = math.log(abs(main.smuon_dz))
+            bdt_smuon_dxy [0] = main.smuon_dxy
+            bdt_smuon_dz [0] = main.smuon_dz
             bdt_smuon_dB3D [0] = main.smuon_dB3D
             bdt_smuon_mva [0] = main.smuon_mva
             bdt_smuon_new_mva [0] = main.smuon_new_mva
