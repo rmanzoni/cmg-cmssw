@@ -5,13 +5,14 @@ from CMGTools.H2TauTau.proto.samples.splitFactor import splitFactor
 from CMGTools.RootTools.json.jsonPick import jsonPick
 from CMGTools.H2TauTau.officialJSONS import jsonMap
 
-from CMGTools.H2TauTau.proto.samples.run2012.data import *
-from CMGTools.H2TauTau.proto.samples.run2012.embed import *
-from CMGTools.H2TauTau.proto.samples.run2012.ewk import *
-#from CMGTools.H2TauTau.proto.samples.run2012.wgamma import *
-from CMGTools.H2TauTau.proto.samples.run2012.diboson import *
-from CMGTools.H2TauTau.proto.samples.run2012.higgs import *
+from CMGTools.H2TauTau.proto.samples.run2012.data       import *
+from CMGTools.H2TauTau.proto.samples.run2012.embed      import *
+from CMGTools.H2TauTau.proto.samples.run2012.ewk        import *
+#from CMGTools.H2TauTau.proto.samples.run2012.wgamma     import *
+from CMGTools.H2TauTau.proto.samples.run2012.diboson    import *
+from CMGTools.H2TauTau.proto.samples.run2012.higgs      import *
 from CMGTools.H2TauTau.proto.samples.run2012.higgs_susy import *
+from CMGTools.H2TauTau.proto.samples.run2012.tH         import *
 
 #from CMGTools.H2TauTau.proto.samples.run2012.triggers_tauMu import data_triggers, mc_triggers, embed_triggers
 #from CMGTools.H2TauTau.proto.samples.run2012.triggers_tauMu import data_triggers, mc_triggers
@@ -61,8 +62,10 @@ aliases = {
     '/ZZJetsTo4L.*START53.*':'ZZJetsTo4L',
     '/WGToLNuG_TuneZ2star_8TeV-madgraph-tauola.*START53*.':'WgammaInc',
     '/WGstarToLNu2E_TuneZ2star_8TeV-madgraph-tauola.*START53*.':'Wgammaee',
-    '/tblv_H126to2tau_q_Yt1-madgraph-pythia6.*START53*.':'tH_Yt1',
-    '/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6.*START53*.':'tH_YtMinus1',
+    #'/tblv_H126to2tau_q_Yt1-madgraph-pythia6.*START53*.':'tH_Yt1',
+    #'/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6.*START53*.':'tH_YtMinus1',
+    '/phys_higgs-qtH-blv_1M-mH125Ct-1.*START50*.':'tH_YtMinus1',
+    '/phys_higgs-WtH_1M-mH125Ct1.*START50*.'     :'tHW_Yt1',
     '/TTZJets.*START53.*':'TTZ',
     '/TTWJets.*START53.*':'TTW',
     '/TTH_Inclusive.*START53.*':'HiggsTTH',
@@ -118,16 +121,16 @@ allsamples.extend( data_list )
 #mc_repro += mc_higgs_susy
 
 print 'connect to the db'
-#connect(mc_tH, '%EMuTau_Yuta_Feb6', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
+connect(mc_tH     , '%EMuTau_Yuta_Feb27', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 connect(mc_diboson, '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(data_list, '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(t_mc_ewk, '%EMuTau_Yuta_Nov15', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_w, '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_dy, '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_ttbarh, '%EMuTau_Yuta_Mar3', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_ttbar, '%EMuTau_Yuta_Nov15', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_ttv, '%EMuTau_Yuta_Mar3', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(data_list , '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(t_mc_ewk  , '%EMuTau_Yuta_Nov15', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_w      , '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_dy     , '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_ttbarh , '%EMuTau_Yuta_Mar3' , 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_ttbar  , '%EMuTau_Yuta_Nov15', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_ttv    , '%EMuTau_Yuta_Mar3' , 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
 #allsamples.extend( embed_list )
 #allsamples.extend( mc_repro )

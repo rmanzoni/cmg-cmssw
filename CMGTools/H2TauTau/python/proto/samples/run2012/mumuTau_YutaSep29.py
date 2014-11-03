@@ -1,18 +1,19 @@
-import itertools, copy
+import itertools
 from CMGTools.RootTools.fwlite.Config import printComps
 from CMGTools.H2TauTau.proto.samples.connect import connect
 from CMGTools.H2TauTau.proto.samples.splitFactor import splitFactor
 from CMGTools.RootTools.json.jsonPick import jsonPick
 from CMGTools.H2TauTau.officialJSONS import jsonMap
 
-from CMGTools.H2TauTau.proto.samples.run2012.data import *
-from CMGTools.H2TauTau.proto.samples.run2012.embed import *
-from CMGTools.H2TauTau.proto.samples.run2012.ewk import *
-#from CMGTools.H2TauTau.proto.samples.run2012.wgamma import *
-from CMGTools.H2TauTau.proto.samples.run2012.diboson import *
-from CMGTools.H2TauTau.proto.samples.run2012.tH import *
-from CMGTools.H2TauTau.proto.samples.run2012.higgs import *
+from CMGTools.H2TauTau.proto.samples.run2012.data       import *
+from CMGTools.H2TauTau.proto.samples.run2012.embed      import *
+from CMGTools.H2TauTau.proto.samples.run2012.ewk        import *
+#from CMGTools.H2TauTau.proto.samples.run2012.wgamma     import *
+from CMGTools.H2TauTau.proto.samples.run2012.diboson    import *
+from CMGTools.H2TauTau.proto.samples.run2012.higgs      import *
 from CMGTools.H2TauTau.proto.samples.run2012.higgs_susy import *
+from CMGTools.H2TauTau.proto.samples.run2012.tH         import *
+
 from CMGTools.H2TauTau.proto.samples.run2012.triggers_mumuTau import data_triggers, mc_triggers, embed_triggers
 #from CMGTools.H2TauTau.proto.samples.run2012.triggers_tauMu import data_triggers, mc_triggers, embed_triggers
 
@@ -63,9 +64,10 @@ aliases = {
     '/ZZJetsTo4L.*START53.*':'ZZJetsTo4L',
     '/WGToLNuG_TuneZ2star_8TeV-madgraph-tauola.*START53*.':'WgammaInc',
     '/WGstarToLNu2E_TuneZ2star_8TeV-madgraph-tauola.*START53*.':'Wgammaee',
-    '/tblv_H126to2tau_q_Yt1-madgraph-pythia6.*START53*.':'tH_Yt1',
-#    '/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6.*START53*.':'tH_YtMinus1',
+    #'/tblv_H126to2tau_q_Yt1-madgraph-pythia6.*START53*.':'tH_Yt1',
+    #'/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6.*START53*.':'tH_YtMinus1',
     '/phys_higgs-qtH-blv_1M-mH125Ct-1.*START50*.':'tH_YtMinus1',
+    '/phys_higgs-WtH_1M-mH125Ct1.*START50*.'     :'tHW_Yt1',
     '/DoubleMu/Run2012A-22Jan2013-v1*' : 'data_Run2012A',
     '/DoubleMuParked/Run2012B-22Jan2013-v1*' : 'data_Run2012B',
     '/DoubleMuParked/Run2012C-22Jan2013-v1*' : 'data_Run2012C',
@@ -89,7 +91,7 @@ MC_list.extend( t_mc_ewk )
 MC_list.extend( mc_ttbarh )
 MC_list.extend( mc_ttv )
 MC_list.extend( mc_vh )
-#MC_list.extend( mc_tH )
+MC_list.extend( mc_tH )
 
 allsamples = copy.copy( MC_list )
 allsamples.extend( data_list )
@@ -101,18 +103,20 @@ allsamples.extend( data_list )
 #mc_repro += mc_higgs_susy
 
 print 'connect to the db'
+connect(MC_list   , '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(data_list , '%MuMuTau_Yuta_Oct13%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_tH     , '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+
+
 #connect(mc_diboson, '%TH_mmt_22jul_newTauID_manzoni%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_diboson, '%TH_mmt_26sep_newTauID_manzoni%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_diboson, '%MuMuTau_Yuta_Oct19%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(MC_list, '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(data_list, '%MuMuTau_Yuta_Oct13%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
 #connect(t_mc_ewk, '%MuTauTau_Yuta_Feb28', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_dy, '%MuTauTau_Yuta_Feb28', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_w, '%MuTauTau_Yuta_Feb28', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(data_list, '%MuTauTau_Yuta_Feb28', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_tH, '%MuTauTau_Yuta_Feb28', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
-connect(mc_tH, '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
 
 #allsamples.extend( embed_list )

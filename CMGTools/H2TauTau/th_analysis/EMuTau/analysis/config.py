@@ -7,74 +7,70 @@ import math
 import copy, subprocess, shelve
 
 lum = 19700
-col_qcd = TColor.GetColor(250,202,255)
-col_tt  = TColor.GetColor(155,152,204)
-col_ttv  = TColor.GetColor(155,182,204)
-col_ewk = TColor.GetColor(222,90,106)
-col_zll = TColor.GetColor(100,182,232)
-col_red = TColor.GetColor(248,206,104)
+col_qcd = TColor.GetColor(250, 202, 255)
+col_tt  = TColor.GetColor(155, 152, 204)
+col_ttv = TColor.GetColor(155, 182, 204)
+col_ewk = TColor.GetColor(222, 90 , 106)
+col_zll = TColor.GetColor(100, 182, 232)
+col_red = TColor.GetColor(248, 206, 104)
 
+basedir   = '/afs/cern.ch/work/m/manzoni/public/tH_ntuple/emt_30_10_2014_v3_JESnom'
+tuplename = 'H2TauTauTreeProducerEMT2'
 
-filedict = {'WZ'  :['WZ','/home/user/ytakahas/emt_20140811//WZJetsTo3LNu/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 1.058*lum/2017979.,0],
-            'ZZ'  :['ZZ','/home/user/ytakahas/emt_20140811//ZZJetsTo4L/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 0.181*lum/4807893.,1],
-            'WW'  :['WW','/home/user/ytakahas/emt_20140811//WWJetsTo2L2Nu/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 5.824*lum/1933235.,2],
-            'tt2l':['tt2l','/home/user/ytakahas/emt_20140811//TTJetsFullLept/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 25.144*lum/12011428.,3],
-            'tt1l':['tt1l','/home/user/ytakahas/emt_20140811//TTJetsSemiLept/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 104.921*lum/24953451.,4],
-            'tt0l':['tt0l','/home/user/ytakahas/emt_20140811//TTJetsHadronic/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 109.455*lum/31223821.,5],
-            'DY' : ['DY','/home/user/ytakahas/emt_20140811//DYJets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 3503.71*lum/30459503., 6],
-            'DY1' :['DY1','/home/user/ytakahas/emt_20140811//DY1Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 561*lum/24045248., 7 ],
-            'DY2' :['DY2','/home/user/ytakahas/emt_20140811//DY2Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 181*lum/21852156., 8 ],
-            'DY3' :['DY3','/home/user/ytakahas/emt_20140811//DY3Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 51.1*lum/11015445.0, 9],
-            'DY4' :['DY4','/home/user/ytakahas/emt_20140811//DY4Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 23.04*lum/6402827.0, 10],
-            'Wjet' :['Wjet','/home/user/ytakahas/emt_20140811//WJets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 36257.2*lum/18393090.0, 11],
-            'W1jet' :['W1jet','/home/user/ytakahas/emt_20140811//W1Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 6440.4*lum/23141598.0, 12],
-            'W2jet' :['W2jet','/home/user/ytakahas/emt_20140811//W2Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 2087.2*lum/34044921.0, 13],
-            'W3jet' :['W3jet','/home/user/ytakahas/emt_20140811//W3Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 619.0*lum/15539503.0, 14],
-            'W4jet' :['W4jet','/home/user/ytakahas/emt_20140811//W4Jets/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 255.2*lum/13331527.9, 15],
-            'tW':['tW','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/WH_analysis/process/WH_em_skim_MC/T_tW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  11.1*lum/497658.0, 18],
-            'tbW':['tbW','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/WH_analysis/process/WH_em_skim_MC/Tbar_tW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  11.1*lum/493460.0, 19],
-            't_tchan':['t_tchan','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/WH_analysis/process/WH_em_skim_MC/T_tchan/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  47.0*lum/3758227.0, 20],
-            'tbar_tchan':['tbar_tchan','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/WH_analysis/process/WH_em_skim_MC/Tbar_tchan/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  25*lum/1935072.0, 21],
-            'tH_Yt1':['tH_Yt1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_emt_20131220/tH_Yt1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.00036776*lum/97986, 22],
-            #            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_emt_20131227/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.00473*lum/118986, 23],
-#            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_emt_20131227_old/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.00473*lum/118986, 23],
-#            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_20140608/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.0211*lum/968025, 23],
-            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_20140811/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.0211*lum/968025, 23],
-#            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/m/manzoni/public/tH_ntuple/newTauID2/signal/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.0211*lum/968025, 23],
-            
-#            'tH_YtMinus1':['tH_YtMinus1','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/tH/tH_emt_20131227/tH_YtMinus1/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.00473*lum/968025, 23],            
-            'TTW':['TTW','/home/user/ytakahas/emt_20140811//TTW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.249*lum/196046, 24],
-            'TTZ':['TTZ','/home/user/ytakahas/emt_20140811//TTZ/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.208*lum/210160, 25],
-            'TTH':['TTH','/home/user/ytakahas/emt_20140811//HiggsTTH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.1302*lum/871234, 26],
-#            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH_notrig/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
-            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
-            'data':['data','/home/user/ytakahas/emt_20140811//data/H2TauTauTreeProducerEMT2_tree.root',1,100]}
-
+filedict = {
+            'WZ'         :[ 'WZ'         ,'/'.join( [basedir, 'WZJetsTo3LNu'  , tuplename, tuplename+'_tree.root'] ), 1.058      * lum / 2017979.   ,  0 ],
+            'ZZ'         :[ 'ZZ'         ,'/'.join( [basedir, 'ZZJetsTo4L'    , tuplename, tuplename+'_tree.root'] ), 0.181      * lum / 4807893.   ,  1 ],
+            'WW'         :[ 'WW'         ,'/'.join( [basedir, 'WWJetsTo2L2Nu' , tuplename, tuplename+'_tree.root'] ), 5.824      * lum / 1933235.   ,  2 ],
+            'tt2l'       :[ 'tt2l'       ,'/'.join( [basedir, 'TTJetsFullLept', tuplename, tuplename+'_tree.root'] ), 25.144     * lum / 12011428.  ,  3 ],
+            'tt1l'       :[ 'tt1l'       ,'/'.join( [basedir, 'TTJetsSemiLept', tuplename, tuplename+'_tree.root'] ), 104.921    * lum / 24953451.  ,  4 ],
+            'tt0l'       :[ 'tt0l'       ,'/'.join( [basedir, 'TTJetsHadronic', tuplename, tuplename+'_tree.root'] ), 109.455    * lum / 31223821.  ,  5 ],
+            'DY'         :[ 'DY'         ,'/'.join( [basedir, 'DYJets'        , tuplename, tuplename+'_tree.root'] ), 3503.71    * lum / 30459503.  ,  6 ],
+            'DY1'        :[ 'DY1'        ,'/'.join( [basedir, 'DY1Jets'       , tuplename, tuplename+'_tree.root'] ), 561        * lum / 24045248.  ,  7 ],
+            'DY2'        :[ 'DY2'        ,'/'.join( [basedir, 'DY2Jets'       , tuplename, tuplename+'_tree.root'] ), 181        * lum / 21852156.  ,  8 ],
+            'DY3'        :[ 'DY3'        ,'/'.join( [basedir, 'DY3Jets'       , tuplename, tuplename+'_tree.root'] ), 51.1       * lum / 11015445.0 ,  9 ],
+            'DY4'        :[ 'DY4'        ,'/'.join( [basedir, 'DY4Jets'       , tuplename, tuplename+'_tree.root'] ), 23.04      * lum / 6402827.0  , 10 ],
+            'Wjet'       :[ 'Wjet'       ,'/'.join( [basedir, 'WJets'         , tuplename, tuplename+'_tree.root'] ), 36257.2    * lum / 18393090.0 , 11 ],
+            'W1jet'      :[ 'W1jet'      ,'/'.join( [basedir, 'W1Jets'        , tuplename, tuplename+'_tree.root'] ), 6440.4     * lum / 23141598.0 , 12 ],
+            'W2jet'      :[ 'W2jet'      ,'/'.join( [basedir, 'W2Jets'        , tuplename, tuplename+'_tree.root'] ), 2087.2     * lum / 34044921.0 , 13 ],
+            'W3jet'      :[ 'W3jet'      ,'/'.join( [basedir, 'W3Jets'        , tuplename, tuplename+'_tree.root'] ), 619.0      * lum / 15539503.0 , 14 ],
+            'W4jet'      :[ 'W4jet'      ,'/'.join( [basedir, 'W4Jets'        , tuplename, tuplename+'_tree.root'] ), 255.2      * lum / 13331527.9 , 15 ],
+            'tW'         :[ 'tW'         ,'/'.join( [basedir, 'T_tW'          , tuplename, tuplename+'_tree.root'] ), 11.1       * lum / 497658.0   , 18 ],
+            'tbW'        :[ 'tbW'        ,'/'.join( [basedir, 'Tbar_tW'       , tuplename, tuplename+'_tree.root'] ), 11.1       * lum / 493460.0   , 19 ],
+            't_tchan'    :[ 't_tchan'    ,'/'.join( [basedir, 'T_tchan'       , tuplename, tuplename+'_tree.root'] ), 47.0       * lum / 3758227.0  , 20 ],
+            'tbar_tchan' :[ 'tbar_tchan' ,'/'.join( [basedir, 'Tbar_tchan'    , tuplename, tuplename+'_tree.root'] ), 25         * lum / 1935072.0  , 21 ],
+            'tH_Yt1'     :[ 'tH_Yt1'     ,'/'.join( [basedir, 'tH_Yt1'        , tuplename, tuplename+'_tree.root'] ), 0.00036776 * lum / 97986      , 22 ],
+            'tH_YtMinus1':[ 'tH_YtMinus1','/'.join( [basedir, 'tH_YtMinus1'   , tuplename, tuplename+'_tree.root'] ), 0.0211     * lum / 968025     , 23 ],
+            'TTW'        :[ 'TTW'        ,'/'.join( [basedir, 'TTW'           , tuplename, tuplename+'_tree.root'] ), 0.249      * lum / 196046     , 24 ],
+            'TTZ'        :[ 'TTZ'        ,'/'.join( [basedir, 'TTZ'           , tuplename, tuplename+'_tree.root'] ), 0.208      * lum / 210160     , 25 ],
+            'TTH'        :[ 'TTH'        ,'/'.join( [basedir, 'HiggsTTH125'   , tuplename, tuplename+'_tree.root'] ), 0.1302     * lum / 871234     , 26 ],
+            'WH'         :[ 'WH'         ,'/'.join( [basedir, 'HiggsVH125'    , tuplename, tuplename+'_tree.root'] ), 0.07       * lum / 27650      , 27 ],
+            'data'       :[ 'data'       ,'/'.join( [basedir, 'data'          , tuplename, tuplename+'_tree.root'] ), 1                             ,100 ],
+           }
 
 ldict = {'submass_x':'M_{l_{2}#tau} [GeV]',
-#         'submass_y':'dN/dM_{l_{2}#tau} [20/GeV]',
+         #'submass_y':'dN/dM_{l_{2}#tau} [20/GeV]',
          'submass_y':'Events / 20 [GeV/c^{2}]',
-         'mupt_x':'p_{T, #mu} [GeV]',
-         'mupt_y':'dN/dp_{T, #mu} [1/GeV]',
-         'ept_x':'p_{T, e} [GeV]',
-         'ept_y':'dN/dp_{T, e} [1/GeV]',
-         'taupt_x':'p_{T, #tau} [GeV]',
-         'taupt_y':'dN/dp_{T, #tau} [1/GeV]',
-         'tauiso_x':'dB isolation [GeV]',
-         'tauiso_y':'Entries [1/GeV]',
-         'mueta_x':'#eta_{#mu}',
-         'mueta_y':'dN/d#eta_{#mu}',
-         'eeta_x':'#eta_{e}',
-         'eeta_y':'dN/d#eta_{e}',
-         'taueta_x':'#eta_{#tau}',
-         'taueta_y':'dN/d#eta_{#tau}',
+         'mupt_x'   :'p_{T, #mu} [GeV]',
+         'mupt_y'   :'dN/dp_{T, #mu} [1/GeV]',
+         'ept_x'    :'p_{T, e} [GeV]',
+         'ept_y'    :'dN/dp_{T, e} [1/GeV]',
+         'taupt_x'  :'p_{T, #tau} [GeV]',
+         'taupt_y'  :'dN/dp_{T, #tau} [1/GeV]',
+         'tauiso_x' :'dB isolation [GeV]',
+         'tauiso_y' :'Entries [1/GeV]',
+         'mueta_x'  :'#eta_{#mu}',
+         'mueta_y'  :'dN/d#eta_{#mu}',
+         'eeta_x'   :'#eta_{e}',
+         'eeta_y'   :'dN/d#eta_{e}',
+         'taueta_x' :'#eta_{#tau}',
+         'taueta_y' :'dN/d#eta_{#tau}',
          }
-
-
 
 class ReadFile:
 
-    def __init__(self, plist):
+    def __init__(self, plist, channel):
+        self.file = None
+
         self.file = filedict
         self.flist = []
         
@@ -99,12 +95,10 @@ class ReadFile:
             tmp = self.file[key]
             return tmp[3]
 
-
-
 ### Classes
 class mobj:
 
-    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dz, dB3D, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_ptratio, mva_csv, new_mva):
+    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dz, dB3D, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_ptratio, mva_csv, new_mva, flag=False):
         self.pt = pt
         self.eta = eta
         self.phi = phi
@@ -131,6 +125,7 @@ class mobj:
         self.mva_ptratio = mva_ptratio
         self.mva_csv = mva_csv
         self.new_mva = new_mva
+        self.flag = flag
         tmp = TLorentzVector()
         tmp.SetPtEtaPhiM(pt, eta, phi, mass)
         self.p = tmp.P()
@@ -146,8 +141,6 @@ class mobj:
         
         dr = deta*deta + dphi*dphi
         return math.sqrt(dr)
-
-
 
 class eobj:
 
@@ -195,7 +188,6 @@ class eobj:
         dphi = deltaPhi(obj1.phi, self.phi)        
         dr = deta*deta + dphi*dphi
         return math.sqrt(dr)
-
 
 class jetobj:
 
@@ -273,7 +265,6 @@ class easyobj:
 #        print 'min_dR = ', min_dr
         return min_dr
 
-
 class easyobj_bjet:
 
     def __init__(self, pt, eta, phi, mva):
@@ -308,7 +299,6 @@ class easyobj_bjet:
 #        print 'min_dR = ', min_dr
         return min_dr
 
-
 class easyobj_gen:
 
     def __init__(self, pt, eta, phi, pdgid):
@@ -341,8 +331,6 @@ class easyobj_gen:
                 min_dr = math.sqrt(dr)
             
         return min_dr
-
-
 
 class tauobj:
 
@@ -394,8 +382,6 @@ class tauobj:
             
 #        print 'min_dR = ', min_dr
         return min_dr
-
-
 
 class diobj:
     
@@ -491,6 +477,34 @@ def noerr(h):
 
     for ibin in range(1,h.GetXaxis().GetNbins()+1):
         h.SetBinError(ibin,0)
+
+
+def returnTopWeight(pname, top_pt, atop_pt):
+
+    _weight_top_ = 1.
+    _weight_atop_ = 1.
+
+    if pname == 'tt0l':
+        _weight_top_  = math.exp(0.156-0.00137*top_pt)
+        _weight_atop_ = math.exp(0.156-0.00137*atop_pt)
+        
+    if pname == 'tt1l':
+        _weight_top_  = math.exp(0.159-0.00141*top_pt)
+        _weight_atop_ = math.exp(0.159-0.00141*atop_pt)
+
+    if pname == 'tt2l':
+        _weight_top_  = math.exp(0.148-0.00129*top_pt)
+        _weight_atop_ = math.exp(0.148-0.00129*atop_pt)
+
+    if pname == 'tt0l' or pname == 'tt1l' or pname == 'tt2l':
+        if top_pt > 400:
+            _weight_top_ = 1.
+        if atop_pt > 400:
+            _weight_atop_ = 1.
+
+    top_weight = math.sqrt(_weight_top_*_weight_atop_)
+    return top_weight
+
 
 
 
@@ -745,7 +759,7 @@ def LegendSettings(leg):
     leg.SetTextFont(42)
 
 
-col_tt = kBlue
+
 hist_dict ={
     'QCD' : {'hid':0, 'color': kMagenta-10, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':0},
     'ZTT' : {'hid':1,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':3},
@@ -754,27 +768,14 @@ hist_dict ={
     'VV' : {'hid':4,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'WZ_ZZ' : {'hid':4,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'DY' : {'hid':4,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'DY4' : {'hid':4,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'DY3' : {'hid':4,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'DY2' : {'hid':4,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'DY1' : {'hid':4,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'WZ' : {'hid':4,'color': col_zll, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'WW' : {'hid':4,'color': col_zll, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'ZZ' : {'hid':4,'color': col_zll, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'W' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'W4jet' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'W3jet' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'W2jet' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
-    'W1jet' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'Wjet' : {'hid':5,'color': kRed+2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1},
     'tt' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
-    'tW' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
-    'tbar_tchan' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
-    't_tchan' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'TT' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'TTW' : {'hid':6,'color': col_ttv, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'TTZ' : {'hid':6,'color': col_ttv, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
-    'tbW' : {'hid':6,'color': col_ttv, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'Reducible' : {'hid':6,'color': kOrange-2, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'tt0l' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
     'tt1l' : {'hid':6,'color': col_tt, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':2},
@@ -783,7 +784,6 @@ hist_dict ={
     'tH_YtMinus1' : {'hid':6,'color': kRed, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1001},
     'TTH' : {'hid':6,'color': kMagenta, 'fill':1, 'lstyle':1, 'lcolor':1, 'layer':1001},
     'VH' : {'hid':7, 'color':kBlue, 'fill':-1, 'lstyle':2, 'lcolor':kBlue, 'layer':1001},
-    'WH' : {'hid':7, 'color':kBlue, 'fill':-1, 'lstyle':2, 'lcolor':kBlue, 'layer':1001},
     'ggH' : {'hid':8,'color': kBlue, 'fill':-1, 'lstyle':2, 'lcolor':kBlue, 'layer':1001},
     'qqH' : {'hid':9,'color': kBlue, 'fill':-1, 'lstyle':2, 'lcolor':kBlue, 'layer':1001},
     'data' : {'hid':10, 'color':kBlack, 'fill':0, 'lstyle':1, 'lcolor':1, 'layer':2999}

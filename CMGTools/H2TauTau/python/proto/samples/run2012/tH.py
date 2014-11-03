@@ -18,9 +18,16 @@ tH_YtMinus1 = cfg.MCComponent(
     triggers = [],
     effCorrFactor = 1 )
 
-
+tHW_Yt1 = cfg.MCComponent(
+    name          = 'tHW_Yt1' ,
+    files         = []        ,
+    xSection      = 13*0.015*0.324*(0.215+0.0632)     , # taken from Benjamin's email
+    nGenEvents    = 0         ,
+    triggers      = []        ,
+    effCorrFactor = 1         )
 
 mc_tH = [
+    tH_YtMinus1,
+    tHW_Yt1
 #    tH_Yt1,
-    tH_YtMinus1
     ]
