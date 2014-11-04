@@ -1180,7 +1180,7 @@ if __name__ == '__main__':
 #                        continue
 
 
-                    if pname not in ['tH_YtMinus1','tHW_Yt1']:
+                    if pname != 'tH_YtMinus1' and pname != 'tHW':
                         if not ((imuon.pt > 20. and ielectron.pt > 10. and imuon.trigmatch and ielectron.trigmatch) or \
                                     (imuon.pt > 10. and ielectron.pt > 20. and imuon.trigmatch and ielectron.trigmatch)):
                             continue

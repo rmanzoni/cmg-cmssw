@@ -12,7 +12,7 @@ from CMGTools.RootTools.RootTools import *
 jobmode = True
 #jobmode = False
 selector = False
-isSignal = False
+isSignal = True
 
 if jobmode:
     selector = False
@@ -410,7 +410,7 @@ if not jobmode:
 #    selectedComponents = data_list
 #    selectedComponents = [data_Run2012A]
 #    selectedComponents = diboson_list
-    selectedComponents = [mc_tHW]
+    selectedComponents = mc_tHW
 #    selectedComponents = mc_tH
 
 
@@ -421,7 +421,7 @@ if jobmode:
 #    selectedComponents += mc_ttv   
 #    selectedComponents = mc_tH
 #    selectedComponents = data_list
-    selectedComponents = [mc_tHW]
+    selectedComponents = mc_tHW
     
     for comp in selectedComponents:
         comp.splitFactor = 200

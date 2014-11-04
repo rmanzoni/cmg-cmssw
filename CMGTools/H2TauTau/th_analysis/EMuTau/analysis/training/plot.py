@@ -47,9 +47,19 @@ def rocCurve(hS, hB, caption):
     effsS = [hS.Integral(0, nBin)/hS.Integral(0, maxBin+1) for nBin in range(0, maxBin + 1) ]
     rejB = [hB.Integral(0, nBin)/hB.Integral(0, maxBin+1) for nBin in range(0, maxBin + 1) ]
 
-    FindBin = hS.FindBin(rel_thr)
+    FindBin = -1
+    _th_ = -1
+    _flag_ = False
+    for ibin in range(1, hS.GetNbinsX()+1):
+      if (hS.Integral(0, ibin)/hS.Integral(0, maxBin+1)) > 0.93 and _flag_==False:
+        FindBin = ibin
+        _th_ = hS.GetBinCenter(ibin)
+        _flag_ = True
+
+
+
     efficiency = hS.Integral(0, FindBin)/hS.Integral(0, maxBin+1)
-    print 'relIso efficiency @ relIso < ', rel_thr, ' = ', efficiency
+    print 'relIso efficiency @ relIso < ', _th_, ' = ', efficiency
 
   else:
     ibin = -1
@@ -153,6 +163,7 @@ if __name__ == '__main__':
     title += ' (Endcap)'
     
   roc_reliso.SetTitle(title)
+  roc_reliso.SetMaximum(0.04)
   roc_reliso.Draw("al")
   roc_giovanni.Draw("lsame")
   roc_yuta.Draw("lsame")
@@ -172,6 +183,14 @@ if __name__ == '__main__':
   print 'MVA_yuta : S = ', h_yuta_S.GetEntries(), 'B = ', h_yuta_B.GetEntries()
 
 
+  fname = 'muon_'
+  if isBarrel:
+    fname += 'barrel.gif'
+  else:
+    fname += 'endcap.gif'
+
+  can_roc_muon.SaveAs(fname)
+  can_roc_muon.SaveAs(fname.replace('gif','pdf'))
 
 
   #########################################################################
@@ -226,6 +245,12 @@ if __name__ == '__main__':
 
   ecan_roc_electron = TCanvas("ecan_roc_electron")
   eroc_reliso.SetTitle(title.replace('muon','electron'))
+
+  if isBarrel:
+    eroc_reliso.SetMaximum(0.1)
+  else:
+    eroc_reliso.SetMaximum(0.4)
+
   eroc_reliso.Draw("al")
   eroc_giovanni.Draw("lsame")
   eroc_yuta.Draw("lsame")
@@ -242,3 +267,12 @@ if __name__ == '__main__':
   print 'relIso : S = ', e_reliso_S.GetEntries(), 'B = ', e_reliso_B.GetEntries()
   print 'MVA : S = ', e_giovanni_S.GetEntries(), 'B = ', e_giovanni_B.GetEntries()
   print 'MVA_yuta : S = ', e_yuta_S.GetEntries(), 'B = ', e_yuta_B.GetEntries()
+
+  fname = 'electron_'
+  if isBarrel:
+    fname += 'barrel.gif'
+  else:
+    fname += 'endcap.gif'
+
+  ecan_roc_electron.SaveAs(fname)
+  ecan_roc_electron.SaveAs(fname.replace('gif','pdf'))

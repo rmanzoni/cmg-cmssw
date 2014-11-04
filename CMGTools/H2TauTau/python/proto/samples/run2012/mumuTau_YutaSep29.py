@@ -92,6 +92,7 @@ MC_list.extend( mc_ttbarh )
 MC_list.extend( mc_ttv )
 MC_list.extend( mc_vh )
 MC_list.extend( mc_tH )
+MC_list.extend( mc_tHW )
 
 allsamples = copy.copy( MC_list )
 allsamples.extend( data_list )
@@ -106,6 +107,7 @@ print 'connect to the db'
 connect(MC_list   , '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 connect(data_list , '%MuMuTau_Yuta_Oct13%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 connect(mc_tH     , '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_tHW    , '%MUMUTAU_Sep27_yuta%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
 
 #connect(mc_diboson, '%TH_mmt_22jul_newTauID_manzoni%', 'cmgTuple_.*root', aliases, cache=True, verbose=False)

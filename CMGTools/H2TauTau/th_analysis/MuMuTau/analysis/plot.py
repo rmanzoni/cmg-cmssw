@@ -33,7 +33,7 @@ variables = {
     'bdt_muon_mva_jet_dr': {'nbin':nbin, 'xtitle':'muon MVA jet dR', 'xmin':0, 'xmax':0.4},
     'bdt_muon_mva_ptratio': {'nbin':nbin, 'xtitle':'muon MVA p_{T} ratio', 'xmin':0, 'xmax':1.5},
     'bdt_muon_mva': {'nbin':nbin, 'xtitle':'muon MVA', 'xmin':0, 'xmax':1.},
-    'bdt_muon_new_mva': {'nbin':nbin, 'xtitle':'muon new MVA', 'xmin':0, 'xmax':1.},
+    'bdt_muon_new_mva': {'nbin':nbin, 'xtitle':'muon new MVA', 'xmin':-1, 'xmax':1.},
 
     'bdt_smuon_pt': {'nbin':nbin, 'xtitle':'smuon pT (GeV)', 'xmin':0, 'xmax':200},
     'bdt_smuon_pdg': {'nbin':40, 'xtitle':'smuon PDG', 'xmin':-20, 'xmax':20},
@@ -46,7 +46,7 @@ variables = {
     'bdt_smuon_mva_jet_dr': {'nbin':nbin, 'xtitle':'smuon MVA jet dR', 'xmin':0, 'xmax':0.4},
     'bdt_smuon_mva_ptratio': {'nbin':nbin, 'xtitle':'smuon MVA p_{T} ratio', 'xmin':0, 'xmax':1.5},
     'bdt_smuon_mva': {'nbin':nbin, 'xtitle':'smuon MVA', 'xmin':0, 'xmax':1.},
-    'bdt_smuon_new_mva': {'nbin':nbin, 'xtitle':'smuon new MVA', 'xmin':0, 'xmax':1.},
+    'bdt_smuon_new_mva': {'nbin':nbin, 'xtitle':'smuon new MVA', 'xmin':-1, 'xmax':1.},
 
     'bdt_evt_missing_et': {'nbin':nbin, 'xtitle':'missing E_{T}', 'xmin':0, 'xmax':200},
     
@@ -67,7 +67,7 @@ selections = {
 #    'ttV':{'selection':'bdt_evt_processid>=17 && bdt_evt_processid<=19', 'col':col_tt, 'order':2},
 #    'data':{'selection':'bdt_evt_processid==100', 'col':1, 'order':2999}
     'Diboson':{'selection':'bdt_evt_processid<=2', 'col':46, 'order':1},
-    'ttbar':{'selection':'bdt_evt_processid>=3 && bdt_evt_processid<=5', 'col':col_tt, 'order':5},
+#    'ttbar':{'selection':'bdt_evt_processid>=3 && bdt_evt_processid<=5', 'col':col_tt, 'order':5},
     'ttV':{'selection':'bdt_evt_processid>=17 && bdt_evt_processid<=18', 'col':kOrange-2, 'order':4},
     'ttH':{'selection':'bdt_evt_processid==19', 'col':col_zll, 'order':2},
 #    'EWK':{'selection':'bdt_evt_processid>=6 && bdt_evt_processid<=15', 'col':col_ewk, 'order':3},
@@ -152,7 +152,7 @@ def makePlotsVars(tree, isSignal=False):
             
         print cname
         c.Print(cname)
-
+        c.Print(cname.replace('gif','pdf'))
 
 if __name__ == '__main__':
 
