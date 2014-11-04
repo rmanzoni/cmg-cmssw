@@ -49,7 +49,8 @@ filedict_mmt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3
             'TTH':['TTH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/HiggsTTH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.1302*lum/871234, 26],
 #            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/MuMuTau/process/mmt_20140801_WH_notrig/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 27],
             'WH':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 27],
-                'tHW':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141031_tHW/tHW/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  *lum/149985, 28],
+                # 0.02 x (0.063 + 0.215 + 0.0228)
+                'tHW':['tHW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141031_tHW/tHW/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.006*lum/149985, 28],
             'data':['data','/afs/cern.ch/user/y/ytakahas/work/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/data/H2TauTauTreeProducerMMT_tree.root',1,100]}
 
 
@@ -87,7 +88,8 @@ filedict_emt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3
             'TTH':['TTH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/HiggsTTH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.1302*lum/871234, 26],
 #            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH_notrig/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
             'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
-                'tHW':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141030_tHW/tHW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  *lum/149985, 28],
+                # 0.02 x (0.063 + 0.215 + 0.0228)
+                'tHW':['tHW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141030_tHW/tHW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.006*lum/149985, 28],
             'data':['data','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/data/H2TauTauTreeProducerEMT2_tree.root',1,100]}
 
 

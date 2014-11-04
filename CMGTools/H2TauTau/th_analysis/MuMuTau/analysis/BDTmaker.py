@@ -30,6 +30,7 @@ process_dict = {'WW':0,
                 'tbW':22,
 #                't_tchan':23,
 #                'tbar_tchan':24,
+                'tHW':25,
                 'data':100};
 
 
@@ -57,6 +58,7 @@ process = ['WW',
            'tbW',
 #           't_tchan',
 #           'tbar_tchan',
+           'tHW',
            'data']
 
 
@@ -416,7 +418,7 @@ for rindex, iregion in enumerate(region):
             nb = main.GetEntry(jentry)
             
             isSignal = False
-            if iprocess=='tH_YtMinus1':
+            if iprocess in ['tH_YtMinus1', 'tHW']:
                 isSignal = True
                 
             ## Filling the trees

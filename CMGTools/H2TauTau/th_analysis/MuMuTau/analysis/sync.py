@@ -858,7 +858,7 @@ if __name__ == '__main__':
 
             flag_SS = True
 
-            if pname != 'tH_YtMinus1':
+            if pname != 'tH_YtMinus1' and pname != 'tHW':
             
                 if not (muon1.pt > 20. and muon2.pt > 10. and muon1.trigmatch and muon2.trigmatch):
                     continue

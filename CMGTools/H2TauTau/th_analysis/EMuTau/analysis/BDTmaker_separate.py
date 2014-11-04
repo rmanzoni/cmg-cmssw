@@ -4,15 +4,6 @@ from ROOT import TFile, gDirectory, TH1F, gStyle, gROOT, TTree, TMVA, Double
 import math, copy, sys, array
 import optparse
 
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'tH_YtMinus1':4, 'redbkg':5, 'data':100}
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'TTW':4, 'TTZ':5, 'tH_YtMinus1':6, 'TTH':7, 'redbkg':8, 'data':100};
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'tH_YtMinus1':6, 'TTH':7, 'redbkg':8, 'WW':4, 'EWK':5, 'data':100};
-
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1','data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'TTW', 'TTZ', 'tH_YtMinus1', 'TTH', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH', 'WW', 'EWK', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH']
-
 process_dict = {'WW':0,
                 'WZ':1,
                 'ZZ':2,
@@ -34,12 +25,9 @@ process_dict = {'WW':0,
                 'TTZ':18,
                 'TTH':19,
                 'redbkg':20,
-                'tHW':21,
                 'data':100};
 
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1','data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'TTW', 'TTZ', 'tH_YtMinus1', 'TTH', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH', 'data']
+
 process = ['WW',
            'WZ',
            'ZZ',
@@ -60,7 +48,6 @@ process = ['WW',
            'TTW',
            'TTZ',
            'TTH',
-           'tHW',
            'data']
 
 
@@ -70,13 +57,6 @@ useTT = False
 region = ['signal','antiE','antiMu','antiEMu']
 
 directory = 'root_process'
-#directory = 'root_process_tauiso_0.75'
-#directory = 'root_process_tauiso_0.5'
-#directory = 'root_process_tauiso_1'
-#directory = 'root_process_tauiso_1.5'
-#directory = 'root_process_tauiso_2'
-#directory = 'root_process_tauiso_2.5'
-
 
 ### For options
 parser = optparse.OptionParser()
@@ -89,8 +69,6 @@ print '[INFO] Control region = ', options.cr
 
 gROOT.SetBatch(True)
 
-muonreader = [0 for ii in range(len(process))]
-electronreader = [0 for ii in range(len(process))]
 
 
 def returnkNN(iregion, iprocess, weight_electron, weight_muon):
@@ -120,51 +98,43 @@ def returnkNN(iregion, iprocess, weight_electron, weight_muon):
     return kNN_weight
 
 
-for index, pn in enumerate(process):
 
-    e_xml = 'kNN_training/weights/KNN_' + pn + '_electron_' + options.kNN + '.xml'
-    m_xml = 'kNN_training/weights/KNN_' + pn + '_muon_' + options.kNN + '.xml'
+e_xml_b = 'kNN_training_separate/weights/KNN_data_electron_barrel_' + options.kNN + '.xml'
+m_xml_b = 'kNN_training_separate/weights/KNN_data_muon_barrel_' + options.kNN + '.xml'
+e_xml_e = 'kNN_training_separate/weights/KNN_data_electron_endcap_' + options.kNN + '.xml'
+m_xml_e = 'kNN_training_separate/weights/KNN_data_muon_endcap_' + options.kNN + '.xml'
 
-#    e_xml = 'weights_btag/KNN_' + pn + '_electron_' + options.kNN + '.xml'
-#    m_xml = 'weights_btag/KNN_' + pn + '_muon_' + options.kNN + '.xml'
+print '[INFO] electron xml file = ', e_xml_b, e_xml_e
+print '[INFO] muon xml file = ', m_xml_b, m_xml_e
 
-#    if pn in ['WZ','ZZ','tt1l','tt2l','data']:
-    if pn in ['data']:
-        pass
-    else:
-        print '[INFO] The process', pn, 'uses the kNN weight for data ...'
-        e_xml = 'kNN_training/weights/KNN_data_electron_' + options.kNN + '.xml'
-        m_xml = 'kNN_training/weights/KNN_data_muon_' + options.kNN + '.xml'
+muonreader_barrel = TMVA.Reader("!Color:Silent=T:Verbose=F")
+muonreader_endcap = TMVA.Reader("!Color:Silent=T:Verbose=F")
+electronreader_barrel = TMVA.Reader("!Color:Silent=T:Verbose=F")        
+electronreader_endcap = TMVA.Reader("!Color:Silent=T:Verbose=F")        
 
-#        e_xml = 'weights_btag/KNN_data_electron_' + options.kNN + '.xml'
-#        m_xml = 'weights_btag/KNN_data_muon_' + options.kNN + '.xml'
-        
+mvar_map_b   = {}
+mvar_map_e   = {}
+evar_map_b   = {}
+evar_map_e   = {}
 
-    print '[INFO] electron xml file = ', e_xml
-    print '[INFO] muon xml file = ', m_xml
+for var in ['lepton_pt', 'evt_njet']:
 
-    muonreader[index] = TMVA.Reader("!Color:Silent=T:Verbose=F")
-    electronreader[index] = TMVA.Reader("!Color:Silent=T:Verbose=F")        
-    mvar_map   = {}
-    evar_map   = {}
+    mvar_map_b[var] = array.array('f',[0])
+    muonreader_barrel.AddVariable(var, mvar_map_b[var])
+    mvar_map_e[var] = array.array('f',[0])
+    muonreader_endcap.AddVariable(var, mvar_map_e[var])
+    
+    evar_map_b[var] = array.array('f',[0])
+    electronreader_barrel.AddVariable(var, evar_map_b[var])
+    evar_map_e[var] = array.array('f',[0])
+    electronreader_endcap.AddVariable(var, evar_map_e[var])
+    
+muonreader_barrel.BookMVA('muon_barrel', m_xml_b)
+muonreader_endcap.BookMVA('muon_endcap', m_xml_e)
 
+electronreader_barrel.BookMVA('electron_barrel', e_xml_b)
+electronreader_endcap.BookMVA('electron_endcap', e_xml_e)
 
-    for var in ['lepton_pt', 'evt_njet']:
-#    for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
-
-        mvar_map[var] = array.array('f',[0])
-        muonreader[index].AddVariable(var, mvar_map[var])
-        
-        evar_map[var] = array.array('f',[0])
-        electronreader[index].AddVariable(var, evar_map[var])
-
-    mvaname = 'muon_' + pn
-    muonreader[index].BookMVA(mvaname, m_xml)
-
-    mvaname = 'electron_' + pn
-    electronreader[index].BookMVA(mvaname, e_xml)
-
-#    print 'type of the index = ', type(index), index, ' -> ', mvaname
 
 
 #########################################
@@ -174,7 +144,7 @@ outputfile = ''
 #if directory.find('os')!=-1 and directory.find('loose')==-1:
 #    outputfile = 'BDT_training_os_' + options.cr + '.root'
 #else:
-outputfile = 'BDT_training_ss_' + options.cr + '.root'
+outputfile = 'BDT_training_separate_ss_' + options.cr + '.root'
     
 file = TFile(outputfile,'recreate')
 t = TTree('Tree','Tree')
@@ -458,7 +428,7 @@ for rindex, iregion in enumerate(region):
             nb = main.GetEntry(jentry)
             
             isSignal = False
-            if iprocess in ['tH_YtMinus1', 'tHW']:
+            if iprocess=='tH_YtMinus1':
                 isSignal = True
                 
             ## Filling the trees
@@ -686,22 +656,26 @@ for rindex, iregion in enumerate(region):
 
             if iregion=='antiMu' or iregion=='antiEMu':
 
-                mvar_map['lepton_pt'][0] = main.muon_pt
-#                mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
-                mvar_map['evt_njet'][0] = main.evt_njet + 1
-                
-                mvaname = 'muon_' + iprocess
-
-                weight_muon = muonreader[index].EvaluateMVA(mvaname)
+                if abs(main.muon_eta) < 1.479:
+                    mvar_map_b['lepton_pt'][0] = main.muon_pt
+                    mvar_map_b['evt_njet'][0] = main.evt_njet + 1
+                    weight_muon = muonreader_barrel.EvaluateMVA('muon_barrel')
+                else:
+                    mvar_map_e['lepton_pt'][0] = main.muon_pt
+                    mvar_map_e['evt_njet'][0] = main.evt_njet + 1
+                    weight_muon = muonreader_endcap.EvaluateMVA('muon_endcap')
                 
             if iregion=='antiE' or iregion=='antiEMu':
 
-                evar_map['lepton_pt'][0] = main.electron_pt
-#                evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
-                evar_map['evt_njet'][0] = main.evt_njet + 1
-                
-                mvaname = 'electron_' + iprocess
-                weight_electron = electronreader[index].EvaluateMVA(mvaname)
+               
+                if abs(main.electron_eta) < 1.479:
+                    evar_map_b['lepton_pt'][0] = main.electron_pt
+                    evar_map_b['evt_njet'][0] = main.evt_njet + 1
+                    weight_electron = electronreader_barrel.EvaluateMVA('electron_barrel')
+                else:
+                    evar_map_e['lepton_pt'][0] = main.electron_pt
+                    evar_map_e['evt_njet'][0] = main.evt_njet + 1
+                    weight_electron = electronreader_endcap.EvaluateMVA('electron_endcap')
 
                
             kNN_weight = returnkNN(iregion, iprocess, weight_electron, weight_muon)

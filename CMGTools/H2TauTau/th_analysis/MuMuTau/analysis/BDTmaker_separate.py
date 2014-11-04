@@ -4,14 +4,6 @@ from ROOT import TFile, gDirectory, TH1F, gStyle, gROOT, TTree, TMVA, Double
 import math, copy, sys, array
 import optparse
 
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'tH_YtMinus1':4, 'redbkg':5, 'data':100}
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'TTW':4, 'TTZ':5, 'tH_YtMinus1':6, 'TTH':7, 'redbkg':8, 'data':100};
-#process_dict = {'WZ':0, 'ZZ':1, 'tt1l':2, 'tt2l':3, 'tH_YtMinus1':6, 'TTH':7, 'redbkg':8, 'WW':4, 'EWK':5, 'data':100};
-
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1','data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'TTW', 'TTZ', 'tH_YtMinus1', 'TTH', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH', 'WW', 'EWK', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH']
 
 process_dict = {'WW':0,
                 'WZ':1,
@@ -34,12 +26,13 @@ process_dict = {'WW':0,
                 'TTZ':18,
                 'TTH':19,
                 'redbkg':20,
-                'tHW':21,
+                'tW':21,
+                'tbW':22,
+#                't_tchan':23,
+#                'tbar_tchan':24,
                 'data':100};
 
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1','data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'TTW', 'TTZ', 'tH_YtMinus1', 'TTH', 'data']
-#process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1', 'TTH', 'data']
+
 process = ['WW',
            'WZ',
            'ZZ',
@@ -60,22 +53,19 @@ process = ['WW',
            'TTW',
            'TTZ',
            'TTH',
-           'tHW',
+           'tW',
+           'tbW',
+#           't_tchan',
+#           'tbar_tchan',
            'data']
 
 
 useTT = False
 #useTT = True
 
-region = ['signal','antiE','antiMu','antiEMu']
+region = ['signal','antiMu','antiMuMu']
 
 directory = 'root_process'
-#directory = 'root_process_tauiso_0.75'
-#directory = 'root_process_tauiso_0.5'
-#directory = 'root_process_tauiso_1'
-#directory = 'root_process_tauiso_1.5'
-#directory = 'root_process_tauiso_2'
-#directory = 'root_process_tauiso_2.5'
 
 
 ### For options
@@ -89,82 +79,53 @@ print '[INFO] Control region = ', options.cr
 
 gROOT.SetBatch(True)
 
-muonreader = [0 for ii in range(len(process))]
-electronreader = [0 for ii in range(len(process))]
 
-
-def returnkNN(iregion, iprocess, weight_electron, weight_muon):
+def returnkNN(iregion, iprocess, weight_muon, weight_smuon, flag_muon, flag_smuon):
 
     kNN_weight = 1.
-    if iregion=='antiE':
-        if weight_electron==1:
-            kNN_weight = 0
-            print '[WARNING] 0 weight for e', iprocess, iregion
-        else:
-            kNN_weight = weight_electron/(1-weight_electron)
-    elif iregion=='antiMu':
-        if weight_muon==1:
+    if iregion=='antiMu':
+        if weight_muon==1 or weight_smuon==1:
             kNN_weight = 0
             print '[WARNING] warning, 0 weight for mu', iprocess, iregion
         else:
-            kNN_weight = weight_muon/(1-weight_muon)
-    elif iregion=='antiEMu':
-        if weight_electron==1 or weight_muon==1:
+            if flag_muon==True and flag_smuon==False:
+                kNN_weight = weight_smuon/(1-weight_smuon)
+            elif flag_muon==False and flag_smuon==True:
+                kNN_weight = weight_muon/(1-weight_muon)
+                                
+    elif iregion=='antiMuMu':
+        if weight_muon==1 or weight_smuon==1:
             kNN_weight = 0
-            print '[WARNING] warning, 0 weight for mu*e', iprocess, iregion
+            print '[WARNING] warning, 0 weight for mu*smu', iprocess, iregion
         else:
-            kNN_weight = weight_muon*weight_electron/((1-weight_muon)*(1-weight_electron))
+            kNN_weight = weight_muon*weight_smuon/((1-weight_muon)*(1-weight_smuon))
     elif iregion=='signal':
         kNN_weight = 1.
 
     return kNN_weight
 
 
-for index, pn in enumerate(process):
+m_xml_b = 'kNN_training_separate/weights/KNN_data_muon_barrel_' + options.kNN + '.xml'
+m_xml_e = 'kNN_training_separate/weights/KNN_data_muon_endcap_' + options.kNN + '.xml'
 
-    e_xml = 'kNN_training/weights/KNN_' + pn + '_electron_' + options.kNN + '.xml'
-    m_xml = 'kNN_training/weights/KNN_' + pn + '_muon_' + options.kNN + '.xml'
+print '[INFO] muon xml file = ', m_xml_b, m_xml_e
 
-#    e_xml = 'weights_btag/KNN_' + pn + '_electron_' + options.kNN + '.xml'
-#    m_xml = 'weights_btag/KNN_' + pn + '_muon_' + options.kNN + '.xml'
+muonreader_barrel = TMVA.Reader("!Color:Silent=T:Verbose=F")
+muonreader_endcap = TMVA.Reader("!Color:Silent=T:Verbose=F")
 
-#    if pn in ['WZ','ZZ','tt1l','tt2l','data']:
-    if pn in ['data']:
-        pass
-    else:
-        print '[INFO] The process', pn, 'uses the kNN weight for data ...'
-        e_xml = 'kNN_training/weights/KNN_data_electron_' + options.kNN + '.xml'
-        m_xml = 'kNN_training/weights/KNN_data_muon_' + options.kNN + '.xml'
+mvar_map_b   = {}
+mvar_map_e   = {}
 
-#        e_xml = 'weights_btag/KNN_data_electron_' + options.kNN + '.xml'
-#        m_xml = 'weights_btag/KNN_data_muon_' + options.kNN + '.xml'
-        
+for var in ['lepton_pt', 'evt_njet']:
 
-    print '[INFO] electron xml file = ', e_xml
-    print '[INFO] muon xml file = ', m_xml
+    mvar_map_b[var] = array.array('f',[0])
+    muonreader_barrel.AddVariable(var, mvar_map_b[var])
+    mvar_map_e[var] = array.array('f',[0])
+    muonreader_endcap.AddVariable(var, mvar_map_e[var])
+    
+muonreader_barrel.BookMVA('muon_barrel', m_xml_b)
+muonreader_endcap.BookMVA('muon_endcap', m_xml_e)
 
-    muonreader[index] = TMVA.Reader("!Color:Silent=T:Verbose=F")
-    electronreader[index] = TMVA.Reader("!Color:Silent=T:Verbose=F")        
-    mvar_map   = {}
-    evar_map   = {}
-
-
-    for var in ['lepton_pt', 'evt_njet']:
-#    for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
-
-        mvar_map[var] = array.array('f',[0])
-        muonreader[index].AddVariable(var, mvar_map[var])
-        
-        evar_map[var] = array.array('f',[0])
-        electronreader[index].AddVariable(var, evar_map[var])
-
-    mvaname = 'muon_' + pn
-    muonreader[index].BookMVA(mvaname, m_xml)
-
-    mvaname = 'electron_' + pn
-    electronreader[index].BookMVA(mvaname, e_xml)
-
-#    print 'type of the index = ', type(index), index, ' -> ', mvaname
 
 
 #########################################
@@ -174,11 +135,11 @@ outputfile = ''
 #if directory.find('os')!=-1 and directory.find('loose')==-1:
 #    outputfile = 'BDT_training_os_' + options.cr + '.root'
 #else:
-outputfile = 'BDT_training_ss_' + options.cr + '.root'
+outputfile = 'BDT_training_separate_ss_' + options.cr + '.root'
     
 file = TFile(outputfile,'recreate')
 t = TTree('Tree','Tree')
-        
+
 bdt_muon_pt = num.zeros(1, dtype=num.float32)
 bdt_muon_eta = num.zeros(1, dtype=num.float32)
 bdt_muon_phi = num.zeros(1, dtype=num.float32)
@@ -192,7 +153,6 @@ bdt_muon_reliso = num.zeros(1, dtype=num.float32)
 bdt_muon_MT = num.zeros(1, dtype=num.float32)
 bdt_muon_charge = num.zeros(1, dtype=num.float32)
 bdt_muon_dpt = num.zeros(1, dtype=num.float32)
-bdt_muon_kNN_jetpt = num.zeros(1, dtype=num.float32)
 bdt_muon_pdg = num.zeros(1, dtype=num.float32)
 bdt_muon_dxy = num.zeros(1, dtype=num.float32)
 bdt_muon_dz = num.zeros(1, dtype=num.float32)
@@ -203,36 +163,34 @@ bdt_muon_mva_neu_iso = num.zeros(1, dtype=num.float32)
 bdt_muon_mva_jet_dr = num.zeros(1, dtype=num.float32)
 bdt_muon_mva_ptratio = num.zeros(1, dtype=num.float32)
 bdt_muon_mva_csv = num.zeros(1, dtype=num.float32)
-bdt_yuta_muon_mva = num.zeros(1, dtype=num.float32)
+bdt_muon_new_mva = num.zeros(1, dtype=num.float32)
 
 
-bdt_electron_pt = num.zeros(1, dtype=num.float32)
-bdt_electron_eta = num.zeros(1, dtype=num.float32)
-bdt_electron_phi = num.zeros(1, dtype=num.float32)
-bdt_electron_mass = num.zeros(1, dtype=num.float32)
-bdt_electron_jetpt = num.zeros(1, dtype=num.float32)
-bdt_electron_jet_csv = num.zeros(1, dtype=num.float32)
-bdt_electron_jet_csv_10 = num.zeros(1, dtype=num.float32)
-bdt_electron_id = num.zeros(1, dtype=num.float32)
-bdt_electron_iso = num.zeros(1, dtype=num.float32)
-bdt_electron_reliso = num.zeros(1, dtype=num.float32)
-bdt_electron_MT = num.zeros(1, dtype=num.float32)
-bdt_electron_charge = num.zeros(1, dtype=num.float32)
-bdt_electron_dpt = num.zeros(1, dtype=num.float32)
-bdt_electron_kNN_jetpt = num.zeros(1, dtype=num.float32)
-bdt_electron_pdg = num.zeros(1, dtype=num.float32)
-bdt_electron_dxy = num.zeros(1, dtype=num.float32)
-bdt_electron_dz = num.zeros(1, dtype=num.float32)
-bdt_electron_dB3D = num.zeros(1, dtype=num.float32)
-bdt_electron_mva = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_ch_iso = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_neu_iso = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_jet_dr = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_ptratio = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_csv = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_score = num.zeros(1, dtype=num.float32)
-bdt_electron_mva_numberOfHits = num.zeros(1, dtype=num.float32)
-bdt_yuta_electron_mva = num.zeros(1, dtype=num.float32)
+bdt_smuon_pt = num.zeros(1, dtype=num.float32)
+bdt_smuon_eta = num.zeros(1, dtype=num.float32)
+bdt_smuon_phi = num.zeros(1, dtype=num.float32)
+bdt_smuon_mass = num.zeros(1, dtype=num.float32)
+bdt_smuon_jetpt = num.zeros(1, dtype=num.float32)
+bdt_smuon_jet_csv = num.zeros(1, dtype=num.float32)
+bdt_smuon_jet_csv_10 = num.zeros(1, dtype=num.float32)
+bdt_smuon_id = num.zeros(1, dtype=num.float32)
+bdt_smuon_iso = num.zeros(1, dtype=num.float32)
+bdt_smuon_reliso = num.zeros(1, dtype=num.float32)
+bdt_smuon_MT = num.zeros(1, dtype=num.float32)
+bdt_smuon_charge = num.zeros(1, dtype=num.float32)
+bdt_smuon_dpt = num.zeros(1, dtype=num.float32)
+bdt_smuon_pdg = num.zeros(1, dtype=num.float32)
+bdt_smuon_dxy = num.zeros(1, dtype=num.float32)
+bdt_smuon_dz = num.zeros(1, dtype=num.float32)
+bdt_smuon_dB3D = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva_ch_iso = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva_neu_iso = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva_jet_dr = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva_ptratio = num.zeros(1, dtype=num.float32)
+bdt_smuon_mva_csv = num.zeros(1, dtype=num.float32)
+bdt_smuon_new_mva = num.zeros(1, dtype=num.float32)
+
 
     
 bdt_tau_pt = num.zeros(1, dtype=num.float32)
@@ -251,8 +209,8 @@ bdt_tau_dB3D = num.zeros(1, dtype=num.float32)
 
 
 bdt_evt_weight = num.zeros(1, dtype=num.float32)
-bdt_evt_Mem = num.zeros(1, dtype=num.float32)
-bdt_evt_Met = num.zeros(1, dtype=num.float32)
+bdt_evt_Mmm = num.zeros(1, dtype=num.float32)
+bdt_evt_Msmt = num.zeros(1, dtype=num.float32)
 bdt_evt_Mmt = num.zeros(1, dtype=num.float32)
 bdt_evt_dphi_metmu = num.zeros(1, dtype=num.float32)
 bdt_evt_dphi_mete = num.zeros(1, dtype=num.float32)
@@ -294,10 +252,10 @@ bdt_evt_processid = num.zeros(1, dtype=num.float32)
 bdt_evt_processid_rindex = num.zeros(1, dtype=num.float32)
 bdt_evt_sphericity = num.zeros(1, dtype=num.float32)
 bdt_evt_aplanarity = num.zeros(1, dtype=num.float32)
-bdt_evt_dr_ejet = num.zeros(1, dtype=num.float32)
+bdt_evt_dr_smujet = num.zeros(1, dtype=num.float32)
 bdt_evt_dr_mujet = num.zeros(1, dtype=num.float32)
 bdt_evt_dr_taujet = num.zeros(1, dtype=num.float32)
-bdt_evt_dr_ejet_csv = num.zeros(1, dtype=num.float32)
+bdt_evt_dr_smujet_csv = num.zeros(1, dtype=num.float32)
 bdt_evt_dr_mujet_csv = num.zeros(1, dtype=num.float32)
 bdt_evt_dr_taujet_csv = num.zeros(1, dtype=num.float32)
 
@@ -309,7 +267,6 @@ t.Branch('bdt_muon_mass', bdt_muon_mass, 'bdt_muon_mass/F')
 t.Branch('bdt_muon_jetpt',bdt_muon_jetpt, 'bdt_muon_jetpt/F')
 t.Branch('bdt_muon_jet_csv',bdt_muon_jet_csv, 'bdt_muon_jet_csv/F')
 t.Branch('bdt_muon_jet_csv_10',bdt_muon_jet_csv_10, 'bdt_muon_jet_csv_10/F')
-t.Branch('bdt_muon_kNN_jetpt',bdt_muon_kNN_jetpt, 'bdt_muon_kNN_jetpt/F')
 t.Branch('bdt_muon_id', bdt_muon_id, 'bdt_muon_id/F')
 t.Branch('bdt_muon_iso', bdt_muon_iso, 'bdt_muon_iso/F')
 t.Branch('bdt_muon_reliso', bdt_muon_reliso, 'bdt_muon_reliso/F')
@@ -321,41 +278,40 @@ t.Branch('bdt_muon_dxy', bdt_muon_dxy, 'bdt_muon_dxy/F')
 t.Branch('bdt_muon_dz', bdt_muon_dz, 'bdt_muon_dz/F')
 t.Branch('bdt_muon_dB3D', bdt_muon_dB3D, 'bdt_muon_dB3D/F')
 t.Branch('bdt_muon_mva', bdt_muon_mva, 'bdt_muon_mva/F')
+t.Branch('bdt_muon_new_mva', bdt_muon_new_mva, 'bdt_muon_new_mva/F')
 t.Branch('bdt_muon_mva_ch_iso', bdt_muon_mva_ch_iso, 'bdt_muon_mva_ch_iso/F')
 t.Branch('bdt_muon_mva_neu_iso', bdt_muon_mva_neu_iso, 'bdt_muon_mva_neu_iso/F')
 t.Branch('bdt_muon_mva_jet_dr', bdt_muon_mva_jet_dr, 'bdt_muon_mva_jet_dr/F')
 t.Branch('bdt_muon_mva_ptratio', bdt_muon_mva_ptratio, 'bdt_muon_mva_ptratio/F')
 t.Branch('bdt_muon_mva_csv', bdt_muon_mva_csv, 'bdt_muon_mva_csv/F')
-t.Branch('bdt_yuta_muon_mva', bdt_yuta_muon_mva, 'bdt_yuta_muon_mva/F')
 
 
-t.Branch('bdt_electron_pt',bdt_electron_pt,'bdt_electron_pt/F')
-t.Branch('bdt_electron_eta',bdt_electron_eta,'bdt_electron_eta/F')
-t.Branch('bdt_electron_phi',bdt_electron_phi,'bdt_electron_phi/F')
-t.Branch('bdt_electron_mass', bdt_electron_mass, 'bdt_electron_mass/F')
-t.Branch('bdt_electron_jetpt',bdt_electron_jetpt, 'bdt_electron_jetpt/F')
-t.Branch('bdt_electron_jet_csv',bdt_electron_jet_csv, 'bdt_electron_jet_csv/F')
-t.Branch('bdt_electron_jet_csv_10',bdt_electron_jet_csv_10, 'bdt_electron_jet_csv_10/F')
-t.Branch('bdt_electron_kNN_jetpt',bdt_electron_kNN_jetpt, 'bdt_electron_kNN_jetpt/F')
-t.Branch('bdt_electron_id', bdt_electron_id, 'bdt_electron_id/F')
-t.Branch('bdt_electron_iso', bdt_electron_iso, 'bdt_electron_iso/F')
-t.Branch('bdt_electron_reliso', bdt_electron_reliso, 'bdt_electron_reliso/F')
-t.Branch('bdt_electron_MT', bdt_electron_MT, 'bdt_electron_MT/F')
-t.Branch('bdt_electron_charge', bdt_electron_charge, 'bdt_electron_charge/F')
-t.Branch('bdt_electron_dpt', bdt_electron_dpt, 'bdt_electron_dpt/F')
-t.Branch('bdt_electron_pdg', bdt_electron_pdg, 'bdt_electron_pdg/F')
-t.Branch('bdt_electron_dxy', bdt_electron_dxy, 'bdt_electron_dxy/F')
-t.Branch('bdt_electron_dz', bdt_electron_dz, 'bdt_electron_dz/F')
-t.Branch('bdt_electron_dB3D', bdt_electron_dB3D, 'bdt_electron_dB3D/F')
-t.Branch('bdt_electron_mva', bdt_electron_mva, 'bdt_electron_mva/F')
-t.Branch('bdt_electron_mva_ch_iso', bdt_electron_mva_ch_iso, 'bdt_electron_mva_ch_iso/F')
-t.Branch('bdt_electron_mva_neu_iso', bdt_electron_mva_neu_iso, 'bdt_electron_mva_neu_iso/F')
-t.Branch('bdt_electron_mva_jet_dr', bdt_electron_mva_jet_dr, 'bdt_electron_mva_jet_dr/F')
-t.Branch('bdt_electron_mva_ptratio', bdt_electron_mva_ptratio, 'bdt_electron_mva_ptratio/F')
-t.Branch('bdt_electron_mva_csv', bdt_electron_mva_csv, 'bdt_electron_mva_csv/F')
-t.Branch('bdt_electron_mva_score', bdt_electron_mva_score, 'bdt_electron_mva_score/F')
-t.Branch('bdt_electron_mva_numberOfHits', bdt_electron_mva_numberOfHits, 'bdt_electron_mva_numberOfHits/F')
-t.Branch('bdt_yuta_electron_mva', bdt_yuta_electron_mva, 'bdt_yuta_electron_mva/F')
+t.Branch('bdt_smuon_pt',bdt_smuon_pt,'bdt_smuon_pt/F')
+t.Branch('bdt_smuon_eta',bdt_smuon_eta,'bdt_smuon_eta/F')
+t.Branch('bdt_smuon_phi',bdt_smuon_phi,'bdt_smuon_phi/F')
+t.Branch('bdt_smuon_mass', bdt_smuon_mass, 'bdt_smuon_mass/F')
+t.Branch('bdt_smuon_jetpt',bdt_smuon_jetpt, 'bdt_smuon_jetpt/F')
+t.Branch('bdt_smuon_jet_csv',bdt_smuon_jet_csv, 'bdt_smuon_jet_csv/F')
+t.Branch('bdt_smuon_jet_csv_10',bdt_smuon_jet_csv_10, 'bdt_smuon_jet_csv_10/F')
+t.Branch('bdt_smuon_id', bdt_smuon_id, 'bdt_smuon_id/F')
+t.Branch('bdt_smuon_iso', bdt_smuon_iso, 'bdt_smuon_iso/F')
+t.Branch('bdt_smuon_reliso', bdt_smuon_reliso, 'bdt_smuon_reliso/F')
+t.Branch('bdt_smuon_MT', bdt_smuon_MT, 'bdt_smuon_MT/F')
+t.Branch('bdt_smuon_charge', bdt_smuon_charge, 'bdt_smuon_charge/F')
+t.Branch('bdt_smuon_dpt', bdt_smuon_dpt, 'bdt_smuon_dpt/F')
+t.Branch('bdt_smuon_pdg', bdt_smuon_pdg, 'bdt_smuon_pdg/F')
+t.Branch('bdt_smuon_dxy', bdt_smuon_dxy, 'bdt_smuon_dxy/F')
+t.Branch('bdt_smuon_dz', bdt_smuon_dz, 'bdt_smuon_dz/F')
+t.Branch('bdt_smuon_dB3D', bdt_smuon_dB3D, 'bdt_smuon_dB3D/F')
+t.Branch('bdt_smuon_mva', bdt_smuon_mva, 'bdt_smuon_mva/F')
+t.Branch('bdt_smuon_mva_ch_iso', bdt_smuon_mva_ch_iso, 'bdt_smuon_mva_ch_iso/F')
+t.Branch('bdt_smuon_mva_neu_iso', bdt_smuon_mva_neu_iso, 'bdt_smuon_mva_neu_iso/F')
+t.Branch('bdt_smuon_mva_jet_dr', bdt_smuon_mva_jet_dr, 'bdt_smuon_mva_jet_dr/F')
+t.Branch('bdt_smuon_mva_ptratio', bdt_smuon_mva_ptratio, 'bdt_smuon_mva_ptratio/F')
+t.Branch('bdt_smuon_mva_csv', bdt_smuon_mva_csv, 'bdt_smuon_mva_csv/F')
+t.Branch('bdt_smuon_new_mva', bdt_smuon_new_mva, 'bdt_smuon_new_mva/F')
+
+
 
 
 t.Branch('bdt_tau_pt',bdt_tau_pt,'bdt_tau_pt/F')
@@ -373,13 +329,14 @@ t.Branch('bdt_tau_dz', bdt_tau_dz, 'bdt_tau_dz/F')
 t.Branch('bdt_tau_dB3D', bdt_tau_dB3D, 'bdt_tau_dB3D/F')
 
 t.Branch('bdt_evt_weight', bdt_evt_weight, 'bdt_evt_weight/F')
-t.Branch('bdt_evt_Mem', bdt_evt_Mem, 'bdt_evt_Mem/F')
+t.Branch('bdt_evt_Mmm', bdt_evt_Mmm, 'bdt_evt_Mmm/F')
+t.Branch('bdt_evt_Mmt', bdt_evt_Mmt, 'bdt_evt_Mmt/F')
+t.Branch('bdt_evt_Msmt', bdt_evt_Msmt, 'bdt_evt_Msmt/F')
+
 t.Branch('bdt_evt_dphi_metmu', bdt_evt_dphi_metmu, 'bdt_evt_dphi_metmu/F')
 t.Branch('bdt_evt_dphi_mete', bdt_evt_dphi_mete, 'bdt_evt_dphi_mete/F')
 t.Branch('bdt_evt_dphi_mettau', bdt_evt_dphi_mettau, 'bdt_evt_dphi_mettau/F')
 
-t.Branch('bdt_evt_Met', bdt_evt_Met, 'bdt_evt_Met/F')
-t.Branch('bdt_evt_Mmt', bdt_evt_Mmt, 'bdt_evt_Mmt/F')
 t.Branch('bdt_evt_LT', bdt_evt_LT, 'bdt_evt_LT/F')
 t.Branch('bdt_evt_L2T', bdt_evt_L2T, 'bdt_evt_L2T/F')
 t.Branch('bdt_evt_sumjetpt', bdt_evt_sumjetpt, 'bdt_evt_sumjetpt/F')
@@ -417,12 +374,11 @@ t.Branch('bdt_evt_processid_rindex', bdt_evt_processid_rindex, 'bdt_evt_processi
 t.Branch('bdt_evt_sphericity', bdt_evt_sphericity, 'bdt_evt_sphericity/F')
 t.Branch('bdt_evt_aplanarity', bdt_evt_aplanarity, 'bdt_evt_aplanarity/F')
 t.Branch('bdt_evt_dr_mujet', bdt_evt_dr_mujet, 'bdt_evt_dr_mujet/F')
-t.Branch('bdt_evt_dr_ejet', bdt_evt_dr_ejet, 'bdt_evt_dr_ejet/F')
+t.Branch('bdt_evt_dr_smujet', bdt_evt_dr_smujet, 'bdt_evt_dr_smujet/F')
 t.Branch('bdt_evt_dr_taujet', bdt_evt_dr_taujet, 'bdt_evt_dr_taujet/F')
 t.Branch('bdt_evt_dr_mujet_csv', bdt_evt_dr_mujet_csv, 'bdt_evt_dr_mujet_csv/F')
-t.Branch('bdt_evt_dr_ejet_csv', bdt_evt_dr_ejet_csv, 'bdt_evt_dr_ejet_csv/F')
+t.Branch('bdt_evt_dr_smujet_csv', bdt_evt_dr_smujet_csv, 'bdt_evt_dr_smujet_csv/F')
 t.Branch('bdt_evt_dr_taujet_csv', bdt_evt_dr_taujet_csv, 'bdt_evt_dr_taujet_csv/F')
-
 
 #run_process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1']
 #run_region = ['signal']
@@ -438,10 +394,6 @@ for rindex, iregion in enumerate(region):
 
         if useTT==False and iprocess in ['tt0l', 'tt1l', 'tt2l']:
             continue
-        
-#        if iprocess is 'data':
-#            continue
-
 
 
         print iregion, '(', rindex, ')', iprocess, '(', index, ') is processing'
@@ -458,10 +410,14 @@ for rindex, iregion in enumerate(region):
             nb = main.GetEntry(jentry)
             
             isSignal = False
-            if iprocess in ['tH_YtMinus1', 'tHW']:
+            if iprocess=='tH_YtMinus1':
                 isSignal = True
                 
             ## Filling the trees
+
+        
+#        if iprocess is 'data':
+#            continue
 
             bdt_muon_pt [0] = main.muon_pt
             bdt_muon_eta [0] = main.muon_eta
@@ -476,47 +432,44 @@ for rindex, iregion in enumerate(region):
             bdt_muon_MT [0] = main.muon_MT
             bdt_muon_charge [0] = main.muon_charge
             bdt_muon_dpt [0] = main.muon_dpt
-            bdt_muon_kNN_jetpt [0] = main.muon_kNN_jetpt
             bdt_muon_pdg [0] = main.muon_pdg
             bdt_muon_dxy [0] = main.muon_dxy
             bdt_muon_dz [0] = main.muon_dz
             bdt_muon_dB3D [0] = main.muon_dB3D
-
             bdt_muon_mva [0] = main.muon_mva
             bdt_muon_mva_ch_iso [0] = main.muon_mva_ch_iso
             bdt_muon_mva_neu_iso [0] = main.muon_mva_neu_iso
             bdt_muon_mva_jet_dr [0] = main.muon_mva_jet_dr
             bdt_muon_mva_ptratio [0] = main.muon_mva_ptratio
             bdt_muon_mva_csv [0] =  main.muon_mva_csv
-            bdt_yuta_muon_mva [0] =  main.muon_new_mva
+            bdt_muon_new_mva [0] = main.muon_new_mva
             
-            bdt_electron_pt [0] = main.electron_pt
-            bdt_electron_eta [0] = main.electron_eta
-            bdt_electron_phi [0] = main.electron_phi
-            bdt_electron_mass [0] = main.electron_mass
-            bdt_electron_jetpt [0] = main.electron_jetpt
-            bdt_electron_jet_csv [0] = main.electron_jet_csv
-            bdt_electron_jet_csv_10 [0] = main.electron_jet_csv_10
-            bdt_electron_id [0] = main.electron_id
-            bdt_electron_iso [0] = main.electron_iso
-            bdt_electron_reliso [0] = main.electron_reliso
-            bdt_electron_MT [0] = main.electron_MT
-            bdt_electron_charge [0] = main.electron_charge
-            bdt_electron_dpt [0] = main.electron_dpt
-            bdt_electron_kNN_jetpt [0] = main.electron_kNN_jetpt
-            bdt_electron_pdg [0] = main.electron_pdg
-            bdt_electron_dxy [0] = main.electron_dxy
-            bdt_electron_dz [0] = main.electron_dz
-            bdt_electron_dB3D [0] = main.electron_dB3D
-            bdt_electron_mva [0] = main.electron_mva
-            bdt_electron_mva_ch_iso[0] = main.electron_mva_ch_iso
-            bdt_electron_mva_neu_iso[0] = main.electron_mva_neu_iso
-            bdt_electron_mva_jet_dr[0] = main.electron_mva_jet_dr
-            bdt_electron_mva_ptratio[0] = main.electron_mva_ptratio
-            bdt_electron_mva_csv[0] = main.electron_mva_csv
-            bdt_electron_mva_score[0] = main.electron_mva_score
-            bdt_electron_mva_numberOfHits[0] = main.electron_mva_numberOfHits
-            bdt_yuta_electron_mva [0] =  main.electron_new_mva
+            bdt_smuon_pt [0] = main.smuon_pt
+            bdt_smuon_eta [0] = main.smuon_eta
+            bdt_smuon_phi [0] = main.smuon_phi
+            bdt_smuon_mass [0] = main.smuon_mass
+            bdt_smuon_jetpt [0] = main.smuon_jetpt
+            bdt_smuon_jet_csv [0] = main.smuon_jet_csv
+            bdt_smuon_jet_csv_10 [0] = main.smuon_jet_csv_10
+            bdt_smuon_id [0] = main.smuon_id
+            bdt_smuon_iso [0] = main.smuon_iso
+            bdt_smuon_reliso [0] = main.smuon_reliso
+            bdt_smuon_MT [0] = main.smuon_MT
+            bdt_smuon_charge [0] = main.smuon_charge
+            bdt_smuon_dpt [0] = main.smuon_dpt
+            bdt_smuon_pdg [0] = main.smuon_pdg
+            bdt_smuon_dxy [0] = main.smuon_dxy
+            bdt_smuon_dz [0] = main.smuon_dz
+            bdt_smuon_dB3D [0] = main.smuon_dB3D
+            bdt_smuon_mva [0] = main.smuon_mva
+            bdt_smuon_mva_ch_iso [0] = main.smuon_mva_ch_iso
+            bdt_smuon_mva_neu_iso [0] = main.smuon_mva_neu_iso
+            bdt_smuon_mva_jet_dr [0] = main.smuon_mva_jet_dr
+            bdt_smuon_mva_ptratio [0] = main.smuon_mva_ptratio
+            bdt_smuon_mva_csv [0] =  main.smuon_mva_csv
+            bdt_smuon_new_mva [0] = main.smuon_new_mva
+
+
             
             bdt_tau_pt [0] = main.tau_pt
             bdt_tau_eta [0] = main.tau_eta
@@ -533,8 +486,8 @@ for rindex, iregion in enumerate(region):
             bdt_tau_dB3D [0] = main.tau_dB3D
             
             bdt_evt_weight [0] = main.evt_weight
-            bdt_evt_Mem [0] = main.evt_Mem
-            bdt_evt_Met [0] = main.evt_Met
+            bdt_evt_Mmm [0] = main.evt_Mmm
+            bdt_evt_Msmt [0] = main.evt_Msmt
             bdt_evt_Mmt [0] = main.evt_Mmt
             bdt_evt_LT [0] = main.evt_LT
             bdt_evt_L2T [0] = main.evt_L2T
@@ -576,21 +529,21 @@ for rindex, iregion in enumerate(region):
             bdt_evt_processid_rindex[0] = -1.
             bdt_evt_sphericity[0] = main.evt_sphericity
             bdt_evt_aplanarity[0] = main.evt_aplanarity
-            bdt_evt_dr_ejet[0] = main.evt_dr_ejet
+            bdt_evt_dr_smujet[0] = main.evt_dr_smujet
             bdt_evt_dr_mujet[0] = main.evt_dr_mujet
             bdt_evt_dr_taujet[0] = main.evt_dr_taujet
-            bdt_evt_dr_ejet_csv[0] = main.evt_dr_ejet_csv
+            bdt_evt_dr_smujet_csv[0] = main.evt_dr_smujet_csv
             bdt_evt_dr_mujet_csv[0] = main.evt_dr_mujet_csv
             bdt_evt_dr_taujet_csv[0] = main.evt_dr_taujet_csv
-            
+
             t.Fill()
 
 
 
 # calculate total # of Data, MC for the red. bkg.
-nevent_mc = [0,0,0,0]
-nevent_data = [0,0,0,0]
-nsf = [0,0,0,0]
+nevent_mc = [0,0,0]
+nevent_data = [0,0,0]
+nsf = [0,0,0]
 
 
 
@@ -682,89 +635,95 @@ for rindex, iregion in enumerate(region):
             nb = main.GetEntry(jentry)
             
             weight_muon = 0.5
-            weight_electron = 0.5
+            weight_smuon = 0.5
 
-            if iregion=='antiMu' or iregion=='antiEMu':
+            if abs(main.muon_eta) < 1.479:
+                mvar_map_b['lepton_pt'][0] = main.muon_pt
+                mvar_map_b['evt_njet'][0] = main.evt_njet + 1
+            
+                weight_muon = muonreader_barrel.EvaluateMVA('muon_barrel')
+            else:
+                mvar_map_e['lepton_pt'][0] = main.muon_pt
+                mvar_map_e['evt_njet'][0] = main.evt_njet + 1
+            
+                weight_muon = muonreader_endcap.EvaluateMVA('muon_endcap')
 
-                mvar_map['lepton_pt'][0] = main.muon_pt
-#                mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
-                mvar_map['evt_njet'][0] = main.evt_njet + 1
+            if abs(main.smuon_eta) < 1.479:
+                mvar_map_b['lepton_pt'][0] = main.smuon_pt
+                mvar_map_b['evt_njet'][0] = main.evt_njet + 1
+            
+                weight_smuon = muonreader_barrel.EvaluateMVA('muon_barrel')
+            else:
+                mvar_map_e['lepton_pt'][0] = main.smuon_pt
+                mvar_map_e['evt_njet'][0] = main.evt_njet + 1
+            
+                weight_smuon = muonreader_endcap.EvaluateMVA('muon_endcap')
                 
-                mvaname = 'muon_' + iprocess
 
-                weight_muon = muonreader[index].EvaluateMVA(mvaname)
-                
-            if iregion=='antiE' or iregion=='antiEMu':
-
-                evar_map['lepton_pt'][0] = main.electron_pt
-#                evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
-                evar_map['evt_njet'][0] = main.evt_njet + 1
-                
-                mvaname = 'electron_' + iprocess
-                weight_electron = electronreader[index].EvaluateMVA(mvaname)
-
-               
-            kNN_weight = returnkNN(iregion, iprocess, weight_electron, weight_muon)
+#            print weight_muon, weight_smuon
+            kNN_weight = returnkNN(iregion, iprocess, weight_muon, weight_smuon, main.muon_flag, main.smuon_flag)
 
             weight_total = main.evt_weight*kNN_weight*nsf[rindex]
-            if iregion=='antiEMu':
+            print 'region, process, weight_muon, weight_smuon, flag, sflag, total = ', iregion, iprocess, weight_muon, weight_smuon, main.muon_flag, main.smuon_flag, weight_total
+            
+            if iregion=='antiMuMu':
                 weight_total *= -1.
 
             total_weight += weight_total
+
 
             bdt_muon_pt [0] = main.muon_pt
             bdt_muon_eta [0] = main.muon_eta
             bdt_muon_phi [0] = main.muon_phi
             bdt_muon_mass [0] = main.muon_mass
             bdt_muon_jetpt [0] = main.muon_jetpt
+            bdt_muon_jet_csv [0] = main.muon_jet_csv
+            bdt_muon_jet_csv_10 [0] = main.muon_jet_csv_10
             bdt_muon_id [0] = main.muon_id
             bdt_muon_iso [0] = main.muon_iso
             bdt_muon_reliso [0] = main.muon_reliso
             bdt_muon_MT [0] = main.muon_MT
             bdt_muon_charge [0] = main.muon_charge
             bdt_muon_dpt [0] = main.muon_dpt
-            bdt_muon_kNN_jetpt [0] = main.muon_kNN_jetpt
-            bdt_muon_pdg [0] = 0
-            bdt_muon_jet_csv [0] = main.muon_jet_csv
-            bdt_muon_jet_csv_10 [0] = main.muon_jet_csv_10
+            bdt_muon_pdg [0] = main.muon_pdg
             bdt_muon_dxy [0] = main.muon_dxy
             bdt_muon_dz [0] = main.muon_dz
             bdt_muon_dB3D [0] = main.muon_dB3D
             bdt_muon_mva [0] = main.muon_mva
+            bdt_muon_new_mva [0] = main.muon_new_mva
             bdt_muon_mva_ch_iso [0] = main.muon_mva_ch_iso
             bdt_muon_mva_neu_iso [0] = main.muon_mva_neu_iso
             bdt_muon_mva_jet_dr [0] = main.muon_mva_jet_dr
             bdt_muon_mva_ptratio [0] = main.muon_mva_ptratio
             bdt_muon_mva_csv [0] =  main.muon_mva_csv
-            bdt_yuta_muon_mva [0] =  main.muon_new_mva
             
-            bdt_electron_pt [0] = main.electron_pt
-            bdt_electron_eta [0] = main.electron_eta
-            bdt_electron_phi [0] = main.electron_phi
-            bdt_electron_mass [0] = main.electron_mass
-            bdt_electron_jetpt [0] = main.electron_jetpt
-            bdt_electron_id [0] = main.electron_id
-            bdt_electron_iso [0] = main.electron_iso
-            bdt_electron_reliso [0] = main.electron_reliso
-            bdt_electron_MT [0] = main.electron_MT
-            bdt_electron_charge [0] = main.electron_charge
-            bdt_electron_dpt [0] = main.electron_dpt
-            bdt_electron_kNN_jetpt [0] = main.electron_kNN_jetpt
-            bdt_electron_pdg [0] = 0
-            bdt_electron_jet_csv [0] = main.electron_jet_csv
-            bdt_electron_jet_csv_10 [0] = main.electron_jet_csv_10
-            bdt_electron_dxy [0] = main.electron_dxy
-            bdt_electron_dz [0] = main.electron_dz
-            bdt_electron_dB3D [0] = main.electron_dB3D
-            bdt_electron_mva [0] = main.electron_mva
-            bdt_electron_mva_ch_iso[0] = main.electron_mva_ch_iso
-            bdt_electron_mva_neu_iso[0] = main.electron_mva_neu_iso
-            bdt_electron_mva_jet_dr[0] = main.electron_mva_jet_dr
-            bdt_electron_mva_ptratio[0] = main.electron_mva_ptratio
-            bdt_electron_mva_csv[0] = main.electron_mva_csv
-            bdt_electron_mva_score[0] = main.electron_mva_score
-            bdt_electron_mva_numberOfHits[0] = main.electron_mva_numberOfHits
-            bdt_yuta_electron_mva [0] =  main.electron_new_mva
+            bdt_smuon_pt [0] = main.smuon_pt
+            bdt_smuon_eta [0] = main.smuon_eta
+            bdt_smuon_phi [0] = main.smuon_phi
+            bdt_smuon_mass [0] = main.smuon_mass
+            bdt_smuon_jetpt [0] = main.smuon_jetpt
+            bdt_smuon_jet_csv [0] = main.smuon_jet_csv
+            bdt_smuon_jet_csv_10 [0] = main.smuon_jet_csv_10
+            bdt_smuon_id [0] = main.smuon_id
+            bdt_smuon_iso [0] = main.smuon_iso
+            bdt_smuon_reliso [0] = main.smuon_reliso
+            bdt_smuon_MT [0] = main.smuon_MT
+            bdt_smuon_charge [0] = main.smuon_charge
+            bdt_smuon_dpt [0] = main.smuon_dpt
+            bdt_smuon_pdg [0] = main.smuon_pdg
+            bdt_smuon_dxy [0] = main.smuon_dxy
+            bdt_smuon_dz [0] = main.smuon_dz
+            bdt_smuon_dB3D [0] = main.smuon_dB3D
+            bdt_smuon_mva [0] = main.smuon_mva
+            bdt_smuon_new_mva [0] = main.smuon_new_mva
+            bdt_smuon_mva_ch_iso [0] = main.smuon_mva_ch_iso
+            bdt_smuon_mva_neu_iso [0] = main.smuon_mva_neu_iso
+            bdt_smuon_mva_jet_dr [0] = main.smuon_mva_jet_dr
+            bdt_smuon_mva_ptratio [0] = main.smuon_mva_ptratio
+            bdt_smuon_mva_csv [0] =  main.smuon_mva_csv
+            
+
+
             
             bdt_tau_pt [0] = main.tau_pt
             bdt_tau_eta [0] = main.tau_eta
@@ -774,15 +733,15 @@ for rindex, iregion in enumerate(region):
             bdt_tau_isolation [0] = main.tau_isolation
             bdt_tau_MT [0] = main.tau_MT
             bdt_tau_decaymode [0] = main.tau_decaymode
-            bdt_tau_pdg [0] = 0
+            bdt_tau_pdg [0] = main.tau_pdg
             bdt_tau_jet_csv [0] = main.tau_jet_csv
             bdt_tau_dxy [0] = main.tau_dxy
             bdt_tau_dz [0] = main.tau_dz
             bdt_tau_dB3D [0] = main.tau_dB3D
-                        
+            
             bdt_evt_weight [0] = weight_total
-            bdt_evt_Mem [0] = main.evt_Mem
-            bdt_evt_Met [0] = main.evt_Met
+            bdt_evt_Mmm [0] = main.evt_Mmm
+            bdt_evt_Msmt [0] = main.evt_Msmt
             bdt_evt_Mmt [0] = main.evt_Mmt
             bdt_evt_LT [0] = main.evt_LT
             bdt_evt_L2T [0] = main.evt_L2T
@@ -793,6 +752,7 @@ for rindex, iregion in enumerate(region):
             bdt_evt_maxMT[0] = main.evt_maxMT
             bdt_evt_deltaeta[0] = main.evt_deltaeta
             bdt_evt_deltaeta_notau[0] = main.evt_deltaeta_notau
+            
             bdt_evt_njet [0] = main.evt_njet
             bdt_evt_njet_or [0] = main.evt_njet_or
             bdt_evt_njet_or30 [0] = main.evt_njet_or30
@@ -818,19 +778,18 @@ for rindex, iregion in enumerate(region):
             bdt_evt_sleading_nbtag[0] = main.evt_sleading_nbtag
             bdt_evt_leading_btag_pt[0] = main.evt_leading_btag_pt
             bdt_evt_sleading_btag_pt[0] = main.evt_sleading_btag_pt
-            bdt_evt_isSignal[0] = False
+            bdt_evt_isSignal[0] = isSignal
             bdt_evt_processid[0] = process_dict['redbkg']
             bdt_evt_processid_rindex[0] = rindex
             bdt_evt_sphericity[0] = main.evt_sphericity
             bdt_evt_aplanarity[0] = main.evt_aplanarity
-            bdt_evt_dr_ejet[0] = main.evt_dr_ejet
+            bdt_evt_dr_smujet[0] = main.evt_dr_smujet
             bdt_evt_dr_mujet[0] = main.evt_dr_mujet
             bdt_evt_dr_taujet[0] = main.evt_dr_taujet
-            bdt_evt_dr_ejet_csv[0] = main.evt_dr_ejet_csv
+            bdt_evt_dr_smujet_csv[0] = main.evt_dr_smujet_csv
             bdt_evt_dr_mujet_csv[0] = main.evt_dr_mujet_csv
             bdt_evt_dr_taujet_csv[0] = main.evt_dr_taujet_csv
 
-            
             t.Fill()
 
         print iregion, iprocess, total_weight
