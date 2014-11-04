@@ -84,6 +84,7 @@ aliases = {
 #MC_list = copy.copy( mc_singletop ) ## for mumuTau
 
 MC_list = copy.copy( mc_tH ) ## for mumuTau
+MC_list.extend( mc_tHW )
 #MC_list = copy.copy( t_mc_ewk ) ## for mumuTau
 
 
@@ -130,6 +131,7 @@ print 'connect to the db'
 #connect(mc_diboson, '%EMuTau_Yuta_Nov24', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 #connect(mc_tH, '%TH_emt_3jun_newTauID_manzoni', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 connect(mc_tH, '%EMuTau_Yuta_Feb27', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
+connect(mc_tHW, '%EMuTau_Yuta_Feb27', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
 
 
 #connect(mc_diboson_wz, '%EMuTau_Yuta_Oct18', 'cmgTuple_.*root', aliases, cache=True, verbose=False)
