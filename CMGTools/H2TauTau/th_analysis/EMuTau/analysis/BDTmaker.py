@@ -34,7 +34,7 @@ process_dict = {'WW':0,
                 'TTZ':18,
                 'TTH':19,
                 'redbkg':20,
-                'tHW':21,
+                'tHW':25,
                 'data':100};
 
 #process = ['WZ', 'ZZ', 'tt1l', 'tt2l', 'tH_YtMinus1','data']
@@ -688,7 +688,8 @@ for rindex, iregion in enumerate(region):
 
                 mvar_map['lepton_pt'][0] = main.muon_pt
 #                mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
-                mvar_map['evt_njet'][0] = main.evt_njet + 1
+#                mvar_map['evt_njet'][0] = main.evt_njet + 1
+                mvar_map['evt_njet'][0] = main.evt_njet_or
                 
                 mvaname = 'muon_' + iprocess
 
@@ -698,7 +699,8 @@ for rindex, iregion in enumerate(region):
 
                 evar_map['lepton_pt'][0] = main.electron_pt
 #                evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
-                evar_map['evt_njet'][0] = main.evt_njet + 1
+#                evar_map['evt_njet'][0] = main.evt_njet + 1
+                evar_map['evt_njet'][0] = main.evt_njet_or
                 
                 mvaname = 'electron_' + iprocess
                 weight_electron = electronreader[index].EvaluateMVA(mvaname)

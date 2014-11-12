@@ -647,14 +647,16 @@ for rindex, iregion in enumerate(region):
 
             mvar_map['lepton_pt'][0] = main.muon_pt
 #            mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
-            mvar_map['evt_njet'][0] = main.evt_njet + 1
+#            mvar_map['evt_njet'][0] = main.evt_njet + 1
+            mvar_map['evt_njet'][0] = main.evt_njet_or
             
             mvaname = 'muon_' + iprocess
             weight_muon = muonreader[index].EvaluateMVA(mvaname)
 
             mvar_map['lepton_pt'][0] = main.smuon_pt
 #            mvar_map['lepton_kNN_jetpt'][0] = main.smuon_kNN_jetpt
-            mvar_map['evt_njet'][0] = main.evt_njet + 1
+#            mvar_map['evt_njet'][0] = main.evt_njet + 1
+            mvar_map['evt_njet'][0] = main.evt_njet_or
             
             weight_smuon = muonreader[index].EvaluateMVA(mvaname)
 

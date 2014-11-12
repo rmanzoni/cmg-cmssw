@@ -45,14 +45,18 @@ print '[INFO] Select the event list = ', options.select
 #mva_muon_barrel = -2.
 #mva_muon_endcap = -2.
 
-mva_muon_barrel = 0.0337
-mva_muon_endcap = -0.0171
+#mva_muon_barrel = 0.0337
+#mva_muon_endcap = -0.0171
+
+mva_muon_barrel = -0.30
+mva_muon_endcap = -0.38
 
 
 mva_muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
 mva_mvar_map   = {}
 
-for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_dB3D', 'bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+#for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
     mva_mvar_map[var] = array.array('f',[0])
     mva_muonreader.AddVariable(var, mva_mvar_map[var])
 
@@ -500,20 +504,24 @@ if __name__ == '__main__':
                 mva_mvar_map['bdt_muon_mva_neu_iso'][0] = mchain.muon_mva_neu_iso
                 mva_mvar_map['bdt_muon_mva_csv'][0] = mchain.muon_mva_csv
 
-
                 cor_dxy = mchain.muon_mva_dxy
                 cor_dz = mchain.muon_mva_dz
                 cor_jet_dr = mchain.muon_mva_jet_dr
                 cor_ptratio = mchain.muon_mva_ptratio
+                cor_sip3D = mchain.muon_sip3D
+                cor_dB3D = abs(mchain.muon_dB3D)
 
                 if pname != 'data':
                     cor_dxy = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_dz = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_jet_dr = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_ptratio = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-                
+                    cor_sip3D = ROOT.scaleSip3dMC(mchain.muon_sip3D, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_dB3D = ROOT.scaleSip3dMC(abs(mchain.muon_dB3D), int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
+                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
                 
@@ -540,7 +548,10 @@ if __name__ == '__main__':
                                  mchain.muon_mva_dxy,
                                  cor_dz,
                                  mchain.muon_mva_dz,
-                                 mchain.muon_dB3D,
+                                 cor_dB3D,
+                                 abs(mchain.muon_dB3D),
+                                 cor_sip3D,
+                                 mchain.muon_sip3D,
                                  mchain.muon_jetcsv,
                                  mchain.muon_jetcsv_10,
                                  mchain.muon_mva,
@@ -831,6 +842,8 @@ if __name__ == '__main__':
             if not len(veto_bjet) >= 1:
                 continue
 
+#            if not njets >= 4:
+#                continue
 
             counter[4] += 1
 
@@ -858,7 +871,7 @@ if __name__ == '__main__':
 
             flag_SS = True
 
-            if pname != 'tH_YtMinus1' and pname != 'tHW':
+            if pname != 'tH_YtMinus1' and pname != 'tHW' and pname != 'WH_notrig':
             
                 if not (muon1.pt > 20. and muon2.pt > 10. and muon1.trigmatch and muon2.trigmatch):
                     continue
@@ -1028,42 +1041,49 @@ if __name__ == '__main__':
             HT = sumjetpt
             H = sumjetp
 
+            for index, icomp in enumerate(selectedLeptons[0]):
+#                print 'index, pt, p =', index, icomp.pt, icomp.p
+                HT += icomp.pt
+                H += icomp.p
+                allparticles.append(icomp.returnVector())
 
-            for jj in veto_jet:
-                
-                imu_pt = 0
-                ie_pt = 0
-                itau_pt = 0
-                imu_p = 0
-                ie_p = 0
-                itau_p = 0
-                imu_4v = None
-                ie_4v = None
-                itau_4v = None
 
-                for imuon, ielectron, itau in selectedLeptons:
-                    if jj.returndR(imuon) < 0.4:
-                        imu_pt = imuon.pt
-                        imu_p = imuon.p
-                        imu_4v = imuon.returnVector()
-                    elif jj.returndR(ielectron) < 0.4:
-                        ie_pt = ielectron.pt
-                        ie_p = ielectron.p
-                        ie_4v = ielectron.returnVector()
-                    elif jj.returndR(itau) < 0.4:
-                        itau_pt = itau.pt
-                        itau_p = itau.p
-                        itau_4v = itau.returnVector()
-                                                
-                HT += (imu_pt + ie_pt + itau_pt)
-                H += imu_p + ie_p + itau_p
 
-                if imu_4v is not None:
-                    allparticles.append(imu_4v)
-                if ie_4v is not None:
-                    allparticles.append(ie_4v)
-                if itau_4v is not None:
-                    allparticles.append(itau_4v)
+#            for jj in veto_jet:
+#                
+#                imu_pt = 0
+#                ie_pt = 0
+#                itau_pt = 0
+#                imu_p = 0
+#                ie_p = 0
+#                itau_p = 0
+#                imu_4v = None
+#                ie_4v = None
+#                itau_4v = None
+#
+#                for imuon, ielectron, itau in selectedLeptons:
+#                    if jj.returndR(imuon) < 0.4:
+#                        imu_pt = imuon.pt
+#                        imu_p = imuon.p
+#                        imu_4v = imuon.returnVector()
+#                    elif jj.returndR(ielectron) < 0.4:
+#                        ie_pt = ielectron.pt
+#                        ie_p = ielectron.p
+#                        ie_4v = ielectron.returnVector()
+#                    elif jj.returndR(itau) < 0.4:
+#                        itau_pt = itau.pt
+#                        itau_p = itau.p
+#                        itau_4v = itau.returnVector()
+#                                                
+#                HT += (imu_pt + ie_pt + itau_pt)
+#                H += imu_p + ie_p + itau_p
+#
+#                if imu_4v is not None:
+#                    allparticles.append(imu_4v)
+#                if ie_4v is not None:
+#                    allparticles.append(ie_4v)
+#                if itau_4v is not None:
+#                    allparticles.append(itau_4v)
 
 #            print 'check -> ', allparticles
                     
@@ -1127,7 +1147,7 @@ if __name__ == '__main__':
                 muon_kNN_jetpt [0] = kNN_muonjetpt
                 muon_dxy [0] = imuon.dxy
                 muon_dz [0] = imuon.dz
-                muon_dB3D [0] = imuon.dB3D
+                muon_dB3D [0] = math.log(imuon.dB3D)
 
 
                 muon_ipdg = 0
@@ -1159,7 +1179,7 @@ if __name__ == '__main__':
                 smuon_kNN_jetpt [0] = kNN_smuonjetpt
                 smuon_dxy [0] = ismuon.dxy
                 smuon_dz [0] = ismuon.dz
-                smuon_dB3D [0] = ismuon.dB3D
+                smuon_dB3D [0] = math.log(ismuon.dB3D)
 
 
                 smuon_ipdg = 0
@@ -1336,7 +1356,13 @@ if __name__ == '__main__':
 
                 
                 evt_njet [0] = main.nJets
-                evt_njet_or [0] = counter_njet_or
+
+                if options.region=='f12':
+                    evt_njet_or [0] = counter_njet_or
+                elif options.region=='f3':
+                    evt_njet_or [0] = counter_njet_or + 1
+
+#                evt_njet_or [0] = counter_njet_or
                 evt_njet_or30 [0] = counter_njet_or30
                 evt_max_jet_eta [0] = max_jet_eta_sign
                 evt_max_jet_eta30 [0] = max_jet_eta30_sign

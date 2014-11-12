@@ -8,21 +8,20 @@
 #
 #################################
 
-import math, sys, array
+import math, sys, array, os, ROOT
 import numpy as num
-from ROOT import TFile, TH1F, gDirectory, TMVA, TTree, Double
-from ROOT import TLorentzVector, Double # for M(l2,tau) calculation
+from ROOT import TFile, TH1F, gDirectory, TMVA, TTree, Double, TLorentzVector
 import optparse
 import CMGTools.H2TauTau.config as tool
 from CMGTools.RootTools.utils.DeltaR import deltaR,deltaPhi
-#import config as tool
 
-import os, ROOT
 if "/smearer_cc.so" not in ROOT.gSystem.GetLibraries(): 
     ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/smearer.cc+" % os.environ['CMSSW_BASE']);
 if "/mcCorrections_cc.so" not in ROOT.gSystem.GetLibraries(): 
     ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/mcCorrections.cc+" % os.environ['CMSSW_BASE']);
-#import config as tool
+
+#isTraining = True
+isTraining = False
 
 ### For options
 parser = optparse.OptionParser()
@@ -32,110 +31,53 @@ parser.add_option('--phys', action="store", dest="phys", default='data')
 parser.add_option('--select', action="store_true", dest="select", default=False)
 options, args = parser.parse_args()
 
-
 print '[INFO] Analysis mode = ', options.mode
 print '[INFO] Control region = ', options.region
 print '[INFO] Physics Proecss = ', options.phys
 print '[INFO] Select the event list = ', options.select
 
-
-e_xml = 'kNN_training/weights/KNN_data_electron_50.xml'
-m_xml = 'kNN_training/weights/KNN_data_muon_50.xml'
-
-print '[INFO] electron xml file = ', e_xml
-print '[INFO] muon xml file = ', m_xml
-
-muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
-electronreader = TMVA.Reader("!Color:Silent=T:Verbose=F")        
-mvar_map   = {}
-evar_map   = {}
-
-# lepton MVA from ttH
-#mva_muon_barrel = 0.621
-#mva_electron_barrel = 0.477
-#
-#mva_muon_endcap = 0.739
-#mva_electron_endcap = 0.535
-
-# lepton MVA from me
-
-#mva_muon_barrel = 0.0089
-#mva_electron_barrel = 0.0649
-#
-#mva_muon_endcap = 0.0621
-#mva_electron_endcap = 0.0891
-
-
-# after optimization : lepton MVA from me
-
-#mva_muon_barrel = 0.073
-#mva_electron_barrel = 0.089
-#
-#mva_muon_endcap = 0.126
-#mva_electron_endcap = 0.113
-
-## latest save
-#mva_muon_barrel = 0.001
-#mva_electron_barrel = 0.073
-
-#mva_muon_endcap = 0.054
-#mva_electron_endcap = 0.097
-
-#mva_muon_barrel = -0.0671
-#mva_electron_barrel = 0.0461
-
-#mva_muon_endcap = -0.1205
-#mva_electron_endcap = 0.0495
-
-
-#mva_muon_barrel = 0.0657
-#mva_electron_barrel = 0.0149
-
-#mva_muon_endcap = 0.0557
-#mva_electron_endcap = 0.05229
-
-
 #mva_muon_barrel = -2
 #mva_electron_barrel = -2
-#
+
 #mva_muon_endcap = -2
 #mva_electron_endcap = -2
 
-mva_muon_barrel = 0.0337
-mva_electron_barrel = -0.0003
+#mva_muon_barrel = 0.0337
+#mva_electron_barrel = -0.0003
+#mva_muon_endcap = -0.0171
+#mva_electron_endcap = -0.0037
 
-mva_muon_endcap = -0.0171
-mva_electron_endcap = -0.0037
+# optimization 
+#mva_muon_barrel = -0.30
+#mva_electron_barrel = -0.50
+#mva_muon_endcap = -0.38
+#mva_electron_endcap = -0.50
+
+mva_muon_barrel = -0.2955 
+mva_electron_barrel =  -0.2367 
+mva_muon_endcap = -0.3761
+mva_electron_endcap = -0.2377 
 
     
-# for var in ['lepton_pt', 'lepton_kNN_jetpt', 'evt_njet']:
-for var in ['lepton_pt', 'evt_njet']:
-    mvar_map[var] = array.array('f',[0])
-    muonreader.AddVariable(var, mvar_map[var])
-        
-    evar_map[var] = array.array('f',[0])
-    electronreader.AddVariable(var, evar_map[var])
-
-muonreader.BookMVA('muon_data', m_xml)
-electronreader.BookMVA('electron_data', e_xml)
-
-
 
 mva_muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
 mva_electronreader = TMVA.Reader("!Color:Silent=T:Verbose=F")        
 mva_mvar_map   = {}
 mva_evar_map   = {}
 
-for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_dB3D', 'bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+#for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_sip3D', 'bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
     mva_mvar_map[var] = array.array('f',[0])
     mva_muonreader.AddVariable(var, mva_mvar_map[var])
 
-for var in ['bdt_electron_mva_score','bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv']:
+for var in ['bdt_electron_mva_score', 'bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv', 'bdt_electron_dB3D']:
+#for var in ['bdt_electron_mva_score', 'bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv', 'bdt_electron_sip3D']:
     mva_evar_map[var] = array.array('f',[0])
     mva_electronreader.AddVariable(var, mva_evar_map[var])
 
-mva_muonreader.BookMVA('mva_muon_data', 'training/weights/TMVAClassification_BDT_muon.weights.xml')
-mva_electronreader.BookMVA('mva_electron_data', 'training/weights/TMVAClassification_BDT_electron.weights.xml')
+if isTraining==False:
+    mva_muonreader.BookMVA('mva_muon_data', 'training/weights/TMVAClassification_BDT_muon.weights.xml')
+    mva_electronreader.BookMVA('mva_electron_data', 'training/weights/TMVAClassification_BDT_electron.weights.xml')
 
 
 
@@ -167,52 +109,22 @@ def returnTopWeight(pname, top_pt, atop_pt):
 
 
 
-def returnkNN(iregion, weight_electron, weight_muon):
-
-    kNN_weight = 1.
-    if iregion=='antiE':
-        if weight_electron==1:
-            kNN_weight = 0
-        else:
-            kNN_weight = weight_electron/(1-weight_electron)
-    elif iregion=='antiMu':
-        if weight_muon==1:
-            kNN_weight = 0
-        else:
-            kNN_weight = weight_muon/(1-weight_muon)
-    elif iregion=='antiEMu':
-        if weight_electron==1 or weight_muon==1:
-            kNN_weight = 0
-        else:
-            kNN_weight = weight_muon*weight_electron/((1-weight_muon)*(1-weight_electron))
-    elif iregion=='signal':
-        kNN_weight = 1.
-
-    return kNN_weight
-
-
-
 elist = []
 
-#for line in open('f3_signal_data_mauro_only.txt'):
 if options.select:
     for line in open('yuta'):
         evt = line.rstrip().split(':')[2]
-#        print evt
         elist.append(int(evt))
     print '[INFO] # of selected events = ', len(elist)
         
 
-#process = ['WW','tt1l','tt2l','DY0','DY1','DY3','DY4']
 process = [options.phys]
 
 ### reading file ...
 db = tool.ReadFile(process, 'emt')
 filedict = db.returnFile()
 
-#print filedict
 
-### For event list
 outfile = [0 for i in range(len(process))]
 
 for ii, pn in enumerate(process):
@@ -239,6 +151,9 @@ if __name__ == '__main__':
     muon_dz = num.zeros(1, dtype=float)
     muon_dz_orig = num.zeros(1, dtype=float)
     muon_dB3D = num.zeros(1, dtype=float)
+    muon_dB3D_orig = num.zeros(1, dtype=float)
+    muon_sip3D = num.zeros(1, dtype=float)
+    muon_sip3D_orig = num.zeros(1, dtype=float)
     muon_id = num.zeros(1, dtype=int)
     muon_iso = num.zeros(1, dtype=int)
     muon_reliso = num.zeros(1, dtype=float)
@@ -281,6 +196,9 @@ if __name__ == '__main__':
     electron_dz = num.zeros(1, dtype=float)
     electron_dz_orig = num.zeros(1, dtype=float)
     electron_dB3D = num.zeros(1, dtype=float)
+    electron_dB3D_orig = num.zeros(1, dtype=float)
+    electron_sip3D = num.zeros(1, dtype=float)
+    electron_sip3D_orig = num.zeros(1, dtype=float)
     electron_ptratio = num.zeros(1, dtype=float)
 
     electron_mva = num.zeros(1, dtype=float)
@@ -360,8 +278,6 @@ if __name__ == '__main__':
     evt_dr_mujet_csv = num.zeros(1, dtype=float)
     evt_dr_ejet_csv = num.zeros(1, dtype=float)
     evt_dr_taujet_csv = num.zeros(1, dtype=float)
-    evt_kNN_weight = num.zeros(1, dtype=float)
-    
     
     t.Branch('muon_pt',muon_pt,'muon_pt/D')
     t.Branch('muon_eta',muon_eta,'muon_eta/D')
@@ -373,6 +289,9 @@ if __name__ == '__main__':
     t.Branch('muon_dz',muon_dz, 'muon_dz/D')
     t.Branch('muon_dz_orig',muon_dz_orig, 'muon_z_orig/D')
     t.Branch('muon_dB3D',muon_dB3D, 'muon_dB3D/D')
+    t.Branch('muon_dB3D_orig',muon_dB3D_orig, 'muon_dB3D_orig/D')
+    t.Branch('muon_sip3D',muon_sip3D, 'muon_sip3D/D')
+    t.Branch('muon_sip3D_orig',muon_sip3D_orig, 'muon_sip3D_orig/D')
     t.Branch('muon_jet_csv',muon_jet_csv, 'muon_jet_csv/D')
     t.Branch('muon_jet_csv_10',muon_jet_csv_10, 'muon_jet_csv_10/D')
     t.Branch('muon_kNN_jetpt',muon_kNN_jetpt, 'muon_kNN_jetpt/D')
@@ -417,6 +336,9 @@ if __name__ == '__main__':
     t.Branch('electron_dz',electron_dz, 'electron_dz/D')
     t.Branch('electron_dz_orig',electron_dz_orig, 'electron_dz_orig/D')
     t.Branch('electron_dB3D',electron_dB3D, 'electron_dB3D/D')
+    t.Branch('electron_dB3D_orig',electron_dB3D_orig, 'electron_dB3D_orig/D')
+    t.Branch('electron_sip3D',electron_sip3D, 'electron_sip3D/D')
+    t.Branch('electron_sip3D_orig',electron_sip3D_orig, 'electron_sip3D_orig/D')
     t.Branch('electron_ptratio', electron_ptratio, 'electron_ptratio/D')
 
     t.Branch('electron_mva', electron_mva, 'electron_mva/D')
@@ -495,7 +417,6 @@ if __name__ == '__main__':
     t.Branch('evt_dr_mujet_csv', evt_dr_mujet_csv, 'evt_dr_mujet_csv/D')
     t.Branch('evt_dr_ejet_csv', evt_dr_ejet_csv, 'evt_dr_ejet_csv/D')
     t.Branch('evt_dr_taujet_csv', evt_dr_taujet_csv, 'evt_dr_taujet_csv/D')
-    t.Branch('evt_kNN_weight', evt_kNN_weight, 'evt_kNN_weight/D')
     
     counter_name = ['Initial',
                     '>=1 (e + mu)',
@@ -567,7 +488,7 @@ if __name__ == '__main__':
             print main.GetEntries(), total_entry, 'weight = ', main.GetEntries()/total_entry
             top_inclusive = main.GetEntries()/total_entry
             
-#        for jentry in xrange(1000):
+
         for jentry in xrange(main.GetEntries()):
 
             ientry = main.LoadTree(jentry)
@@ -619,9 +540,7 @@ if __name__ == '__main__':
                     
                     continue
 
-#            counter[1] += 1
 
-                        # generator information
             gp = []
             if pname != 'data':
                 for igen in xrange(ptr_ng, ptr_ng+ngen):
@@ -668,21 +587,28 @@ if __name__ == '__main__':
                 cor_dz = mchain.muon_mva_dz
                 cor_jet_dr = mchain.muon_mva_jet_dr
                 cor_ptratio = mchain.muon_mva_ptratio
+                cor_sip3D = mchain.muon_sip3D
+                cor_dB3D = abs(mchain.muon_dB3D)
 
                 if pname != 'data':
                     cor_dxy = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-#                    print 'dxy_orig, pdg, pt, eta, matchid, any, corrected = ', mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany, cor_dxy
-                    
                     cor_dz = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_jet_dr = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_ptratio = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-
+                    cor_sip3D = ROOT.scaleSip3dMC(mchain.muon_sip3D, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_dB3D = ROOT.scaleSip3dMC(abs(mchain.muon_dB3D), int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
+#                mva_mvar_map['bdt_muon_sip3D'][0] = cor_sip3D
+                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
-                
-                mva_iso_muon = mva_muonreader.EvaluateMVA('mva_muon_data')
+
+                if isTraining==False:
+                    mva_iso_muon = mva_muonreader.EvaluateMVA('mva_muon_data')
+                else:
+                    mva_iso_muon = -1
 
 
                 if (options.mode=='signal' and mchain.muon_id and ((abs(mchain.muon_eta) < 1.479 and mva_iso_muon > mva_muon_barrel) or (abs(mchain.muon_eta) > 1.479 and mva_iso_muon > mva_muon_endcap))) or \
@@ -709,7 +635,10 @@ if __name__ == '__main__':
                                      mchain.muon_mva_dxy,
                                      cor_dz,
                                      mchain.muon_mva_dz,
-                                     mchain.muon_dB3D,
+                                     cor_dB3D,
+                                     abs(mchain.muon_dB3D),
+                                     cor_sip3D,
+                                     mchain.muon_sip3D,
                                      mchain.muon_jetcsv,
                                      mchain.muon_jetcsv_10,
                                      mchain.muon_mva,
@@ -754,20 +683,27 @@ if __name__ == '__main__':
                 cor_ptratio = echain.electron_mva_ptratio
                 cor_dxy = echain.electron_mva_dxy
                 cor_dz = echain.electron_mva_dz
-                
+                cor_sip3D = echain.electron_sip3D
+                cor_dB3D = abs(echain.electron_dB3D)
 
                 if pname != 'data':
                     cor_jet_dr = ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                     cor_ptratio = ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                     cor_dxy = ROOT.scaleDxyMC(echain.electron_mva_dxy, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                     cor_dz = ROOT.scaleDzMC(echain.electron_mva_dz, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
-
+                    cor_sip3D = ROOT.scaleSip3dMC(echain.electron_sip3D, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+                    cor_dB3D = ROOT.scaleSip3dMC(abs(echain.electron_dB3D), int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                 
                 mva_evar_map['bdt_electron_mva_jet_dr'][0] = cor_jet_dr
                 mva_evar_map['bdt_electron_mva_ptratio'][0] = cor_ptratio
+#                mva_evar_map['bdt_electron_sip3D'][0] = cor_sip3D
+                mva_evar_map['bdt_electron_dB3D'][0] = cor_dB3D
 
-
-                mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
+                
+                if isTraining==False:
+                    mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
+                else:
+                    mva_iso_electron = -1
 
             
                 if (options.mode=='signal' and echain.electron_id and ((abs(echain.electron_eta) < 1.479 and mva_iso_electron > mva_electron_barrel) or (abs(echain.electron_eta) > 1.479 and mva_iso_electron > mva_electron_endcap))) or \
@@ -795,7 +731,10 @@ if __name__ == '__main__':
                                          echain.electron_mva_dxy,
                                          cor_dz,
                                          echain.electron_mva_dz,
-                                         echain.electron_dB3D,
+                                         cor_dB3D,
+                                         abs(echain.electron_dB3D),
+                                         cor_sip3D,
+                                         echain.electron_sip3D,
                                          echain.electron_jetcsv,
                                          echain.electron_jetcsv_10,
                                          echain.electron_mva,
@@ -829,31 +768,6 @@ if __name__ == '__main__':
 
             counter[1] += 1
             
-#            lepton_type = "None"
-
-#            _muon_ = []
-#            _electron_ = []
-
-
-#            if signal_muon[0].pt > signal_electron[0].pt:
-#                _muon_ = [ii for ii in signal_muon if ii.pt > 20.]
-#                _electron_ = [ii for ii in signal_electron if ii.pt > 10.]
-#                lepton_type = "muon"
-#            elif signal_muon[0].pt < signal_electron[0].pt:
-#                _muon_ = [ii for ii in signal_muon if ii.pt > 10.]
-#                _electron_ = [ii for ii in signal_electron if ii.pt > 20.]
-#                lepton_type = "electron"
-
-#            if not (len(_muon_)==1 and len(_electron_)==1):
-#                ptr_m += nmuon
-#                ptr_e += nelectron
-#                ptr_t += ntau
-#                ptr_vm += nvmuon
-#                ptr_ve += nvelectron
-#                ptr_vt += nvtau
-#                ptr_nb += nbjets
-#                continue
-
             
             electron = signal_electron
             muon = signal_muon
@@ -878,8 +792,6 @@ if __name__ == '__main__':
                 if ((options.region=='f12' and tchain.tau_id and tchain.dBisolation < 2.) or \
                     (options.region=='f3' and tchain.tau_id and tchain.dBisolation > 2.)):
 
-#                if ((options.region=='f12' and tchain.tau_id and tchain.tau_mvaisolation > 0.785) or \
-#                    (options.region=='f3' and tchain.tau_id and tchain.dBisolation < 0.785)):
 
                     tau = tool.tauobj(tchain.tau_pt,
                                       tchain.tau_eta,
@@ -899,50 +811,14 @@ if __name__ == '__main__':
 
 
 
-
-#                    if tau.charge*muon.charge==1:
-#                        continue
-#                    
-#                    if tau.returnmindR(muon) < 0.5:
-#                        continue
-#
-#                    if tau.returnmindR(electron) < 0.5:
-#                        continue
-#
-#                    if tool.diobj(tau, muon).returnmass() > 71.2 and tool.diobj(tau, muon).returnmass() < 111.2:
-#                        if not (tchain.tau_againstMuTight and
-#                                ((tchain.tau_decaymode==0 and tchain.tau_ep > 0.2) or (tchain.tau_decaymode!=0))):
-#
-#                            continue
-#
-#                    if tool.diobj(tau, electron).returnmass() > 71.2 and tool.diobj(tau, electron).returnmass() < 111.2:
-#                        if not tchain.tau_againstEMedium:
-#                            continue
-#                        
-#                    # calculate M(l2,tau) => soft-lepton + tau
-#                    Mass = -1
-#                    if lepton_type=="electron":
-#                        Mass = tool.diobj(muon, tau).returnmass()
-#                    elif lepton_type=="muon":
-#                        Mass = tool.diobj(electron, tau).returnmass()
-#                
-#
-#                    if Mass < 20.:
-#                        continue
-
-                        
+                       
                     signal_tau.append(tau)
 
-                    
-
-#            print 'muon = ', len(signal_muon), 'electron = ', len(signal_electron), 'tau = ', len(signal_tau)
-            
             ptr_m += nmuon
             ptr_e += nelectron
             ptr_t += ntau
 
 
-#            signal_tau = [it for it in signal_tau if it.charge*muon.charge==-1]
             if not len(signal_tau)>=1:
                 ptr_vm += nvmuon
                 ptr_ve += nvelectron
@@ -950,7 +826,6 @@ if __name__ == '__main__':
                 ptr_nb += nbjets
                 if pname != 'data': ptr_ng += ngen
                 ptr_nj += njets
-#                print 'tau requirement = ', main.evt
                 continue
 
             tau = signal_tau
@@ -1030,8 +905,6 @@ if __name__ == '__main__':
                                        bchain.bjet_mva)
 
                 if bj.pt > 20 and abs(bj.eta) < 2.4 and  bj.returnmindR(muon) > 0.4 and bj.returnmindR(electron) > 0.4 and bj.returnmindR(tau) > 0.4:
-#                if bj.pt > 20 and abs(bj.eta) < 2.4 and bj.mva > 0.898:
-#                if bj.pt > 20 and abs(bj.eta) < 2.4:
                     veto_bjet.append(bj)
 
 
@@ -1145,6 +1018,8 @@ if __name__ == '__main__':
 
 
 
+
+
             counter[3] += 1
 
             stau = []
@@ -1182,7 +1057,7 @@ if __name__ == '__main__':
 #                        continue
 
 
-                    if pname != 'tH_YtMinus1' and pname != 'tHW':
+                    if pname != 'tH_YtMinus1' and pname != 'tHW' and pname != 'WH_notrig':
                         if not ((imuon.pt > 20. and ielectron.pt > 10. and imuon.trigmatch and ielectron.trigmatch) or \
                                     (imuon.pt > 10. and ielectron.pt > 20. and imuon.trigmatch and ielectron.trigmatch)):
                             continue
@@ -1369,42 +1244,54 @@ if __name__ == '__main__':
             HT = sumjetpt
             H = sumjetp
 
+            for index, icomp in enumerate(selectedLeptons[0]):
+#                print 'index, pt, p =', index, icomp.pt, icomp.p
+                HT += icomp.pt
+                H += icomp.p
+                allparticles.append(icomp.returnVector())
 
-            for jj in veto_jet:
-                
-                imu_pt = 0
-                ie_pt = 0
-                itau_pt = 0
-                imu_p = 0
-                ie_p = 0
-                itau_p = 0
-                imu_4v = None
-                ie_4v = None
-                itau_4v = None
+#            HT += (selectedLeptons[0][0].pt + selectedLeptons[1].pt + selectedLeptons[2].pt)
+#            H += (selectedLeptons[0][0].p + selectedLeptons[1].p + selectedLeptons[2].p)
 
-                for imuon, ielectron, itau in selectedLeptons:
-                    if jj.returndR(imuon) < 0.4:
-                        imu_pt = imuon.pt
-                        imu_p = imuon.p
-                        imu_4v = imuon.returnVector()
-                    elif jj.returndR(ielectron) < 0.4:
-                        ie_pt = ielectron.pt
-                        ie_p = ielectron.p
-                        ie_4v = ielectron.returnVector()
-                    elif jj.returndR(itau) < 0.4:
-                        itau_pt = itau.pt
-                        itau_p = itau.p
-                        itau_4v = itau.returnVector()
-                                                
-                HT += (imu_pt + ie_pt + itau_pt)
-                H += imu_p + ie_p + itau_p
+            
+            
+#            for jj in veto_jet:
+#                
+#                imu_pt = 0
+#                ie_pt = 0
+#                itau_pt = 0
+#                imu_p = 0
+#                ie_p = 0
+#                itau_p = 0
+#                imu_4v = None
+#                ie_4v = None
+#                itau_4v = None
+#
+#                for imuon, ielectron, itau in selectedLeptons:
+#                    if jj.returndR(imuon) < 0.4:
+#                        imu_pt = imuon.pt
+#                        imu_p = imuon.p
+#                        imu_4v = imuon.returnVector()
+#                    elif jj.returndR(ielectron) < 0.4:
+#                        ie_pt = ielectron.pt
+#                        ie_p = ielectron.p
+#                        ie_4v = ielectron.returnVector()
+#                    elif jj.returndR(itau) < 0.4:
+#                        itau_pt = itau.pt
+#                        itau_p = itau.p
+#                        itau_4v = itau.returnVector()
+#                                                
+#                HT += (imu_pt + ie_pt + itau_pt)
+#                H += imu_p + ie_p + itau_p
+#
+#                if imu_4v is not None:
+#                    allparticles.append(imu_4v)
+#                if ie_4v is not None:
+#                    allparticles.append(ie_4v)
+#                if itau_4v is not None:
+#                    allparticles.append(itau_4v)
 
-                if imu_4v is not None:
-                    allparticles.append(imu_4v)
-                if ie_4v is not None:
-                    allparticles.append(ie_4v)
-                if itau_4v is not None:
-                    allparticles.append(itau_4v)
+
 
 #            print 'check -> ', allparticles
                     
@@ -1470,7 +1357,10 @@ if __name__ == '__main__':
                 muon_dz [0] = imuon.dz
                 muon_dxy_orig [0] = imuon.dxy_orig
                 muon_dz_orig [0] = imuon.dz_orig
-                muon_dB3D [0] = imuon.dB3D
+                muon_dB3D [0] = math.log(imuon.dB3D)
+                muon_dB3D_orig [0] = math.log(imuon.dB3D_orig)
+                muon_sip3D [0] = math.log(imuon.sip3D)
+                muon_sip3D_orig [0] = math.log(imuon.sip3D_orig)
 
 
                 muon_ipdg = 0
@@ -1501,7 +1391,10 @@ if __name__ == '__main__':
                 electron_dz [0] = ielectron.dz
                 electron_dxy_orig [0] = ielectron.dxy_orig
                 electron_dz_orig [0] = ielectron.dz_orig
-                electron_dB3D [0] = ielectron.dB3D
+                electron_dB3D [0] = math.log(ielectron.dB3D)
+                electron_dB3D_orig [0] = math.log(ielectron.dB3D_orig)
+                electron_sip3D [0] = math.log(ielectron.sip3D)
+                electron_sip3D_orig [0] = math.log(ielectron.sip3D_orig)
 
 
                 electron_ipdg = 0
@@ -1696,7 +1589,12 @@ if __name__ == '__main__':
 
                 
                 evt_njet [0] = main.nJets
-                evt_njet_or [0] = counter_njet_or
+
+                if options.region=='f12':
+                    evt_njet_or [0] = counter_njet_or
+                elif options.region=='f3':
+                    evt_njet_or [0] = counter_njet_or + 1
+                    
                 evt_njet_or30 [0] = counter_njet_or30
                 evt_max_jet_eta [0] = max_jet_eta_sign
                 evt_max_jet_eta30 [0] = max_jet_eta30_sign
@@ -1771,43 +1669,12 @@ if __name__ == '__main__':
                     evt_sleading_btag[0] = smax_btag
                     evt_leading_btag_pt[0] = max_btag_pt
                     evt_sleading_btag_pt[0] = smax_btag_pt
-
                     
-                weight_muon = 0.5
-                weight_electron = 0.5
-            
-                if options.mode=='antiMu' or options.mode=='antiEMu':
-
-                    mvar_map['lepton_pt'][0] = imuon.pt
-                    # mvar_map['lepton_kNN_jetpt'][0] = kNN_muonjetpt
-                    mvar_map['evt_njet'][0] = main.nJets + 1
-                    
-                    weight_muon = muonreader.EvaluateMVA('muon_data')
-                    muon_kNN[0] = weight_muon
-                if options.mode=='antiE' or options.mode=='antiEMu':
-
-                    evar_map['lepton_pt'][0] = ielectron.pt
-                    # evar_map['lepton_kNN_jetpt'][0] = kNN_electronjetpt
-                    evar_map['evt_njet'][0] = main.nJets + 1
-                    
-                    weight_electron = electronreader.EvaluateMVA('electron_data')
-                    electron_kNN[0] = weight_electron
-
-               
-                kNN_weight = returnkNN(options.mode,  weight_electron, weight_muon)
-                
-#                weight_total = main.evt_weight*kNN_weight*nsf[rindex]
-                if options.mode=='antiEMu':
-                    kNN_weight *= -1.
-
-                evt_kNN_weight[0] = kNN_weight
-
                 t.Fill()
 
 
 
 
-#            print 'Ne, Nm, Nt = ', len(selectron), len(smuon), len(stau), ' comb = ', counter_pass
 
             if options.mode=='signal' and options.region=='f12':
                 if counter_pass == 1:

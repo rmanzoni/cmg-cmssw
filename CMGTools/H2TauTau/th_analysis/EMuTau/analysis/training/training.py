@@ -9,7 +9,7 @@ from CMGTools.RootTools.utils.DeltaR import deltaR,deltaPhi
 
 
 ROOT.TMVA.Tools.Instance()
-ntuple = ROOT.TFile("BDT_training_ss_f12.root")
+ntuple = ROOT.TFile("BDT_training_ss_f12_training.root")
 tree = ntuple.Get("Tree")
 
 fout = ROOT.TFile("test.root","RECREATE")
@@ -25,6 +25,9 @@ factory = ROOT.TMVA.Factory("TMVAClassification", fout,
 factory.SetWeightExpression('bdt_evt_weight')
 factory.AddVariable("bdt_muon_dxy", "F")
 factory.AddVariable("bdt_muon_dz", "F")
+#factory.AddVariable("log(abs(bdt_muon_dB3D))", "F")
+factory.AddVariable("bdt_muon_dB3D", "F")
+#factory.AddVariable("bdt_muon_sip3D", "F")
 factory.AddVariable("bdt_muon_mva_ch_iso", "F")
 factory.AddVariable("bdt_muon_mva_neu_iso", "F")
 factory.AddVariable("bdt_muon_mva_jet_dr", "F")
@@ -54,12 +57,14 @@ method = factory.BookMethod(ROOT.TMVA.Types.kBDT, "BDT",
                             ":".join(["!H",
                                       "!V",
                                       "NTrees=850",
-                                      "nEventsMin=150",
+                                      "nEventsMin=0",
                                       "MaxDepth=3",
                                       "BoostType=AdaBoost",
-                                      "AdaBoostBeta=0.5",
+                                      "AdaBoostBeta=0.05",
                                       "SeparationType=GiniIndex",
-                                      "nCuts=20",
+                                      "nCuts=1000",
+#                                      "UseBaggedBoost=True:BaggedSampleFraction=0.5",
+#                                      "MinNodeSize=0.1",
                                       "PruneMethod=NoPruning",
                                       ]))
 
@@ -92,6 +97,9 @@ efactory.AddVariable("bdt_electron_mva_neu_iso", "F")
 efactory.AddVariable("bdt_electron_mva_jet_dr", "F")
 efactory.AddVariable("bdt_electron_mva_ptratio", "F")
 efactory.AddVariable("bdt_electron_mva_csv", "F")
+#efactory.AddVariable("log(abs(bdt_electron_dB3D))", "F")
+efactory.AddVariable("bdt_electron_dB3D", "F")
+#efactory.AddVariable("bdt_electron_sip3D", "F")
 
 efactory.AddSignalTree(tree)
 efactory.AddBackgroundTree(tree)
@@ -114,12 +122,14 @@ emethod = efactory.BookMethod(ROOT.TMVA.Types.kBDT, "BDT",
                               ":".join(["!H",
                                         "!V",
                                         "NTrees=850",
-                                        "nEventsMin=150",
+                                        "nEventsMin=0",
                                         "MaxDepth=3",
                                         "BoostType=AdaBoost",
-                                        "AdaBoostBeta=0.5",
+                                        "AdaBoostBeta=0.05",
                                         "SeparationType=GiniIndex",
-                                        "nCuts=20",
+                                        "nCuts=1000",
+#                                        "UseBaggedBoost=True:BaggedSampleFraction=0.5",
+#                                        "MinNodeSize=0.1",
                                         "PruneMethod=NoPruning",
                                         ]))
 

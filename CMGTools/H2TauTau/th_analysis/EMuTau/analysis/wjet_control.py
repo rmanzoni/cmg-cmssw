@@ -39,44 +39,21 @@ process = [options.phys]
 db = tool.ReadFile(process, 'emt')
 filedict = db.returnFile()
 
-#mva_muon_barrel = 0.0089
-#mva_electron_barrel = 0.0649
-#
-#mva_muon_endcap = 0.0621
-#mva_electron_endcap = 0.0891
+#mva_muon_barrel = -0.2955
+#mva_electron_barrel = -0.2367
 
-#mva_muon_barrel = 0.0833
-#mva_electron_barrel = 0.0599
+#mva_muon_endcap = -0.3761
+#mva_electron_endcap = -0.2377
 
-#mva_muon_endcap = 0.0851
-#mva_electron_endcap = 0.0801
+mva_muon_barrel = -0.2955 
+mva_electron_barrel =  -0.2367 
+mva_muon_endcap = -0.3761
+mva_electron_endcap = -0.2377 
 
-#mva_muon_barrel = 0.0425
-#mva_electron_barrel = 0.0429
-#
-#mva_muon_endcap = -0.0113
-#mva_electron_endcap = 0.0327
-
-#mva_muon_barrel = -0.0671
-#mva_electron_barrel = 0.0461
-
-#mva_muon_endcap = -0.1205
-#mva_electron_endcap = 0.0495
-
-##################################
-# 93% eff. point
-#mva_muon_barrel = -0.0383
-#mva_electron_barrel = 0.0557
-
-#mva_muon_endcap =  -0.0891
-#mva_electron_endcap =  0.0523
-##################################
-
-mva_muon_barrel = 0.0337
-mva_electron_barrel = -0.0003
-
-mva_muon_endcap = -0.0171
-mva_electron_endcap = -0.0037
+#mva_muon_barrel = -0.30
+#mva_electron_barrel = -0.50
+#mva_muon_endcap = -0.38
+#mva_electron_endcap = -0.50
 
 
 mva_muonreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
@@ -84,11 +61,13 @@ mva_electronreader = TMVA.Reader("!Color:Silent=T:Verbose=F")
 mva_mvar_map   = {}
 mva_evar_map   = {}
 
-for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_dB3D', 'bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
+#for var in ['bdt_muon_dxy','bdt_muon_dz','bdt_muon_sip3D', 'bdt_muon_mva_ch_iso','bdt_muon_mva_neu_iso','bdt_muon_mva_jet_dr','bdt_muon_mva_ptratio','bdt_muon_mva_csv']:
     mva_mvar_map[var] = array.array('f',[0])
     mva_muonreader.AddVariable(var, mva_mvar_map[var])
 
-for var in ['bdt_electron_mva_score','bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv']:
+for var in ['bdt_electron_mva_score', 'bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv', 'bdt_electron_dB3D']:
+#for var in ['bdt_electron_mva_score', 'bdt_electron_mva_ch_iso','bdt_electron_mva_neu_iso','bdt_electron_mva_jet_dr','bdt_electron_mva_ptratio','bdt_electron_mva_csv', 'bdt_electron_sip3D']:
     mva_evar_map[var] = array.array('f',[0])
     mva_electronreader.AddVariable(var, mva_evar_map[var])
 
@@ -110,7 +89,7 @@ if __name__ == '__main__':
         ofile = TFile(outputfile, 'recreate')
         t = TTree('kNNTrainingTree','kNNTrainingTree')
 
-        variables = [('lepton_pt', float), ('lepton_eta', float), ('lepton_phi', float), ('lepton_mass', float), ('lepton_jetpt', float), ('lepton_kNN_jetpt', float), ('lepton_njet', int), ('lepton_id', int), ('lepton_iso', int), ('lepton_reliso', float), ('lepton_MT', float), ('lepton_charge', int), ('lepton_dpt', float), ('lepton_mva', float), ('lepton_mva_threshold', float), ('slepton_pt', float), ('slepton_eta', float), ('slepton_phi', float), ('slepton_mass', float), ('slepton_jetpt', float), ('slepton_kNN_jetpt', float), ('slepton_njet', int), ('slepton_id', int), ('slepton_iso', int), ('slepton_reliso', float), ('slepton_MT', float), ('slepton_charge', int), ('slepton_dpt', float), ('slepton_mva', float), ('evt_weight_raw', float), ('evt_weight_muid', float), ('evt_weight_mutrig', float), ('evt_weight_eid', float), ('evt_weight_etrig', float), ('evt_run', int), ('evt_evt', int), ('evt_lum', int), ('evt_njet', int), ('evt_nbjet', int), ('evt_isMC', int), ('evt_isMCw', float), ('evt_id', int), ('evt_met', float), ('evt_weight', float), ('evt_Mem', float), ('lepton_pdgid', int), ('lepton_pdgid_dr', float), ('slepton_pdgid', int), ('slepton_pdgid_dr', float)]
+        variables = [('lepton_pt', float), ('lepton_eta', float), ('lepton_phi', float), ('lepton_mass', float), ('lepton_jetpt', float), ('lepton_kNN_jetpt', float), ('lepton_njet', int), ('lepton_id', int), ('lepton_iso', int), ('lepton_reliso', float), ('lepton_MT', float), ('lepton_charge', int), ('lepton_dpt', float), ('lepton_mva', float), ('lepton_mva_threshold', float), ('slepton_pt', float), ('slepton_eta', float), ('slepton_phi', float), ('slepton_mass', float), ('slepton_jetpt', float), ('slepton_kNN_jetpt', float), ('slepton_njet', int), ('slepton_id', int), ('slepton_iso', int), ('slepton_reliso', float), ('slepton_MT', float), ('slepton_charge', int), ('slepton_dpt', float), ('slepton_mva', float), ('evt_weight_raw', float), ('evt_weight_muid', float), ('evt_weight_mutrig', float), ('evt_weight_eid', float), ('evt_weight_etrig', float), ('evt_run', int), ('evt_evt', int), ('evt_lum', int), ('evt_njet', int), ('evt_njet_or', int), ('evt_nbjet', int), ('evt_isMC', int), ('evt_isMCw', float), ('evt_id', int), ('evt_met', float), ('evt_weight', float), ('evt_Mem', float), ('lepton_pdgid', int), ('lepton_pdgid_dr', float), ('slepton_pdgid', int), ('slepton_pdgid_dr', float)]
     
         var_dict = {}
         for var in variables:
@@ -135,6 +114,7 @@ if __name__ == '__main__':
         vechain = gDirectory.Get('H2TauTauTreeProducerEMT2_vetoelectron')
         vtchain = gDirectory.Get('H2TauTauTreeProducerEMT2_vetotau')
         bchain = gDirectory.Get('H2TauTauTreeProducerEMT2_bjet')
+        jchain = gDirectory.Get('H2TauTauTreeProducerEMT2_jet')
         gchain = gDirectory.Get('H2TauTauTreeProducerEMT2_gen')
 
         ptr_m = 0        
@@ -146,6 +126,7 @@ if __name__ == '__main__':
         ptr_vt = 0
 
         ptr_nb = 0
+        ptr_nj = 0
         ptr_ng = 0
 
 
@@ -174,6 +155,8 @@ if __name__ == '__main__':
             nvtau      = int(main.nvtau)
 
             nbjets     = int(main.nBJets)
+            njets     = int(main.nJets)
+
             if pname != 'data':
                 ngen = int(main.nGen)
 
@@ -216,12 +199,8 @@ if __name__ == '__main__':
                     matchany = 2
 
 
-#                mva_mvar_map['bdt_muon_dxy'][0] = mchain.muon_dxy
-#                mva_mvar_map['bdt_muon_dz'][0] = mchain.muon_dz
                 mva_mvar_map['bdt_muon_mva_ch_iso'][0] = mchain.muon_mva_ch_iso
                 mva_mvar_map['bdt_muon_mva_neu_iso'][0] = mchain.muon_mva_neu_iso
-#                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = mchain.muon_mva_jet_dr
-#                mva_mvar_map['bdt_muon_mva_ptratio'][0] = mchain.muon_mva_ptratio
                 mva_mvar_map['bdt_muon_mva_csv'][0] = mchain.muon_mva_csv
 
 
@@ -229,34 +208,27 @@ if __name__ == '__main__':
                 cor_dz = mchain.muon_mva_dz
                 cor_jet_dr = mchain.muon_mva_jet_dr
                 cor_ptratio = mchain.muon_mva_ptratio
+                cor_sip3D = mchain.muon_sip3D
+                cor_dB3D = abs(mchain.muon_dB3D)
 
                 if pname != 'data':
                     cor_dxy = ROOT.scaleDxyMC(mchain.muon_mva_dxy, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_dz = ROOT.scaleDzMC(mchain.muon_mva_dz, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_jet_dr = ROOT.correctJetDRMC(mchain.muon_mva_jet_dr, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
                     cor_ptratio = ROOT.correctJetPtRatioMC(mchain.muon_mva_ptratio, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
-                
+                    cor_sip3D = ROOT.scaleSip3dMC(mchain.muon_sip3D, int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+                    cor_dB3D = ROOT.scaleSip3dMC(abs(mchain.muon_dB3D), int(muon_ipdg), mchain.muon_pt, mchain.muon_eta, matchid, matchany)
+#                    print 'before, after = ', mchain.muon_dB3D, cor_dB3D
+                    
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
+                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
 
-                    
                 
                 mva_iso_muon = mva_muonreader.EvaluateMVA('mva_muon_data')
-#
-#                mva_mvar_map['bdt_muon_dxy'][0] = mchain.muon_dxy
-#                mva_mvar_map['bdt_muon_dz'][0] = mchain.muon_dz
-#                mva_mvar_map['bdt_muon_mva_ch_iso'][0] = mchain.muon_mva_ch_iso
-#                mva_mvar_map['bdt_muon_mva_neu_iso'][0] = mchain.muon_mva_neu_iso
-#                mva_mvar_map['bdt_muon_mva_jet_dr'][0] = mchain.muon_mva_jet_dr
-#                mva_mvar_map['bdt_muon_mva_ptratio'][0] = mchain.muon_mva_ptratio
-#                mva_mvar_map['bdt_muon_mva_csv'][0] = mchain.muon_mva_csv
-#                
-#                mva_iso_muon = mva_muonreader.EvaluateMVA('mva_muon_data')
 
-#                if ((options.channel=='muon' and mchain.muon_MT < 35.) or \
-#                    (options.channel=='electron' and mchain.muon_id and mchain.muon_reliso < 0.15 and mchain.muon_MT > 35)):
 
                 if ((options.channel=='muon' and mchain.muon_MT < 35.) or \
                     (options.channel=='electron' and \
@@ -284,7 +256,10 @@ if __name__ == '__main__':
                                      mchain.muon_mva_dxy,
                                      cor_dz,
                                      mchain.muon_mva_dz,
-                                     mchain.muon_dB3D,
+                                     cor_dB3D,
+                                     abs(mchain.muon_dB3D),
+                                     cor_sip3D,
+                                     mchain.muon_sip3D,
                                      mchain.muon_jetcsv,
                                      mchain.muon_jetcsv_10,
                                      mchain.muon_mva,
@@ -298,9 +273,6 @@ if __name__ == '__main__':
                                      mva_iso_muon
                                     )
 
-
-
-                        
                     signal_muon.append(muon)
 
 
@@ -322,43 +294,34 @@ if __name__ == '__main__':
                 if abs(electron_ipdg)==5:
                     matchany = 2
 
-#                mva_evar_map['bdt_electron_mva_score'][0] = echain.electron_mva_score
-#                mva_evar_map['bdt_electron_mva_ch_iso'][0] = echain.electron_mva_ch_iso
-#                mva_evar_map['bdt_electron_mva_neu_iso'][0] = echain.electron_mva_neu_iso
-#                mva_evar_map['bdt_electron_mva_jet_dr'][0] = echain.electron_mva_jet_dr
-#                mva_evar_map['bdt_electron_mva_ptratio'][0] = echain.electron_mva_ptratio
-#                mva_evar_map['bdt_electron_mva_csv'][0] = echain.electron_mva_csv
-#                
-#                mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
-
-
 
                 mva_evar_map['bdt_electron_mva_score'][0] = echain.electron_mva_score
                 mva_evar_map['bdt_electron_mva_ch_iso'][0] = echain.electron_mva_ch_iso
                 mva_evar_map['bdt_electron_mva_neu_iso'][0] = echain.electron_mva_neu_iso
                 mva_evar_map['bdt_electron_mva_csv'][0] = echain.electron_mva_csv
 
-
                 cor_jet_dr = echain.electron_mva_jet_dr
                 cor_ptratio = echain.electron_mva_ptratio
+                cor_dxy = echain.electron_mva_dxy
+                cor_dz = echain.electron_mva_dz
+                cor_sip3D = echain.electron_sip3D
+                cor_dB3D = abs(echain.electron_dB3D)
 
-#                print 'before', cor_jet_dr
                 if pname != 'data':
                     cor_jet_dr = ROOT.correctJetDRMC(echain.electron_mva_jet_dr, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                     cor_ptratio = ROOT.correctJetPtRatioMC(echain.electron_mva_ptratio, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
-#                print 'after', cor_jet_dr
-                                
+                    cor_dxy = ROOT.scaleDxyMC(echain.electron_mva_dxy, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+                    cor_dz = ROOT.scaleDzMC(echain.electron_mva_dz, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+                    cor_sip3D = ROOT.scaleSip3dMC(echain.electron_sip3D, int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
+                    cor_dB3D = ROOT.scaleSip3dMC(abs(echain.electron_dB3D), int(electron_ipdg), echain.electron_pt, echain.electron_eta, matchid, matchany)
                 
                 mva_evar_map['bdt_electron_mva_jet_dr'][0] = cor_jet_dr
                 mva_evar_map['bdt_electron_mva_ptratio'][0] = cor_ptratio
-
+                mva_evar_map['bdt_electron_dB3D'][0] = cor_dB3D
 
                 mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
 
 
-
-
-#                import pdb; pdb.set_trace()
 
                 if ((options.channel=='electron' and echain.electron_MT < 35.) or \
                     (options.channel=='muon' and \
@@ -386,7 +349,10 @@ if __name__ == '__main__':
                                          echain.electron_mva_dxy,
                                          cor_dz,
                                          echain.electron_mva_dz,
-                                         echain.electron_dB3D,
+                                         cor_dB3D,
+                                         abs(echain.electron_dB3D),
+                                         cor_sip3D,
+                                         echain.electron_sip3D,
                                          echain.electron_jetcsv,
                                          echain.electron_jetcsv_10,
                                          echain.electron_mva,
@@ -402,7 +368,7 @@ if __name__ == '__main__':
                                          mva_iso_electron
                                    )
 
-
+                    
                     signal_electron.append(electron)
 
 
@@ -416,6 +382,7 @@ if __name__ == '__main__':
                 ptr_ve += nvelectron
                 ptr_vt += nvtau
                 ptr_nb += nbjets
+                ptr_nj += njets
                 if pname != 'data': ptr_ng += ngen
                 continue
 
@@ -445,6 +412,7 @@ if __name__ == '__main__':
                 ptr_ve += nvelectron
                 ptr_vt += nvtau
                 ptr_nb += nbjets
+                ptr_nj += njets
                 if pname != 'data': ptr_ng += ngen
 
                 continue
@@ -513,8 +481,29 @@ if __name__ == '__main__':
                 ptr_ve += nvelectron
                 ptr_vt += nvtau
                 ptr_nb += nbjets
+                ptr_nj += njets
                 if pname != 'data': ptr_ng += ngen
                 continue
+
+
+            veto_jet = []
+            for ij in xrange(ptr_nj, ptr_nj+njets):
+
+                jchain.LoadTree(ij)
+                jchain.GetEntry(ij)
+
+                jj = tool.jetobj(jchain.jet_pt,
+                                 jchain.jet_eta,
+                                 jchain.jet_phi,
+                                 jchain.jet_mass,
+                                 jchain.jet_btagMVA)
+
+                if jj.pt > 20. and abs(jj.eta) < 4.7 and \
+                        jj.returndR(muon) > 0.4 and \
+                        jj.returndR(electron) > 0.4:
+
+                    veto_jet.append(jj)
+            
 
             #  VETO
             ######################
@@ -601,6 +590,7 @@ if __name__ == '__main__':
             ptr_ve += nvelectron
             ptr_vt += nvtau
             ptr_nb += nbjets
+            ptr_nj += njets
             if pname != 'data': ptr_ng += ngen
 
             if tool.diobj(muon, electron).returnmass() < 20:
@@ -766,7 +756,9 @@ if __name__ == '__main__':
             var_dict['evt_weight_raw'][0] = weight_raw
             
             var_dict['evt_Mem'][0] = tool.diobj(muon, electron).returnmass()
-            var_dict['evt_njet'][0] = main.nJets
+#            var_dict['evt_njet'][0] = main.nJets
+            var_dict['evt_njet'][0] = len(veto_jet)
+            var_dict['evt_njet_or'][0] = len(veto_jet)
             var_dict['evt_nbjet'][0] = nbjets
             var_dict['evt_id'][0] = ptype
             var_dict['evt_isMC'][0] = isMC
