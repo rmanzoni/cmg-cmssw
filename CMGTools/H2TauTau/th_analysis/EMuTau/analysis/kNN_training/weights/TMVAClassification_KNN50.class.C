@@ -10,10 +10,10 @@ Method         : KNN::KNN50
 TMVA Release   : 4.1.2         [262402]
 ROOT Release   : 5.32/00       [335872]
 Creator        : ytakahas
-Date           : Wed Nov 12 08:23:38 2014
+Date           : Wed Nov 12 14:02:46 2014
 Host           : Linux lxbuild168.cern.ch 2.6.18-308.16.1.el5 #1 SMP Thu Oct 4 14:02:28 CEST 2012 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/kNN_training
-Training events: 18995
+Training events: 24563
 Analysis type  : [Classification]
 
 
@@ -42,8 +42,8 @@ UseLDA: "False" [Use local linear discriminant - experimental feature]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 2
-lepton_pt                     lepton_pt                     lepton_pt                     lepton_pt                                                       'F'    [10.0001907349,372.700866699]
-evt_njet                      evt_njet                      evt_njet                      evt_njet                                                        'F'    [0,9]
+lepton_pt                     lepton_pt                     lepton_pt                     lepton_pt                                                       'F'    [10.0023565292,369.342407227]
+evt_njet                      evt_njet                      evt_njet                      evt_njet                                                        'F'    [0,11]
 NSpec 0
 
 
@@ -114,10 +114,10 @@ class ReadKNN50 : public IClassifierReader {
       }
 
       // initialize min and max vectors (for normalisation)
-      fVmin[0] = 10.0001907348633;
-      fVmax[0] = 372.700866699219;
+      fVmin[0] = 10.0023565292358;
+      fVmax[0] = 369.342407226562;
       fVmin[1] = 0;
-      fVmax[1] = 9;
+      fVmax[1] = 11;
 
       // initialize input variable types
       fType[0] = 'F';

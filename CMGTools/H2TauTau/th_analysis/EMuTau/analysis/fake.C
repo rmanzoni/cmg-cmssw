@@ -83,10 +83,10 @@ void fake(){
     gStyle->SetOptStat    (0);
 
 
-  Double_t binning[8] = {0,10,20,30,50,70,100,200};
+    Double_t binning[8] = {0,10,20,30,40,50,70,100};
 
-  Bool_t isMuon = false;
-  //Bool_t isMuon = true;
+    //Bool_t isMuon = false;
+    Bool_t isMuon = true;
   TString fname = (isMuon) ? "root_aux/Wjet_muon_training.root" : "root_aux/Wjet_electron_training.root";
 
   TFile *_file0 = TFile::Open(fname);
@@ -116,6 +116,8 @@ void fake(){
     if(ivar==0 || ivar==1){
       h_before[ivar] = new TH1F(hname_before, hname_before, 7, binning);
       h_after[ivar] = new TH1F(hname_after, hname_after, 7, binning);
+      //h_before[ivar] = new TH1F(hname_before, hname_before, 20,0,100);
+      //h_after[ivar] = new TH1F(hname_after, hname_after, 20,0,100);
     }else{
       h_before[ivar] = new TH1F(hname_before, hname_before, 10, 0, 10);
       h_after[ivar] = new TH1F(hname_after, hname_after, 10, 0, 10);
@@ -142,9 +144,11 @@ void fake(){
     if(isMuon){
       kNNTrainingTree->Draw(bname,"(evt_nbjet>=1 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25))*evt_weight*evt_isMCw");
       kNNTrainingTree->Draw(aname, "(evt_nbjet>=1 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25) && lepton_id==1 && lepton_mva > lepton_mva_threshold)*evt_weight*evt_isMCw");
+      //kNNTrainingTree->Draw(aname, "(evt_nbjet>=1 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25) && lepton_id==1 && lepton_mva > 0)*evt_weight*evt_isMCw");
     }else{
       kNNTrainingTree->Draw(bname,"(evt_nbjet>=0 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25))*evt_weight*evt_isMCw");
       kNNTrainingTree->Draw(aname, "(evt_nbjet>=0 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25) && lepton_id==1 && lepton_mva > lepton_mva_threshold)*evt_weight*evt_isMCw");
+      //kNNTrainingTree->Draw(aname, "(evt_nbjet>=0 && (!evt_isMC || evt_id==0 || evt_id==1 || evt_id==24 || evt_id==25) && lepton_id==1 && lepton_mva > 0)*evt_weight*evt_isMCw");
     }
     
     gr_data[ivar] = new TGraphAsymmErrors();
@@ -164,7 +168,7 @@ void fake(){
 
     TString lname = (isMuon) ? "jet #rightarrow #mu" : "jet #rightarrow e";
 
-    Float_t xval = (ivar==0) ? 152 : 7.5;
+    Float_t xval = (ivar==0) ? 75 : 7.5;
     TLatex * tex = new TLatex(xval, 0.2644593,lname);
     tex->SetTextFont(42);
     tex->SetTextSize(0.05637982);

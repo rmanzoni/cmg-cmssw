@@ -36,11 +36,11 @@ print '[INFO] Control region = ', options.region
 print '[INFO] Physics Proecss = ', options.phys
 print '[INFO] Select the event list = ', options.select
 
-mva_muon_barrel = -2
-mva_electron_barrel = -2
+#mva_muon_barrel = -2
+#mva_electron_barrel = -2
 
-mva_muon_endcap = -2
-mva_electron_endcap = -2
+#mva_muon_endcap = -2
+#mva_electron_endcap = -2
 
 #mva_muon_barrel = 0.0337
 #mva_electron_barrel = -0.0003
@@ -48,10 +48,10 @@ mva_electron_endcap = -2
 #mva_electron_endcap = -0.0037
 
 # optimization 
-#mva_muon_barrel = -0.30
-#mva_electron_barrel = -0.50
-#mva_muon_endcap = -0.38
-#mva_electron_endcap = -0.50
+mva_muon_barrel = 0.
+mva_electron_barrel = 0.
+mva_muon_endcap = 0.
+mva_electron_endcap = 0.
 
 #mva_muon_barrel = -0.2955 
 #mva_electron_barrel =  -0.2367 
