@@ -36,11 +36,11 @@ print '[INFO] Control region = ', options.region
 print '[INFO] Physics Proecss = ', options.phys
 print '[INFO] Select the event list = ', options.select
 
-#mva_muon_barrel = -2
-#mva_electron_barrel = -2
+mva_muon_barrel = -2
+mva_electron_barrel = -2
 
-#mva_muon_endcap = -2
-#mva_electron_endcap = -2
+mva_muon_endcap = -2
+mva_electron_endcap = -2
 
 #mva_muon_barrel = 0.0337
 #mva_electron_barrel = -0.0003
@@ -53,10 +53,10 @@ print '[INFO] Select the event list = ', options.select
 #mva_muon_endcap = -0.38
 #mva_electron_endcap = -0.50
 
-mva_muon_barrel = -0.2955 
-mva_electron_barrel =  -0.2367 
-mva_muon_endcap = -0.3761
-mva_electron_endcap = -0.2377 
+#mva_muon_barrel = -0.2955 
+#mva_electron_barrel =  -0.2367 
+#mva_muon_endcap = -0.3761
+#mva_electron_endcap = -0.2377 
 
     
 
@@ -601,7 +601,7 @@ if __name__ == '__main__':
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
 #                mva_mvar_map['bdt_muon_sip3D'][0] = cor_sip3D
-                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
+                mva_mvar_map['bdt_muon_dB3D'][0] = math.log(cor_dB3D)
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
 
@@ -697,7 +697,7 @@ if __name__ == '__main__':
                 mva_evar_map['bdt_electron_mva_jet_dr'][0] = cor_jet_dr
                 mva_evar_map['bdt_electron_mva_ptratio'][0] = cor_ptratio
 #                mva_evar_map['bdt_electron_sip3D'][0] = cor_sip3D
-                mva_evar_map['bdt_electron_dB3D'][0] = cor_dB3D
+                mva_evar_map['bdt_electron_dB3D'][0] = math.log(cor_dB3D)
 
                 
                 if isTraining==False:

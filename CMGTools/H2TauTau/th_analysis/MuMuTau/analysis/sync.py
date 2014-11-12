@@ -521,7 +521,7 @@ if __name__ == '__main__':
                     
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
-                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
+                mva_mvar_map['bdt_muon_dB3D'][0] = math.log(cor_dB3D)
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
                 

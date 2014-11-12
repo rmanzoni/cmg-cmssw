@@ -8,7 +8,7 @@
 #
 #################################
 
-import array
+import array, math
 import numpy as num
 from ROOT import TFile, gDirectory, TMVA, TTree
 import optparse
@@ -44,6 +44,11 @@ filedict = db.returnFile()
 
 #mva_muon_endcap = -0.3761
 #mva_electron_endcap = -0.2377
+
+#mva_muon_barrel = -2
+#mva_electron_barrel =  -2
+#mva_muon_endcap = -2
+#mva_electron_endcap = -2
 
 mva_muon_barrel = -0.2955 
 mva_electron_barrel =  -0.2367 
@@ -222,7 +227,7 @@ if __name__ == '__main__':
                     
                 mva_mvar_map['bdt_muon_dxy'][0] = cor_dxy
                 mva_mvar_map['bdt_muon_dz'][0] = cor_dz
-                mva_mvar_map['bdt_muon_dB3D'][0] = cor_dB3D
+                mva_mvar_map['bdt_muon_dB3D'][0] = math.log(cor_dB3D)
                 mva_mvar_map['bdt_muon_mva_jet_dr'][0] = cor_jet_dr
                 mva_mvar_map['bdt_muon_mva_ptratio'][0] = cor_ptratio
 
@@ -317,7 +322,7 @@ if __name__ == '__main__':
                 
                 mva_evar_map['bdt_electron_mva_jet_dr'][0] = cor_jet_dr
                 mva_evar_map['bdt_electron_mva_ptratio'][0] = cor_ptratio
-                mva_evar_map['bdt_electron_dB3D'][0] = cor_dB3D
+                mva_evar_map['bdt_electron_dB3D'][0] = math.log(cor_dB3D)
 
                 mva_iso_electron = mva_electronreader.EvaluateMVA('mva_electron_data')
 
