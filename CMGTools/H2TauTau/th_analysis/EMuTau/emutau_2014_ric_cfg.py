@@ -5,7 +5,7 @@ from CMGTools.RootTools.fwlite.Config import printComps
 from CMGTools.H2TauTau.triggerMap import pathsAndFilters
 from CMGTools.RootTools.RootTools import * 
 
-jobmode = True
+jobmode = False
 
 # Andrew Summer 13 (MC is identical to the previous one)
 puFileMC   = '/afs/cern.ch/user/a/agilbert/public/HTT_Pileup/13-09-13/MC_Summer12_PU_S10-600bins.root'
@@ -20,7 +20,14 @@ mc_muEffWeight     = 'effMu_muTau_Data_2012ABCDSummer13'
 
 eventSelector = cfg.Analyzer(
     'EventSelector',
-    toSelect = []
+    toSelect = [
+    936379,
+    546428,
+    110310,    
+    111181,
+    111704,
+    113782 ## down -up
+    ]
     )
 
 jsonAna = cfg.Analyzer(
@@ -75,7 +82,7 @@ jetAna = cfg.Analyzer(
     btagSFseed = 123456        ,
     relaxJetId = False         , 
     jerCorr    = False         , # jet energy resolution
-    jesCorr    = 1.         , # jet energy scale in units of sigma
+    jesCorr    = -1.            , # jet energy scale in units of sigma
     )
 
 vbfSimpleAna = cfg.Analyzer(
@@ -95,10 +102,10 @@ from CMGTools.H2TauTau.proto.samples.run2012.emuTau_YutaFeb12 import *
 #########################################################################################
 
 ## RICCARDO
-MC_list = copy.copy( mc_diboson )
-MC_list.extend( mc_ttv )
-# MC_list.extend( mc_tH  )
-MC_list.extend( mc_ttbarh )
+# MC_list = copy.copy( mc_diboson )
+# MC_list.extend( mc_ttv )
+MC_list.extend( mc_tH  )
+# MC_list.extend( mc_ttbarh )
 
 # MC_list = copy.copy( mc_tH  )
 
@@ -110,9 +117,9 @@ for mc in MC_list:
 selectedComponents = []
 
 sequence = cfg.Sequence([
-  #eventSelector,
+  eventSelector,
   jsonAna, 
-  triggerAna, # remove for the signal
+  #triggerAna, # remove for the signal
   vertexAna,
   EMuTauAna,
   jetAna,

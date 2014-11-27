@@ -33,5 +33,5 @@ mc_tH = [
     ]
 
 mc_tHW = [
-    tHW
+    tHW_Yt1
     ]

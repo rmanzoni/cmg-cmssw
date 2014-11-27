@@ -359,11 +359,15 @@ class WHEMTAnalyzer(Analyzer):
         # CSV veto
         electroncand_removebjet = []
         muoncand_removebjet = []
+
+        #import pdb ; pdb.set_trace()        
         
         for ielectron in event.electroncand:
             bm, dr2min = bestMatch(ielectron, event.CSVjet)
             if dr2min > 0.25:
                 electroncand_removebjet.append(ielectron)
+
+        #import pdb ; pdb.set_trace()        
 
         for imuon in event.muoncand:
             bm, dr2min = bestMatch(imuon, event.CSVjet)
@@ -373,6 +377,7 @@ class WHEMTAnalyzer(Analyzer):
         event.electroncand = electroncand_removebjet
         event.muoncand = muoncand_removebjet
         
+        #import pdb ; pdb.set_trace()        
         
 #        event.flag_trigmatched = False
 #        
@@ -663,6 +668,8 @@ class WHEMTAnalyzer(Analyzer):
         event.vetomuoncand = self.buildVetoLeptons(self.handles['muons'].product(), event)
         event.vetoelectroncand = self.buildVetoOtherLeptons(self.handles['electrons'].product(), event)
 
+        #import pdb ; pdb.set_trace()        
+
         flag_sscharge = False
         for im in event.muoncand:
             for ie in event.electroncand:
@@ -778,6 +785,7 @@ class WHEMTAnalyzer(Analyzer):
 
 #        print 'All events passed : ', event.run, event.lumi, event.eventId
         
+        #import pdb ; pdb.set_trace()        
         return True
 
         
