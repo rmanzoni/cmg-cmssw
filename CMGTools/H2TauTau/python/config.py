@@ -17,6 +17,7 @@ col_red = TColor.GetColor(248,206,104)
 
 filedict_mmt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/WZJetsTo3LNu/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 1.058*lum/2017979.,0],
 #                'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141010_WZ_notrig/WZJetsTo3LNu/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 1.058*lum/2017979.,0],
+                'WZ_notrig'  :['WZ_notrig','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141103_WZ_notrig/WZJetsTo3LNu/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 1.058*lum/2017979.,0],
             'ZZ'  :['ZZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/ZZJetsTo4L/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 0.181*lum/4807893.,1],
             'WW'  :['WW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/WWJetsTo2L2Nu/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 5.824*lum/1933235.,2],
             'tt2l':['tt2l','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/TTJetsFullLept/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root', 25.144*lum/12011428.,3],
@@ -48,14 +49,17 @@ filedict_mmt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3
             'TTZ':['TTZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/TTZ/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.208*lum/210160, 25],
             'TTH':['TTH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/HiggsTTH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.1302*lum/871234, 26],
 #            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/MuMuTau/process/mmt_20140801_WH_notrig/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 27],
-            'WH':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 27],
                 # 0.02 x (0.063 + 0.215 + 0.0228)
                 'tHW':['tHW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141031_tHW/tHW/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.006*lum/149985, 28],
+                'WH':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141103_WH/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 29],
+                'WH_notrig':['WH_notrig','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141103_WH_notrig/HiggsVH125/H2TauTauTreeProducerMMT/H2TauTauTreeProducerMMT_tree.root',  0.07*lum/27650, 30],
+
             'data':['data','/afs/cern.ch/user/y/ytakahas/work/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/MuMuTau/mmt_20141030/data/H2TauTauTreeProducerMMT_tree.root',1,100]}
 
 
 
 filedict_emt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/WZJetsTo3LNu/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 1.058*lum/2017979.,0],
+                'WZ_notrig'  :['WZ_notrig','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141104_WZ_notrig/WZJetsTo3LNu/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 1.058*lum/2017979.,0],
             'ZZ'  :['ZZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/ZZJetsTo4L/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 0.181*lum/4807893.,1],
             'WW'  :['WW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/WWJetsTo2L2Nu/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 5.824*lum/1933235.,2],
             'tt2l':['tt2l','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/TTJetsFullLept/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root', 25.144*lum/12011428.,3],
@@ -86,10 +90,12 @@ filedict_emt = {'WZ'  :['WZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3
             'TTW':['TTW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/TTW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.249*lum/196046, 24],
             'TTZ':['TTZ','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/TTZ/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.208*lum/210160, 25],
             'TTH':['TTH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/HiggsTTH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.1302*lum/871234, 26],
-#            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH_notrig/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
-            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
+#            'WH':['WH','/afs/cern.ch/work/y/ytakahas/htautau_2014/CMSSW_5_3_14/src/CMGTools/H2TauTau/EMuTau/process/emt_20140801_WH/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 27],
                 # 0.02 x (0.063 + 0.215 + 0.0228)
                 'tHW':['tHW','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141030_tHW/tHW/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.006*lum/149985, 28],
+                'WH':['WH','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141104_WH/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 29],
+                'WH_notrig':['WH_notrig','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141104_WH_notrig/HiggsVH125/H2TauTauTreeProducerEMT2/H2TauTauTreeProducerEMT2_tree.root',  0.07*lum/27650, 30],
+
             'data':['data','/afs/cern.ch/work/y/ytakahas/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/emt_20141031/data/H2TauTauTreeProducerEMT2_tree.root',1,100]}
 
 
@@ -153,7 +159,7 @@ class ReadFile:
 ### Classes
 class mobj:
 
-    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dxy_orig, dz, dz_orig, dB3D, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_jet_dr_orig, mva_ptratio, mva_ptratio_orig, mva_csv, new_mva, flag=False):
+    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dxy_orig, dz, dz_orig, dB3D, dB3D_orig, sip3D, sip3D_orig, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_jet_dr_orig, mva_ptratio, mva_ptratio_orig, mva_csv, new_mva, flag=False):
         self.pt = pt
         self.eta = eta
         self.phi = phi
@@ -173,6 +179,9 @@ class mobj:
         self.dz = dz
         self.dz_orig = dz_orig
         self.dB3D = dB3D
+        self.dB3D_orig = dB3D_orig
+        self.sip3D = sip3D
+        self.sip3D_orig = sip3D_orig
         self.csv = csv
         self.csv_10 = csv_10
         self.mva = mva
@@ -203,7 +212,7 @@ class mobj:
 
 class eobj:
 
-    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dxy_orig, dz, dz_orig, dB3D, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_jet_dr_orig, mva_ptratio, mva_ptratio_orig, mva_csv, mva_score, mva_nhit, new_mva):
+    def __init__(self, pt, eta, phi, mass, jetpt, njet, charge, trigmatch, trig_weight, id_weight, isid, isiso, reliso, MT, dxy, dxy_orig, dz, dz_orig, dB3D, dB3D_orig, sip3D, sip3D_orig, csv, csv_10, mva, mva_ch, mva_neu, mva_jet_dr, mva_jet_dr_orig, mva_ptratio, mva_ptratio_orig, mva_csv, mva_score, mva_nhit, new_mva):
         self.pt = pt
         self.eta = eta
         self.phi = phi
@@ -223,6 +232,9 @@ class eobj:
         self.dz = dz
         self.dz_orig = dz_orig
         self.dB3D = dB3D
+        self.dB3D_orig = dB3D_orig
+        self.sip3D = sip3D
+        self.sip3D_orig = sip3D_orig
         self.csv = csv
         self.csv_10 = csv_10
         self.mva = mva

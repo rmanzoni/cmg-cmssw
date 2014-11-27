@@ -16,8 +16,8 @@ def LegendSettings(leg):
 
 
 rel_thr = 1.
-#isBarrel = False
-isBarrel = True
+isBarrel = False
+#isBarrel = True
 
 gROOT.SetBatch(True)
 

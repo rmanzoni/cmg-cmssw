@@ -14,13 +14,13 @@ process = ['WW', 'WZ', 'ZZ',
 
 
 #nstep = 20
-nstep = 50
-scan_width = 0.2
+nstep = 25
+scan_width = 0.1
 
 
 region = ['signal','antiE','antiMu','antiEMu']
 
-directory = 'root_process_inc'
+directory = 'root_process'
 
 
 ### For options
@@ -152,11 +152,20 @@ for index, pn in enumerate(process):
 #_muon_endcap_ = 0.0621
 #_electron_endcap_ = 0.0891
 
-_muon_barrel_ = -0.0383
-_electron_barrel_ = 0.0557
+#_muon_barrel_ = -0.0383
+#_electron_barrel_ = 0.0557
+#
+#_muon_endcap_ = -0.0891
+#_electron_endcap_ = 0.0523
 
-_muon_endcap_ = -0.0891
-_electron_endcap_ = 0.0523
+_muon_barrel_ = -0.2955
+_electron_barrel_ = -0.4367
+
+_muon_endcap_ = -0.3761
+_electron_endcap_ = -0.437
+
+#-0.384099990129
+
 
 outputfile = 'Scan.root'
     
@@ -197,18 +206,18 @@ t.Branch('n_max',n_max,'n_max/F')
 
 
 
-for ie in range(0, 1):
-    for im in range(0, 1):
+for ie in range(0, nstep+1):
+    for im in range(0, nstep+1):
 
-        ie_barrel = -0.0003
-        ie_endcap = -0.0037
-        im_barrel = 0.0337
-        im_endcap = -0.0171
-#        ie_barrel = _electron_barrel_ - scan_width + 2*ie*scan_width/nstep
-#        ie_endcap = _electron_endcap_ - scan_width + 2*ie*scan_width/nstep
-#
-#        im_barrel = _muon_barrel_ - scan_width + 2*im*scan_width/nstep
-#        im_endcap = _muon_endcap_ - scan_width + 2*im*scan_width/nstep
+#        ie_barrel = -0.0003
+#        ie_endcap = -0.0037
+#        im_barrel = 0.0337
+#        im_endcap = -0.0171
+        ie_barrel = _electron_barrel_ - scan_width + 2*ie*scan_width/nstep
+        ie_endcap = _electron_endcap_ - scan_width + 2*ie*scan_width/nstep
+
+        im_barrel = _muon_barrel_ - scan_width + 2*im*scan_width/nstep
+        im_endcap = _muon_endcap_ - scan_width + 2*im*scan_width/nstep
 
 
 
@@ -327,10 +336,10 @@ for ie in range(0, 1):
 
 
                 if iprocess=='data':
-                    print iprocess, total
+#                    print iprocess, total
                     nevent_data[rindex] += total
                 else:
-                    print iprocess, total
+#                    print iprocess, total
                     nevent_mc[rindex] += total
 
             sf = 1.
@@ -338,7 +347,7 @@ for ie in range(0, 1):
                 print '[WARNING] 0 division = ', rindex, iregion, '(Data, MC) = ', nevent_data[rindex], nevent_mc[rindex]
             else:
                 sf = Double((nevent_data[rindex] - nevent_mc[rindex])/(nevent_data[rindex]))
-                print rindex, iregion, '(Data, MC) = ', nevent_data[rindex], nevent_mc[rindex]
+#                print rindex, iregion, '(Data, MC) = ', nevent_data[rindex], nevent_mc[rindex]
                 
             nsf[rindex] = sf
 
@@ -380,7 +389,7 @@ for ie in range(0, 1):
                         
                         mvar_map['lepton_pt'][0] = main.muon_pt
 #                        mvar_map['lepton_kNN_jetpt'][0] = main.muon_kNN_jetpt
-                        mvar_map['evt_njet'][0] = main.evt_njet + 1
+                        mvar_map['evt_njet'][0] = main.evt_njet
                         
                         mvaname = 'muon_' + iprocess
                         
@@ -390,7 +399,7 @@ for ie in range(0, 1):
                     
                         evar_map['lepton_pt'][0] = main.electron_pt
 #                        evar_map['lepton_kNN_jetpt'][0] = main.electron_kNN_jetpt
-                        evar_map['evt_njet'][0] = main.evt_njet + 1
+                        evar_map['evt_njet'][0] = main.evt_njet
                         
                         mvaname = 'electron_' + iprocess
                         weight_electron = electronreader[index].EvaluateMVA(mvaname)
@@ -423,7 +432,7 @@ for ie in range(0, 1):
         Nsig = 0.
         Nbkg = 0.
 
-        print
+#        print
         
         for key, value in dict_counter.iteritems():
 #            print '\t', key, ('%.2f' % (float(dict_counter[key]['counter'])))
@@ -433,7 +442,7 @@ for ie in range(0, 1):
             else:
                 Nbkg += float(dict_counter[key]['counter'])
 
-        s = float(Nsig)*0.919
+        s = float(Nsig)*0.915
         b = float(Nbkg+Nred)
         _sig_ = s/math.sqrt(s+b+0.1*b*b)
         print '\t Nsig, Nbkg, Nred, Nbkg_tot, sig. = ', ('%.2f' % float(s)), ('%.2f' % float(Nbkg)), ('%.2f' % float(Nred)), ('%.2f' % float(b)), ('%.2f' % float(_sig_))

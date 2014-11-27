@@ -72,7 +72,7 @@ selections = {
     'ttV':{'selection':'bdt_evt_processid>=17 && bdt_evt_processid<=18', 'col':kOrange-2, 'order':4},
     'ttH':{'selection':'bdt_evt_processid==19', 'col':col_zll, 'order':2},
     'Reducible':{'selection':'bdt_evt_processid==20', 'col':col_qcd, 'order':3},
-    'signal':{'selection':'bdt_evt_processid==16', 'col':kBlue, 'order':1001},
+    'signal':{'selection':'bdt_evt_processid==16 || bdt_evt_processid==25', 'col':kBlue, 'order':1001},
     'data':{'selection':'bdt_evt_processid==100', 'col':1, 'order':2999}
     }
 
@@ -155,10 +155,12 @@ def makePlotsVars(tree, isSignal=False):
 
 if __name__ == '__main__':
 
+#    tfile = ROOT.TFile('BDT_training_separate_ss_f3.root')
     tfile = ROOT.TFile('BDT_training_ss_f3.root')
     tree = tfile.Get('Tree')
     makePlotsVars(tree)
 
+#    tfile = ROOT.TFile('BDT_training_separate_ss_f12.root')
     tfile = ROOT.TFile('BDT_training_ss_f12.root')
     tree = tfile.Get('Tree')
     makePlotsVars(tree, True)

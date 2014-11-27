@@ -26,7 +26,7 @@ variables = {
     'bdt_muon_pdg': {'nbin':40, 'xtitle':'muon PDG', 'xmin':-20, 'xmax':20},
     'bdt_muon_mva_neu_iso': {'nbin':nbin, 'xtitle':'muon MVA neutral iso', 'xmin':0, 'xmax':1},
     'bdt_muon_mva_ch_iso': {'nbin':nbin, 'xtitle':'muon MVA charged iso', 'xmin':0, 'xmax':1},
-    'bdt_muon_dB3D': {'nbin':nbin, 'xtitle':'muon MVA dB3D (cm)', 'xmin':-0.05, 'xmax':0.05},
+    'bdt_muon_dB3D': {'nbin':nbin, 'xtitle':'muon log(abs(dB3D))', 'xmin':-15, 'xmax':0.},
     'bdt_muon_dz': {'nbin':nbin, 'xtitle':'muon log(abs(dz))', 'xmin':-15, 'xmax':0},
     'bdt_muon_dxy': {'nbin':nbin, 'xtitle':'muon log(abs(dxy))', 'xmin':-15, 'xmax':0},
     'bdt_muon_mva_csv': {'nbin':nbin, 'xtitle':'muon MVA CSV', 'xmin':0, 'xmax':1},
@@ -39,7 +39,7 @@ variables = {
     'bdt_smuon_pdg': {'nbin':40, 'xtitle':'smuon PDG', 'xmin':-20, 'xmax':20},
     'bdt_smuon_mva_neu_iso': {'nbin':nbin, 'xtitle':'smuon MVA neutral iso', 'xmin':0, 'xmax':1},
     'bdt_smuon_mva_ch_iso': {'nbin':nbin, 'xtitle':'smuon MVA charged iso', 'xmin':0, 'xmax':1},
-    'bdt_smuon_dB3D': {'nbin':nbin, 'xtitle':'smuon MVA dB3D (cm)', 'xmin':-0.05, 'xmax':0.05},
+    'bdt_smuon_dB3D': {'nbin':nbin, 'xtitle':'smuon log(abs(dB3D))', 'xmin':-15, 'xmax':0},
     'bdt_smuon_dz': {'nbin':nbin, 'xtitle':'smuon log(abs(dz))', 'xmin':-15, 'xmax':0},
     'bdt_smuon_dxy': {'nbin':nbin, 'xtitle':'smuon log(abs(dxy))', 'xmin':-15, 'xmax':0},
     'bdt_smuon_mva_csv': {'nbin':nbin, 'xtitle':'smuon MVA CSV', 'xmin':0, 'xmax':1},
@@ -73,7 +73,7 @@ selections = {
 #    'EWK':{'selection':'bdt_evt_processid>=6 && bdt_evt_processid<=15', 'col':col_ewk, 'order':3},
 #    'ST':{'selection':'bdt_evt_processid>=21 && bdt_evt_processid<=24', 'col':col_qcd, 'order':6},
     'reducible':{'selection':'bdt_evt_processid==20', 'col':col_qcd, 'order':3},
-    'signal':{'selection':'bdt_evt_processid==16', 'col':kBlue, 'order':1001},
+    'signal':{'selection':'bdt_evt_processid==16 || bdt_evt_processid==25', 'col':kBlue, 'order':1001},
     'data':{'selection':'bdt_evt_processid==100', 'col':1, 'order':2999}
     }
 
@@ -156,10 +156,12 @@ def makePlotsVars(tree, isSignal=False):
 
 if __name__ == '__main__':
 
+#    tfile = ROOT.TFile('BDT_training_separate_ss_f3.root')
     tfile = ROOT.TFile('BDT_training_ss_f3.root')
     tree = tfile.Get('Tree')
     makePlotsVars(tree)
 
+#    tfile = ROOT.TFile('BDT_training_separate_ss_f12.root')
     tfile = ROOT.TFile('BDT_training_ss_f12.root')
     tree = tfile.Get('Tree')
     makePlotsVars(tree, True)

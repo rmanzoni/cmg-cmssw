@@ -2,6 +2,9 @@ import ROOT
 import optparse, os
 import array
 
+from ROOT import gROOT
+
+gROOT.SetBatch(True)
 ### For options
 parser = optparse.OptionParser()
 parser.add_option('--channel', action="store", dest="channel", default='electron')
@@ -33,7 +36,8 @@ else:
 
 nNeighbours = 50
 
-dir="/afs/cern.ch/user/s/steggema/work/Yuta/CMSSW_5_3_19/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/root_aux/"
+#dir="/afs/cern.ch/user/s/steggema/work/Yuta/CMSSW_5_3_19/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/root_aux/"
+dir="/afs/cern.ch/user/y/ytakahas/work/th_analysis/CMSSW_5_3_14_patch2/src/CMGTools/H2TauTau/th_analysis/EMuTau/analysis/root_aux/"
 
 file_data = ROOT.TFile(dir + fname)
 tree_data = file_data.Get('kNNTrainingTree')
@@ -168,7 +172,7 @@ for var in var_dict:
         vd['hist_w'].Draw('same hist e')
     print 'Integral ori', vd['hist_p'].Integral()
     print 'Integral pre', vd['hist_w'].Integral()
-    cv.Print(var+'.pdf')
+    cv.Print(var+ '_' + options.channel + '.gif')
 
 
 # import NtupleTMVAEvaluate
