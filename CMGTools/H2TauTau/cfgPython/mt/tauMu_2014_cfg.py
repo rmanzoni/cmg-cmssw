@@ -131,8 +131,10 @@ TauMuAna = cfg.Analyzer(
 dyJetsFakeAna = cfg.Analyzer(
     DYJetsFakeAnalyzer,
     'DYJetsFakeAnalyzer',
-    leptonType = 13,
-    src = 'prunedGenParticles',
+    channel = 'mt',
+    genPtCut = 8.,
+    #leptonType = 13,
+    #src = 'prunedGenParticles',
     )
 
 WNJetsAna = cfg.Analyzer(
@@ -228,7 +230,8 @@ treeProducerXCheck = cfg.Analyzer(
 
 #########################################################################################
 
-from CMGTools.H2TauTau.proto.samples.csa2014.tauMu_Sync_Jan import MC_list, mc_higgs, mc_dict
+# from CMGTools.H2TauTau.proto.samples.csa2014.tauMu_Sync_Jan import MC_list, mc_higgs, mc_dict
+from CMGTools.H2TauTau.proto.samples.phys14.diTau_Ric_Jan27 import *
 
 #########################################################################################
 
@@ -242,7 +245,8 @@ for mc in MC_list:
     mc.puFileData = puFileData
 
 
-selectedComponents = [mc_dict['HiggsTTHInclusive125']]
+# selectedComponents = [mc_dict['HiggsTTHInclusive125']]
+selectedComponents = allsamples
 
 sequence = cfg.Sequence( [
     # eventSelector,
@@ -274,16 +278,16 @@ if syncntuple:
 # selectedComponents = [comp for comp in selectedComponents if comp.dataset_entries > 0]
 
 #mc_dict['HiggsTTHInclusive125'].files = ['/afs/cern.ch/user/s/steggema/work/CMSSW_7_2_3/src/CMGTools/H2TauTau/prod/tauMu_fullsel_tree_CMG.root']
-mc_dict['HiggsTTHInclusive125'].files = ['/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_2_3/src/CMGTools/H2TauTau/prod/diTau_fullsel_tree_CMG.root']
+# mc_dict['HiggsTTHInclusive125'].files = ['/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_2_3/src/CMGTools/H2TauTau/prod/diTau_fullsel_tree_CMG.root']
 
-test = 1
-if test==1:
-    comp = mc_dict['HiggsTTHInclusive125']
-    # comp = data_Run2012A
+test = 1 # test = 0 run on batch, test = 1 run locally
+if test == 1 :
+    cache              = True
+    comp               = HiggsGGH125
+    comp.triggers      = [] # empty for now
     selectedComponents = [comp]
-    comp.splitFactor = 1
-    # comp.files = comp.files[:10]
-    # comp.files = ['tauMu_fullsel_tree_CMG.root']
+    comp.splitFactor   = 1
+    comp.files         = comp.files[:1]
 elif test==2:
     selectedComponents = selectedComponents[:12]
     for comp in selectedComponents:

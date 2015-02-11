@@ -126,7 +126,9 @@ class EMuAnalyzer( DiLeptonAnalyzer ):
 #         if self.relaxEleId:
 #             return electron.relaxedIdForEleTau() and \
 #                self.testVertex( electron )    
-        return electron.tightIdForEleTau() and \
+#         return electron.tightIdForEleTau() and \
+#                self.testVertex( electron )
+        return electron.tightId() and \
                self.testVertex( electron )
                
     def testLeg2Iso(self, electron, isocut):

@@ -1,229 +1,179 @@
 #!/bin/env python
-from PhysicsTools.HeppyCore.utils.deltar import deltaR, deltaPhi
 
+# from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer  import AutoFillTreeProducer 
+from PhysicsTools.Heppy.analyzers.core.autovars              import NTupleVariable 
+from PhysicsTools.HeppyCore.utils.deltar                     import deltaR, deltaPhi
+from CMGTools.H2TauTau.proto.analyzers.tauIDs                import tauIDs
 
-tauIDs = ['againstElectronLoose', 'againstElectronLooseMVA5', 'againstElectronMVA5category', 'againstElectronMVA5raw', 'againstElectronMedium', 'againstElectronMediumMVA5', 'againstElectronTight', 'againstElectronTightMVA5', 'againstElectronVLooseMVA5', 'againstElectronVTightMVA5', 'againstMuonLoose', 'againstMuonLoose2', 'againstMuonLoose3', 'againstMuonLooseMVA', 'againstMuonMVAraw', 'againstMuonMedium', 'againstMuonMedium2', 'againstMuonMediumMVA', 'againstMuonTight', 'againstMuonTight2', 'againstMuonTight3', 'againstMuonTightMVA', 'byCombinedIsolationDeltaBetaCorrRaw3Hits', 'byIsolationMVA3newDMwLTraw', 'byIsolationMVA3newDMwoLTraw', 'byIsolationMVA3oldDMwLTraw', 'byIsolationMVA3oldDMwoLTraw', 'byLooseCombinedIsolationDeltaBetaCorr3Hits', 'byLooseIsolationMVA3newDMwLT', 'byLooseIsolationMVA3newDMwoLT', 'byLooseIsolationMVA3oldDMwLT', 'byLooseIsolationMVA3oldDMwoLT', 'byMediumCombinedIsolationDeltaBetaCorr3Hits', 'byMediumIsolationMVA3newDMwLT', 'byMediumIsolationMVA3newDMwoLT', 'byMediumIsolationMVA3oldDMwLT', 'byMediumIsolationMVA3oldDMwoLT', 'byTightCombinedIsolationDeltaBetaCorr3Hits', 'byTightIsolationMVA3newDMwLT', 'byTightIsolationMVA3newDMwoLT', 'byTightIsolationMVA3oldDMwLT', 'byTightIsolationMVA3oldDMwoLT', 'byVLooseIsolationMVA3newDMwLT', 'byVLooseIsolationMVA3newDMwoLT', 'byVLooseIsolationMVA3oldDMwLT', 'byVLooseIsolationMVA3oldDMwoLT', 'byVTightIsolationMVA3newDMwLT', 'byVTightIsolationMVA3newDMwoLT', 'byVTightIsolationMVA3oldDMwLT', 'byVTightIsolationMVA3oldDMwoLT', 'byVVTightIsolationMVA3newDMwLT', 'byVVTightIsolationMVA3newDMwoLT', 'byVVTightIsolationMVA3oldDMwLT', 'byVVTightIsolationMVA3oldDMwoLT', 'chargedIsoPtSum', 'decayModeFinding', 'decayModeFindingNewDMs', 'neutralIsoPtSum', 'puCorrPtSum']
-
-def var( tree, varName, type=float ):
-    tree.var(varName, type)
-
-def fill( tree, varName, value ):
-    tree.fill( varName, value )
-
-# simple particle
-
-def bookParticle( tree, pName ):
-    var(tree, '{pName}_pt'.format(pName=pName))
-    var(tree, '{pName}_eta'.format(pName=pName))
-    var(tree, '{pName}_phi'.format(pName=pName))
-    var(tree, '{pName}_charge'.format(pName=pName))
-
-def fillParticle( tree, pName, particle ):
-    fill(tree, '{pName}_pt'.format(pName=pName), particle.pt() )
-    fill(tree, '{pName}_eta'.format(pName=pName), particle.eta() )
-    fill(tree, '{pName}_phi'.format(pName=pName), particle.phi() )
-    fill(tree, '{pName}_charge'.format(pName=pName), particle.charge() )
-
-def bookGenParticle(tree, pName):
-    bookParticle(tree, pName)
-    var(tree, '{pName}_mass'.format(pName=pName))
-    var(tree, '{pName}_pdgId'.format(pName=pName))
-    
-def fillGenParticle( tree, pName, particle ):
-    fillParticle( tree, pName, particle )
-    fill(tree, '{pName}_mass'.format(pName=pName), particle.mass() )
-    fill(tree, '{pName}_pdgId'.format(pName=pName), particle.pdgId() )
+def multi_getattr(obj, attr, **kw):
+  '''
+  Get a named attribute from an object; multi_getattr(x, 'a.b.c.d') is
+  equivalent to x.a.b.c.d. When a default argument is given, it is
+  returned when any attribute in the chain doesn't exist; without
+  it, an exception is raised when a missing attribute is encountered.
+  '''
+  attributes = attr.split(".")
+  for i in attributes:
+    try:
+      obj = getattr(obj, i)
+      if callable(obj):
+        obj = obj()
+    except AttributeError:
+      if kw.has_key('default'):
+        return kw['default']
+      else:
+        raise
+  return obj
+  
+def pthiggs(event) :
+  return (event.diLepton.leg1().p4()+event.diLepton.leg2().p4()+event.diLepton.met().p4()).pt()
+def l1eta  (event) :
+  return event.diLepton.leg1().eta()
+def l2eta  (event) :
+  return event.diLepton.leg2().eta()
+def l1phi  (event) :
+  return event.diLepton.leg1().phi()
+def l2phi  (event) :
+  return event.diLepton.leg2().phi()
+def metphi (event) :
+  return event.diLepton.met().phi()
 
 # di-tau
+diLeptonVars = [
+  NTupleVariable('visMass'      , lambda event : event.diLepton.mass()                                         , float, mcOnly=False, help='di-tau visible mass'                                                                         ),
+  NTupleVariable('svfitMass'    , lambda event : event.diLepton.svfitMass()                                    , float, mcOnly=False, help='di-tau SVfit mass'                                                                           ),
+  NTupleVariable('pZetaMET'     , lambda event : event.diLepton.pZetaMET()                                     , float, mcOnly=False, help='p_Z invisible'                                                                               ),
+  NTupleVariable('pZetaVis'     , lambda event : event.diLepton.pZetaVis()                                     , float, mcOnly=False, help='p_Z visible'                                                                                 ),
+  NTupleVariable('pZetaDisc'    , lambda event : event.diLepton.pZetaDisc()                                    , float, mcOnly=False, help='p_Z discriminator'                                                                           ),
+  NTupleVariable('mt'           , lambda event : event.diLepton.mTLeg2()                                       , float, mcOnly=False, help='m_T(met,leg2). Leg2 usually means the lepton. Met is the one associated to the di-tau pair'  ),
+  NTupleVariable('mtleg2'       , lambda event : event.diLepton.mTLeg2()                                       , float, mcOnly=False, help='m_T(met,leg2). Met is the one associated to the di-tau pair'                                 ),
+  NTupleVariable('mtleg1'       , lambda event : event.diLepton.mTLeg1()                                       , float, mcOnly=False, help='m_T(met,leg1). Met is the one associated to the di-tau pair'                                 ),
+  NTupleVariable('met'          , lambda event : event.diLepton.met().pt()                                     , float, mcOnly=False, help='met pt'                                                                                      ),
+  NTupleVariable('mex'          , lambda event : event.diLepton.met().px()                                     , float, mcOnly=False, help='mex'                                                                                         ),
+  NTupleVariable('mey'          , lambda event : event.diLepton.met().py()                                     , float, mcOnly=False, help='mey'                                                                                         ),
+  NTupleVariable('metphi'       , lambda event : event.diLepton.met().phi()                                    , float, mcOnly=False, help='met phi'                                                                                     ),
+  # RIC: these don't appear to be there FIXME
+  # NTupleVariable('metcov00'     , lambda event : event.diLepton.metSig().significance()(0,0))                  , float, mcOnly=False, help='met covariance matrix (0,0)'                                                                 ),
+  # NTupleVariable('metcov01'     , lambda event : event.diLepton.metSig().significance()(0,1))                  , float, mcOnly=False, help='met covariance matrix (0,1)'                                                                 ),
+  # NTupleVariable('metcov10'     , lambda event : event.diLepton.metSig().significance()(1,0))                  , float, mcOnly=False, help='met covariance matrix (1,0)'                                                                 ),
+  # NTupleVariable('metcov11'     , lambda event : event.diLepton.metSig().significance()(1,1))                  , float, mcOnly=False, help='met covariance matrix (1,1)'                                                                 ),
+  NTupleVariable('pthiggs'      , lambda event : pthiggs(event)                                                , float, mcOnly=False, help='pt Higgs: (leg1 + leg2 + MET) pt'                                                            ),
+  NTupleVariable('deltaPhiL1L2' , lambda event : deltaPhi(l1phi(event), l2phi(event))                          , float, mcOnly=False, help='delta phi between leg 1 and leg2'                                                            ),
+  NTupleVariable('deltaEtaL1L2' , lambda event : abs(l1eta(event)-l2eta(event))                                , float, mcOnly=False, help='delta eta between leg 1 and leg2'                                                            ),
+  NTupleVariable('deltaRL1L2'   , lambda event : deltaR(l1eta(event), l1phi(event), l2eta(event), l2phi(event)), float, mcOnly=False, help='delta R between leg 1 and leg2'                                                              ),
+  NTupleVariable('deltaPhiL1MET', lambda event : deltaPhi(l1phi(event), metphi(event))                         , float, mcOnly=False, help='delta phi between leg 1 and met. Met is the one associated to the di-tau pair'               ),
+  NTupleVariable('deltaPhiL2MET', lambda event : deltaPhi(l2phi(event), metphi(event))                         , float, mcOnly=False, help='delta phi between leg 2 and met. Met is the one associated to the di-tau pair'               ),
+]  
 
-def bookDiLepton(tree):
-    var( tree, 'visMass'      )
-    var( tree, 'svfitMass'    )
-    var( tree, 'pZetaMET'     )
-    var( tree, 'pZetaVis'     )
-    var( tree, 'pZetaDisc'    )
-    var( tree, 'mtleg2'       )
-    var( tree, 'mtleg1'       )
-    var( tree, 'mt'           )
-    var( tree, 'met'          )
-    var( tree, 'metphi'       )
-    var( tree, 'pthiggs'      )
-    var( tree, 'deltaPhiL1L2' )
-    var( tree, 'deltaEtaL1L2' )
-    var( tree, 'deltaRL1L2'   )
-    var( tree, 'deltaPhiL1MET')
-    var( tree, 'deltaPhiL2MET')
+# vbf
+VBFVars =  [
+  NTupleVariable('mjj'      , lambda event : event.vbf.mjj             , float, mcOnly=False, help='VBF invariant mass of the two highest pt jets'                        ),
+  NTupleVariable('deta'     , lambda event : event.vbf.deta            , float, mcOnly=False, help='VBF eta separation between the two highest pt jets'                   ),
+  NTupleVariable('nCentral' , lambda event : len(event.vbf.centralJets), float, mcOnly=False, help='VBF number of jets with pt>30 in the eta gap between the tagging jets'),
+  NTupleVariable('mva'      , lambda event : event.vbf.mva             , float, mcOnly=False, help='VBF MVA score'                                                        ),
+  NTupleVariable('jdphi'    , lambda event : event.vbf.dphi            , float, mcOnly=False, help='VBF phi separation between the two highest pt jets'                   ),
+  NTupleVariable('dijetpt'  , lambda event : event.vbf.dijetpt         , float, mcOnly=False, help='VBF pt of the di-jet system'                                          ),
+  NTupleVariable('dijetphi' , lambda event : event.vbf.dijetphi        , float, mcOnly=False, help='VBF phi of the di-jet system'                                         ),
+  NTupleVariable('hdijetphi', lambda event : event.vbf.dphidijethiggs  , float, mcOnly=False, help='VBF phi separation between the Higgs system and the di-jet system'    ),
+  NTupleVariable('visjeteta', lambda event : event.vbf.visjeteta       , float, mcOnly=False, help='VBF visible jet eta'                                                  ),
+  NTupleVariable('ptvis'    , lambda event : event.vbf.ptvis           , float, mcOnly=False, help='VBF visible pt'                                                       ),
+]
+
+# DY fakes
+ZttGenVars =  [
+  NTupleVariable('isZtt' , lambda event : event.isZtt , float, mcOnly=True, help='Z/H -> tautau, fully hadronic'),
+  NTupleVariable('isZmt' , lambda event : event.isZmt , float, mcOnly=True, help='Z/H -> tautau, mutau'         ),
+  NTupleVariable('isZet' , lambda event : event.isZet , float, mcOnly=True, help='Z/H -> tautau, etau'          ),
+  NTupleVariable('isZee' , lambda event : event.isZee , float, mcOnly=True, help='Z/H -> tautau, ee'            ),
+  NTupleVariable('isZmm' , lambda event : event.isZmm , float, mcOnly=True, help='Z/H -> tautau, mm'            ),
+  NTupleVariable('isZem' , lambda event : event.isZem , float, mcOnly=True, help='Z/H -> tautau, em'            ),
+  NTupleVariable('isZEE' , lambda event : event.isZEE , float, mcOnly=True, help='Z/H -> ee'                    ),
+  NTupleVariable('isZMM' , lambda event : event.isZMM , float, mcOnly=True, help='Z/H -> mm'                    ),
+  NTupleVariable('isZLL' , lambda event : event.isZLL , float, mcOnly=True, help='Z/H -> ll (ee or mm)'         ),
+  NTupleVariable('isFake', lambda event : event.isFake, float, mcOnly=True, help='check DYJetsFakeAnalyzer'     ),
+]
 
 
-def fillDiLepton(tree, diLepton):
-    fill(tree, 'visMass'  , diLepton.mass()     )
-    fill(tree, 'svfitMass', diLepton.svfitMass())
-    fill(tree, 'pZetaMET' , diLepton.pZetaMET() )
-    fill(tree, 'pZetaVis' , diLepton.pZetaVis() )
-    fill(tree, 'pZetaDisc', diLepton.pZetaDisc())
-    fill(tree, 'mt'       , diLepton.mTLeg2()   )
-    fill(tree, 'mtleg2'   , diLepton.mTLeg2()   ) # RIC: handy for tt, redundant but non destructive
-    fill(tree, 'mtleg1'   , diLepton.mTLeg1()   )
-    fill(tree, 'met'      , diLepton.met().pt() )
-    fill(tree, 'metphi'   , diLepton.met().phi())
-
-    pthiggs = (diLepton.leg1().p4()+diLepton.leg2().p4()+diLepton.met().p4()).pt()
-    fill(tree, 'pthiggs', pthiggs)
+# simple particle
+def fillParticle( pName, particle ):
+    return [
+             NTupleVariable('{pName}_pt'    .format(pName=pName), lambda event : multi_getattr(event, particle).pt()    , float, mcOnly=False, help='{PART} pt'    .format(PART=particle)),
+             NTupleVariable('{pName}_eta'   .format(pName=pName), lambda event : multi_getattr(event, particle).eta()   , float, mcOnly=False, help='{PART} eta'   .format(PART=particle)),
+             NTupleVariable('{pName}_phi'   .format(pName=pName), lambda event : multi_getattr(event, particle).phi()   , float, mcOnly=False, help='{PART} phi'   .format(PART=particle)),
+             NTupleVariable('{pName}_charge'.format(pName=pName), lambda event : multi_getattr(event, particle).charge(), int  , mcOnly=False, help='{PART} charge'.format(PART=particle)),
+           ]  
     
-    l1eta  = diLepton.leg1().eta()
-    l2eta  = diLepton.leg2().eta()
-    l1phi  = diLepton.leg1().phi()
-    l2phi  = diLepton.leg2().phi()
-    metphi = diLepton.met().phi()
-    fill(tree, 'deltaPhiL1L2' , deltaPhi(l1phi, l2phi)            )
-    fill(tree, 'deltaEtaL1L2' , abs(l1eta-l2eta)                  )
-    fill(tree, 'deltaRL1L2'   , deltaR(l1eta, l1phi, l2eta, l2phi))
-    fill(tree, 'deltaPhiL1MET', deltaPhi(l1phi, metphi)           )
-    fill(tree, 'deltaPhiL2MET', deltaPhi(l2phi, metphi)           )
-    
+def fillGenParticle( pName, particle ):
+    return fillParticle(pName, particle) + \
+           [
+             NTupleVariable('{pName}_mass'  .format(pName=pName), lambda event : multi_getattr(event, particle).mass() , float, mcOnly=True, help='{PART} gen mass'.format(PART=particle)),
+             NTupleVariable('{pName}_pdgId' .format(pName=pName), lambda event : multi_getattr(event, particle).pdgId(), float, mcOnly=True, help='{PART} pdg ID'  .format(PART=particle)),
+           ]  
+   
 # lepton
-
-def bookLepton( tree, pName ):
-    bookParticle(tree, pName )
-    var(tree, '{pName}_relIso05'      .format(pName=pName))
-    var(tree, '{pName}_dxy'           .format(pName=pName))
-    var(tree, '{pName}_dz'            .format(pName=pName))
-    var(tree, '{pName}_weight'        .format(pName=pName))
-    var(tree, '{pName}_triggerWeight' .format(pName=pName))
-    var(tree, '{pName}_triggerEffData'.format(pName=pName))
-    var(tree, '{pName}_triggerEffMC'  .format(pName=pName))
-    var(tree, '{pName}_recEffWeight'  .format(pName=pName))
-
-def fillLepton( tree, pName, lepton ):
-    fillParticle(tree, pName, lepton )
-    fill(tree, '{pName}_relIso05'      .format(pName=pName), lepton.relIsoAllChargedDB05() )
-    fill(tree, '{pName}_dxy'           .format(pName=pName), lepton.dxy()                  )
-    fill(tree, '{pName}_dz'            .format(pName=pName), lepton.dz()                   )
-    fill(tree, '{pName}_weight'        .format(pName=pName), lepton.weight                 )
-    fill(tree, '{pName}_triggerWeight' .format(pName=pName), lepton.triggerWeight          )
-    fill(tree, '{pName}_triggerEffData'.format(pName=pName), lepton.triggerEffData         )
-    fill(tree, '{pName}_triggerEffMC'  .format(pName=pName), lepton.triggerEffMC           )
-    fill(tree, '{pName}_recEffWeight'  .format(pName=pName), lepton.recEffWeight           )
-
+def fillLepton( pName, lepton ):
+    return fillParticle(pName, lepton) + \
+           [
+             NTupleVariable('{pName}_relIso05'      .format(pName=pName), lambda event : multi_getattr(event, lepton).relIsoAllChargedDB05(), float, mcOnly=False, help='{PART} relative isolation, all charged particles, delta beta corrected, radius 0.5'.format(PART=lepton)),
+             NTupleVariable('{pName}_dxy'           .format(pName=pName), lambda event : multi_getattr(event, lepton).dxy()                 , float, mcOnly=False, help='{PART} dxy wrt its own vertex (vertex has been assigned beforehand)'               .format(PART=lepton)),
+             NTupleVariable('{pName}_dz'            .format(pName=pName), lambda event : multi_getattr(event, lepton).dz()                  , float, mcOnly=False, help='{PART} dz wrt its own vertex (vertex has been assigned beforehand)'                .format(PART=lepton)),
+             NTupleVariable('{pName}_weight'        .format(pName=pName), lambda event : multi_getattr(event, lepton).weight                , float, mcOnly=False, help='{PART} weight. Product of all weights'                                             .format(PART=lepton)),
+             NTupleVariable('{pName}_triggerWeight' .format(pName=pName), lambda event : multi_getattr(event, lepton).triggerWeight         , float, mcOnly=False, help='{PART} trigger weight computed as data efficiency divided by MC efficiency'        .format(PART=lepton)),
+             NTupleVariable('{pName}_triggerEffData'.format(pName=pName), lambda event : multi_getattr(event, lepton).triggerEffData        , float, mcOnly=False, help='{PART} trigger efficiency as measured in data'                                     .format(PART=lepton)),
+             NTupleVariable('{pName}_triggerEffMC'  .format(pName=pName), lambda event : multi_getattr(event, lepton).triggerEffMC          , float, mcOnly=False, help='{PART} trigger efficiency as measured in MC'                                       .format(PART=lepton)),
+             NTupleVariable('{pName}_recEffWeight'  .format(pName=pName), lambda event : multi_getattr(event, lepton).recEffWeight          , float, mcOnly=False, help='{PART} reconstruction ID + Iso weight'                                             .format(PART=lepton)),
+           ]  
 
 # muon
-
-
-def bookMuon( tree, pName ):
-    bookLepton(tree, pName )
-    # JAN FIXME - do we need the MVA iso and does it exist?
-    # var(tree, '{pName}_mvaIso'.format(pName=pName))
-    var(tree, '{pName}_looseId'.format(pName=pName))
-    var(tree, '{pName}_tightId'.format(pName=pName))
-
-def fillMuon( tree, pName, muon ):
-    fillLepton(tree, pName, muon)
+def fillMuon( pName, muon ):
+    return fillLepton(pName, muon) + \
+           [
+             NTupleVariable('{pName}_looseId'.format(pName=pName), lambda event : multi_getattr(event, muon).looseId(), float, mcOnly=False, help='Muon loose ID as defined in Heppy Muon'),
+             NTupleVariable('{pName}_tightId'.format(pName=pName), lambda event : multi_getattr(event, muon).tightId(), float, mcOnly=False, help='Muon tight ID as defined in Heppy Muon'),
+           ] 
     # JAN FIXME - do we need the MVA iso and does it exist?
     # fill(tree, '{pName}_mvaIso'.format(pName=pName), muon.mvaIso() )
-    fill(tree, '{pName}_looseId'.format(pName=pName), muon.looseId() )
-    fill(tree, '{pName}_tightId'.format(pName=pName), muon.tightId() )
-
 
 # electron
-
-
-def bookEle( tree, pName ):
-    bookLepton(tree, pName )
-    # var(tree, '{pName}_mvaIso'.format(pName=pName))
-    var(tree, '{pName}_mvaTrigV0'.format(pName=pName))
-    var(tree, '{pName}_mvaNonTrigV0'.format(pName=pName))
-    var(tree, '{pName}_looseId'.format(pName=pName))
-    var(tree, '{pName}_tightId'.format(pName=pName))
-    var(tree, '{pName}_numberOfMissingHits'.format(pName=pName))
-    var(tree, '{pName}_passConversionVeto'.format(pName=pName))
-    
-
-def fillEle( tree, pName, ele ):
-    fillLepton(tree, pName, ele)
+def fillEle( pName, ele ):
+    return fillLepton(pName, ele) + \
+           [
+             NTupleVariable('{pName}_mvaTrigV0'          .format(pName=pName), lambda event : multi_getattr(event, ele).mvaTrigV0()         , float, mcOnly=False, help='Electron mvaTrigV0 ID as defined in Heppy Muon'         ),
+             NTupleVariable('{pName}_mvaNonTrigV0'       .format(pName=pName), lambda event : multi_getattr(event, ele).mvaNonTrigV0()      , float, mcOnly=False, help='Electron mvaNonTrigV0 ID as defined in Heppy Muon'      ),
+             NTupleVariable('{pName}_looseId'            .format(pName=pName), lambda event : multi_getattr(event, ele).looseIdForEleTau()  , float, mcOnly=False, help='Electron looseIdForEleTau ID as defined in Heppy Muon'  ),
+             NTupleVariable('{pName}_tightId'            .format(pName=pName), lambda event : multi_getattr(event, ele).tightIdForEleTau()  , float, mcOnly=False, help='Electron tightIdForEleTau ID as defined in Heppy Muon'  ),
+             NTupleVariable('{pName}_numberOfMissingHits'.format(pName=pName), lambda event : multi_getattr(event, ele).lostInner()         , float, mcOnly=False, help='Electron lostInner ID as defined in Heppy Muon'         ),
+             NTupleVariable('{pName}_passConversionVeto' .format(pName=pName), lambda event : multi_getattr(event, ele).passConversionVeto(), float, mcOnly=False, help='Electron passConversionVeto ID as defined in Heppy Muon'),
+           ] 
     # JAN FIXME - do we need the MVA iso and does it exist?
     # fill(tree, '{pName}_mvaIso'.format(pName=pName), ele.mvaIso() )
-    # fill(tree, '{pName}_mvaTrigV0'.format(pName=pName), ele.electronID("mvaTrigV0") )
-    # fill(tree, '{pName}_mvaNonTrigV0'.format(pName=pName), ele.electronID("mvaNonTrigV0") )
-    fill(tree, '{pName}_mvaTrigV0'.format(pName=pName), ele.mvaTrigV0() )
-    fill(tree, '{pName}_mvaNonTrigV0'.format(pName=pName), ele.mvaNonTrigV0() )
-    fill(tree, '{pName}_looseId'.format(pName=pName), ele.looseIdForEleTau() )
-    fill(tree, '{pName}_tightId'.format(pName=pName), ele.tightIdForEleTau() )
-    fill(tree, '{pName}_numberOfMissingHits'.format(pName=pName), ele.lostInner() )
-    fill(tree, '{pName}_passConversionVeto'.format(pName=pName), ele.passConversionVeto() )
+    # fill(tree, '{pName}_mvaTrigV0'.format(pName=pName), ele.electronID('mvaTrigV0') )
+    # fill(tree, '{pName}_mvaNonTrigV0'.format(pName=pName), ele.electronID('mvaNonTrigV0') )
 
 # tau 
+def fillTau( pName, tau ):
 
-def bookTau( tree, pName ):
-    bookLepton(tree, pName )
-    for tauID in tauIDs:
-        var(tree, '{pName}_{tauID}'.format(pName=pName, tauID=tauID))
-   
-    var(tree, '{pName}_EOverp'.format(pName=pName))
-    var(tree, '{pName}_decayMode'.format(pName=pName))
-    var(tree, '{pName}_mass'.format(pName=pName))
-    var(tree, '{pName}_zImpact'.format(pName=pName))
-
-def fillTau( tree, pName, tau ):
-    fillLepton(tree, pName, tau)
-    for tauID in tauIDs:
-        fill(tree, '{pName}_{tauID}'.format(pName=pName, tauID=tauID),
-            tau.tauID(tauID))
-    # fill(tree, '{pName}_EOverp'.format(pName=pName),
-    #      tau.calcEOverP())
-    fill(tree, '{pName}_decayMode'.format(pName=pName),
-         tau.decayMode())
-    fill(tree, '{pName}_mass'.format(pName=pName),
-         tau.mass())
-    fill(tree, '{pName}_zImpact'.format(pName=pName),
-         tau.zImpact())
+    ids = []
+    for id in tauIDs :
+      ids.append( NTupleVariable('{pName}_{tauID}'.format(pName=pName, tauID=id), lambda event : multi_getattr(event, tau).tauID(id), float, mcOnly=False, help='Tau {tauID} discriminator'.format(tauID=id)) )
+    return fillLepton(pName, tau) + ids + \
+           [
+             NTupleVariable('{pName}_decayMode'.format(pName=pName), lambda event : multi_getattr(event, tau).decayMode(), float, mcOnly=False, help='Tau decay mode'                                      ),
+             NTupleVariable('{pName}_mass'     .format(pName=pName), lambda event : multi_getattr(event, tau).mass()     , float, mcOnly=False, help='Tau mass (RIC: isn\'t it the same as the p4.mass()?)'),
+             NTupleVariable('{pName}_zImpact'  .format(pName=pName), lambda event : multi_getattr(event, tau).zImpact()  , float, mcOnly=False, help='Tau z impact parameter'                              ),
+           ]
 
 # jet
-
-def bookJet( tree, pName ):
-    bookParticle(tree, pName )
-    var(tree, '{pName}_puMva'.format(pName=pName))
-    var(tree, '{pName}_looseJetId'.format(pName=pName))
-    var(tree, '{pName}_btagMVA'.format(pName=pName))
-    var(tree, '{pName}_area'.format(pName=pName))
-    var(tree, '{pName}_genJetPt'.format(pName=pName))
-    var(tree, '{pName}_partonFlavour'.format(pName=pName))
-
-def fillJet( tree, pName, jet ):
-    fillParticle(tree, pName, jet )
+def fillJet( pName, jet ):
     # JAN - only one PU mva working point, but we may want to add more
     # run in our skimming step
     # (for which Jet.py would have to be touched again)
-    fill(tree, '{pName}_puMva'.format(pName=pName), jet.puMva('pileupJetIdFull:full53xDiscriminant') )
-    fill(tree, '{pName}_looseJetId'.format(pName=pName), jet.looseJetId())
-    fill(tree, '{pName}_btagMVA'.format(pName=pName), jet.btagMVA)
-    fill(tree, '{pName}_area'.format(pName=pName), jet.jetArea())
-    if hasattr(jet, 'matchedGenJet') and jet.matchedGenJet:
-        fill(tree, '{pName}_genJetPt'.format(pName=pName), jet.matchedGenJet.pt())
-    fill(tree, '{pName}_partonFlavour'.format(pName=pName), jet.partonFlavour())
-
-# vbf
-
-def bookVBF( tree, pName ):
-    var(tree, '{pName}_mjj'.format(pName=pName))
-    var(tree, '{pName}_deta'.format(pName=pName))
-    var(tree, '{pName}_nCentral'.format(pName=pName))
-    var(tree, '{pName}_mva'.format(pName=pName))
-    var(tree, '{pName}_jdphi'.format(pName=pName))
-    var(tree, '{pName}_dijetpt'.format(pName=pName))
-    var(tree, '{pName}_dijetphi'.format(pName=pName))
-    var(tree, '{pName}_hdijetphi'.format(pName=pName))
-    var(tree, '{pName}_visjeteta'.format(pName=pName))
-    var(tree, '{pName}_ptvis'.format(pName=pName))
-    
-def fillVBF( tree, pName, vbf ):
-    fill(tree, '{pName}_mjj'.format(pName=pName), vbf.mjj )
-    fill(tree, '{pName}_deta'.format(pName=pName), vbf.deta )
-    fill(tree, '{pName}_nCentral'.format(pName=pName), len(vbf.centralJets) )
-    fill(tree, '{pName}_mva'.format(pName=pName), vbf.mva )
-    fill(tree, '{pName}_jdphi'.format(pName=pName), vbf.dphi )
-    fill(tree, '{pName}_dijetpt'.format(pName=pName), vbf.dijetpt )
-    fill(tree, '{pName}_dijetphi'.format(pName=pName), vbf.dijetphi )
-    fill(tree, '{pName}_hdijetphi'.format(pName=pName), vbf.dphidijethiggs )
-    fill(tree, '{pName}_visjeteta'.format(pName=pName), vbf.visjeteta )
-    fill(tree, '{pName}_ptvis'.format(pName=pName), vbf.ptvis )
-    
+    return fillParticle(pName, jet) + \
+           [
+             NTupleVariable('{pName}_puMva'        .format(pName=pName), lambda jet : jet.puMva('pileupJetIdFull:full53xDiscriminant'), float, mcOnly=False, help='Tau decay mode '),
+             NTupleVariable('{pName}_looseJetId'   .format(pName=pName), lambda jet : jet.looseJetId()                                , float, mcOnly=False, help='Tau decay mode '),
+             NTupleVariable('{pName}_btagMVA'      .format(pName=pName), lambda jet : jet.btagMVA                                     , float, mcOnly=False, help='Tau decay mode '),
+             NTupleVariable('{pName}_area'         .format(pName=pName), lambda jet : jet.jetArea()                                   , float, mcOnly=False, help='Tau decay mode '),
+             NTupleVariable('{pName}_genJetPt'     .format(pName=pName), lambda jet : jet.matchedGenJet.pt()                          , float, mcOnly=True , help='Tau decay mode '),
+             NTupleVariable('{pName}_partonFlavour'.format(pName=pName), lambda jet : jet.partonFlavour()                             , float, mcOnly=False, help='Tau decay mode '),
+           ]     
