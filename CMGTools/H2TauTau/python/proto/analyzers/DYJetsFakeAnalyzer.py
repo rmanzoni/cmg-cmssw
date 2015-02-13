@@ -16,19 +16,35 @@ class DYJetsFakeAnalyzer( Analyzer ):
   def process(self, event) :
     
     ## flag to split DYJets into ZTT, ZL, ZJ
-    event.isZtt   = -1  
-    event.isZmt   = -1  
-    event.isZet   = -1  
-    event.isZee   = -1  
-    event.isZmm   = -1  
-    event.isZem   = -1  
-    event.isZEE   = -1  
-    event.isZMM   = -1  
-    event.isZLL   = -1      
-    event.isFake  = -1
-        
-    if   'Higgs' in self.cfg_comp.name : theZs = [ bos for bos in event.genHiggsBosons if bos.pdgId() == 25 ]
-    elif 'DY'    in self.cfg_comp.name : theZs = [ bos for bos in event.genVBosons     if bos.pdgId() == 23 ]
+    event.isZtt   = None
+    event.isZmt   = None
+    event.isZet   = None
+    event.isZee   = None
+    event.isZmm   = None
+    event.isZem   = None
+    event.isZEE   = None
+    event.isZMM   = None
+    event.isZLL   = None    
+    event.isFake  = None
+    event.genMass = None
+    event.genMet  = None
+    event.genMex  = None
+    event.genMey  = None
+
+    # gen MET as sum of the neutrino 4-momenta
+    # RIC: not very elegant try except
+    try :
+      genmet = event.gennus[0]
+      for nu in event.gennus[1:] :
+        genmet += nu.p4()
+      event.genMet = genmet.pt()
+      event.genMex = genmet.px()
+      event.genMey = genmet.py()
+    except :
+      pass
+       
+    if   'Higgs' in self.cfg_comp.name : theZs = [ bos for bos in event.genHiggsBosons if bos.pdgId() in (25, 35, 36, 37) ]
+    elif 'DY'    in self.cfg_comp.name : theZs = [ bos for bos in event.genVBosons     if bos.pdgId() == 23               ]
     else                               : return True
 
     # there must always be a Z or a H boson
@@ -37,6 +53,9 @@ class DYJetsFakeAnalyzer( Analyzer ):
       print 'I cannot find any H or Z in the sample!' 
       return False
     
+    # gen mass of the Higgs or Z boson
+    event.genMass = theZs[0].mass()
+        
     self.getGenType(event)
 
     ptcut = 0.
@@ -79,14 +98,14 @@ class DYJetsFakeAnalyzer( Analyzer ):
       self.l1.isTauHad = True
 
     # to generated leptons from taus
-    if not l1match :
+    if not self.l1.isTauHad :
       l1match, dR2best = bestMatch(self.l1, self.ptSelGentauleps)
       if dR2best < dR2 :
         self.l1.genl1 = l1match
         self.l1.isTauLep = True
 
     # to generated prompt leptons
-    if not l1match :
+    if not self.l1.isTauLep :
       l1match, dR2best = bestMatch(self.l1, self.ptSelGenleps)
       if dR2best < dR2 :
         self.l1.genl1 = l1match
@@ -100,14 +119,14 @@ class DYJetsFakeAnalyzer( Analyzer ):
       self.l2.isTauHad = True
         
     # to generated leptons from taus
-    if not l2match :
+    if not self.l2.isTauHad :
       l2match, dR2best = bestMatch(self.l2, self.ptSelGentauleps)
       if dR2best < dR2 :
         self.l2.genl2 = l2match
         self.l2.isTauLep = True
 
     # to generated prompt leptons
-    if not l2match :
+    if not self.l2.isTauLep :
       l2match, dR2best = bestMatch(self.l2, self.ptSelGenleps)
       if dR2best < dR2 :
         self.l2.genl2 = l2match
