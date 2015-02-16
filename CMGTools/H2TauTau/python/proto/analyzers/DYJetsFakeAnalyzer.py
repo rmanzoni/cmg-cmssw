@@ -13,35 +13,39 @@ class DYJetsFakeAnalyzer( Analyzer ):
   In case of VH events, only the Higgs is considered.
   '''
 
+#   def __init__(self, event) :
+#     super(DYJetsFakeAnalyzer, self).__init__(event)
+#     ## flag to split DYJets into ZTT, ZL, ZJ
+  
   def process(self, event) :
-    
-    ## flag to split DYJets into ZTT, ZL, ZJ
-    event.isZtt   = None
-    event.isZmt   = None
-    event.isZet   = None
-    event.isZee   = None
-    event.isZmm   = None
-    event.isZem   = None
-    event.isZEE   = None
-    event.isZMM   = None
-    event.isZLL   = None    
-    event.isFake  = None
-    event.genMass = None
-    event.genMet  = None
-    event.genMex  = None
-    event.genMey  = None
+
+    event.isZtt     = None
+    event.isZmt     = None
+    event.isZet     = None
+    event.isZee     = None
+    event.isZmm     = None
+    event.isZem     = None
+    event.isZEE     = None
+    event.isZMM     = None
+    event.isZLL     = None    
+    event.isFake    = None
+    event.genMass   = None
+    event.genMet    = None
+    event.genMex    = None
+    event.genMey    = None
+    event.genMetPhi = None
 
     # gen MET as sum of the neutrino 4-momenta
-    # RIC: not very elegant try except
-    try :
-      genmet = event.gennus[0]
-      for nu in event.gennus[1:] :
+    neutrinos = [ part for part in event.genParticles if abs(part.pdgId()) in (12,14,16) ]
+    if len(neutrinos) == 0 : pass
+    else :
+      genmet = neutrinos[0].p4()
+      for nu in neutrinos[1:] :
         genmet += nu.p4()
-      event.genMet = genmet.pt()
-      event.genMex = genmet.px()
-      event.genMey = genmet.py()
-    except :
-      pass
+      event.genMet    = genmet.pt()
+      event.genMex    = genmet.px()
+      event.genMey    = genmet.py()
+      event.genMetPhi = genmet.py()
        
     if   'Higgs' in self.cfg_comp.name : theZs = [ bos for bos in event.genHiggsBosons if bos.pdgId() in (25, 35, 36, 37) ]
     elif 'DY'    in self.cfg_comp.name : theZs = [ bos for bos in event.genVBosons     if bos.pdgId() == 23               ]

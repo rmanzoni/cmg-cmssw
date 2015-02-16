@@ -11,6 +11,7 @@ from PhysicsTools.Heppy.analyzers.core.EventSelector import EventSelector
 from PhysicsTools.Heppy.analyzers.objects.VertexAnalyzer import VertexAnalyzer
 from PhysicsTools.Heppy.analyzers.core.PileUpAnalyzer import PileUpAnalyzer
 from PhysicsTools.Heppy.analyzers.gen.GeneratorAnalyzer  import GeneratorAnalyzer
+from PhysicsTools.Heppy.analyzers.core.AutoFillTreeProducer import AutoFillTreeProducer
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.JetAnalyzer import JetAnalyzer
@@ -25,7 +26,7 @@ from CMGTools.H2TauTau.proto.analyzers.WNJetsTreeAnalyzer import WNJetsTreeAnaly
 from CMGTools.H2TauTau.proto.analyzers.TauDecayModeWeighter import TauDecayModeWeighter
 from CMGTools.H2TauTau.proto.analyzers.TauFakeRateWeighter import TauFakeRateWeighter
 from CMGTools.H2TauTau.proto.analyzers.LeptonWeighter import LeptonWeighter
-from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauMu import H2TauTauTreeProducerTauMu
+# from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauMu import H2TauTauTreeProducerTauMu
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauSyncTree import H2TauTauSyncTree
 
 from CMGTools.RootTools.analyzers.VBFSimpleAnalyzer import VBFSimpleAnalyzer
@@ -66,7 +67,9 @@ eventSelector = cfg.Analyzer(
     EventSelector,
     name='EventSelector',
     toSelect=[
-    105104
+#     105104,
+    331,
+    357,
     ]
     )
 
@@ -217,16 +220,30 @@ vbfSimpleAna = cfg.Analyzer(
     deltaEta = 3.5
     )
 
+# treeProducer = cfg.Analyzer(
+#     H2TauTauTreeProducerTauMu,
+#     'H2TauTauTreeProducerTauMu'
+#     )
+
+from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauMu import *
+## Tree Producer
 treeProducer = cfg.Analyzer(
-    H2TauTauTreeProducerTauMu,
-    'H2TauTauTreeProducerTauMu'
+    AutoFillTreeProducer                        , 
+    'H2TauTauTreeProducerTauMu'                 ,
+    vectorTree          = True                  ,
+    saveTLorentzVectors = False                 , # can set to True to get also the TLorentzVectors, but trees will be bigger
+    defaultFloatType    = 'F'                   , # use Float_t for floating point
+#     PDFWeights          = PDFWeights            ,
+    globalVariables     = htt_mt_globalVariables,
+    globalObjects       = htt_mt_globalObjects  ,
+    collections         = htt_mt_collections    ,
     )
 
-treeProducerXCheck = cfg.Analyzer(
-    H2TauTauSyncTree,
-    'H2TauTauSyncTree',
-    pt20 = False
-    )
+# treeProducerXCheck = cfg.Analyzer(
+#     H2TauTauSyncTree,
+#     'H2TauTauSyncTree',
+#     pt20 = False
+#     )
 
 #########################################################################################
 

@@ -161,7 +161,6 @@ higgsWeighter = cfg.Analyzer(
 #   'H2TauTauTreeProducerTauTau',
 #   )
 
-# from CMGTools.TTHAnalysis.analyzers.treeProducerSusyMultilepton import * 
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauTau import *
 ## Tree Producer
 treeProducer = cfg.Analyzer(
