@@ -2,7 +2,8 @@ from PhysicsTools.Heppy.analyzers.core.Analyzer import Analyzer
 from TauAnalysis.SVfitStandalone.SVfitStandaloneAlgorithm import SVfitAlgo
 from TauAnalysis.SVfitStandalone.MeasuredTauLepton import measuredTauLepton
 
-from ROOT import TMatrixD, svFitStandalone, std
+from ROOT import TMatrixD, std
+# from ROOT import TMatrixD, svFitStandalone, std
 
 class SVfitProducer(Analyzer):
     '''Computes SVfit di-tau mass at the ntuple level.'''
@@ -21,14 +22,33 @@ class SVfitProducer(Analyzer):
         if self.cfg_ana.l2type == 'tau':
             decayMode2 = event.leg2.decayMode()
 
+        # RIC: some PF muons/electron can get the wrong mass assigned.
+        # Peg their masses to the PDG values
+        if   self.cfg_ana.l1type == 'muon' : mass1 = 0.10566    # PDG mass [GeV]
+        elif self.cfg_ana.l1type == 'ele'  : mass1 = 0.51100e-3 # PDG mass [GeV]
+        else : mass1 = event.leg1.mass()
+
+        if   self.cfg_ana.l2type == 'muon' : mass2 = 0.10566    # PDG mass [GeV]
+        elif self.cfg_ana.l2type == 'ele'  : mass2 = 0.51100e-3 # PDG mass [GeV]
+        else : mass2 = event.leg2.mass()
+
         leg1 = measuredTauLepton(self.legType[self.cfg_ana.l1type], event.leg1.pt(),
-                                 event.leg1.eta(), event.leg1.phi(), event.leg1.mass(), decayMode1)
+                                 event.leg1.eta(), event.leg1.phi(), mass1, decayMode1)
         leg2 = measuredTauLepton(self.legType[self.cfg_ana.l2type], event.leg2.pt(),
-                                 event.leg2.eta(), event.leg2.phi(), event.leg2.mass(), decayMode2)
+                                 event.leg2.eta(), event.leg2.phi(), mass2, decayMode2)
 
         measuredLeptons = std.vector('svFitStandalone::MeasuredTauLepton')()
-        measuredLeptons.push_back(leg1) # RIC: order matters!
-        measuredLeptons.push_back(leg2) # RIC: order matters!
+        
+        if self.cfg_ana.order == '12' :
+            measuredLeptons.push_back(leg1)
+            measuredLeptons.push_back(leg2)
+        if self.cfg_ana.order == '21' :
+            measuredLeptons.push_back(leg2)
+            measuredLeptons.push_back(leg1)
+
+        measuredLeptonsInverted = std.vector('svFitStandalone::MeasuredTauLepton')()
+        measuredLeptonsInverted.push_back(leg1)
+        measuredLeptonsInverted.push_back(leg2)
 
         metcov = TMatrixD(2, 2)
 
@@ -40,10 +60,13 @@ class SVfitProducer(Analyzer):
         mex = event.diLepton.met().px()
         mey = event.diLepton.met().py()
 
-        svfit = SVfitAlgo(measuredLeptons, mex, mey, metcov, self.cfg_ana.verbose)
+        svfit = SVfitAlgo(measuredLeptons, mex, mey, metcov, 2*self.cfg_ana.verbose)
+        svfitInv = SVfitAlgo(measuredLeptonsInverted, mex, mey, metcov, 2*self.cfg_ana.verbose)
 
+        print '\n\n', '==*=='*10
         if self.cfg_ana.integration == 'VEGAS':
             svfit.integrateVEGAS()
+            svfitInv.integrateVEGAS()
         elif self.cfg_ana.integration == 'MarkovChain':
             svfit.integrateMarkovChain()
         else:
@@ -52,15 +75,23 @@ class SVfitProducer(Analyzer):
             raise
 
         # debug
-        if hasattr(self.cfg_ana, 'debug'):
-            if self.cfg_ana.debug:
-                if abs(event.diLepton.svfitMass()-svfit.getMass()) > 0.01:
-                    print 'WARNING: run {RUN}, lumi {LUMI}, event {EVT}'.format(RUN=str(event.run),
-                                                                                LUMI=str(event.lumi),
-                                                                                EVT=str(event.eventId))
-                    print 'precomputed svfit mass   ', event.diLepton.svfitMass()
-                    print 'svfit mass computed here ', svfit.getMass()
+        if self.cfg_ana.verbose:
+            if abs(event.diLepton.svfitMass()-svfit.getMass()) > 0.01:
+                print 'WARNING: run {RUN}, lumi {LUMI}, event {EVT}'.format(RUN=str(event.run),
+                                                                            LUMI=str(event.lumi),
+                                                                            EVT=str(event.eventId))
+                print 'precomputed svfit mass       ', event.diLepton.svfitMass()
+                print 'svfit mass computed here     ', svfit.mass()
+                #print 'svfit mass computed here inv ', svfitInv.getMass()
 
+        import pdb ; pdb.set_trace()
+        
+        
+#         for i in xrange(5):
+#             print '\n\n', '==*=='*10, i
+#             svfit.integrateVEGAS()
+#             print 'svfit mass computed at the %d round, %f, %f ' %(i, svfit.getMass(), svfit.mass())
+        
         # method override
-        event.diLepton.svfitMass = svfit.getMass
+        event.diLepton.svfitMass = svfit.mass
     

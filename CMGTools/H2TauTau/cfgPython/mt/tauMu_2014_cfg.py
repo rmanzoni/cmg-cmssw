@@ -10,7 +10,7 @@ from CMGTools.H2TauTau.proto.analyzers.LeptonWeighter import LeptonWeighter
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer import SVfitProducer
 
 # common configuration and sequence
-from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJetsFakeAna, puFileData, puFileMC
+from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJetsFakeAna, puFileData, puFileMC, eventSelector
 
 
 ### mu-tau specific configuration settings
@@ -18,7 +18,7 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJets
 # 'Nom', 'Up', 'Down', or None
 shift = None
 syncntuple = True
-computeSVfit = False
+computeSVfit = True
 
 # When ready, include weights from CMGTools.H2TauTau.proto.weights.weighttable
 
@@ -101,7 +101,8 @@ svfitProducer = cfg.Analyzer(
     name='SVfitProducer',
     integration='VEGAS',
     #integration='MarkovChain',
-    #debug=True,
+    verbose=True,
+    order='21', # muon first, tau second
     l1type='tau',
     l2type='muon'
     )
@@ -142,8 +143,17 @@ if syncntuple:
 ###################################################
 ###             CHERRY PICK EVENTS              ###
 ###################################################
-# eventSelector.toSelect = []
-# sequence.insert(0, eventSelector)
+eventSelector.toSelect = [
+# 9900,
+2295,
+# 2387,
+# 10708,
+# 12903,
+# 14346,
+# 20892,
+# 18330,
+]
+sequence.insert(0, eventSelector)
 
 ###################################################
 ###            SET BATCH OR LOCAL               ###
