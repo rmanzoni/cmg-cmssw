@@ -149,7 +149,7 @@ void DiTauWithSVFitProducer<T, U>::produce(edm::Event& iEvent, const edm::EventS
         NSVfitStandalone2011::LorentzVector p2(diTau.daughter(1)->p4());
         measuredTauLeptons.push_back(NSVfitStandalone2011::MeasuredTauLepton2011(leg2type2011,p2));
         measuredTauLeptons.push_back(NSVfitStandalone2011::MeasuredTauLepton2011(leg1type2011,p1));    
-        NSVfitStandaloneAlgorithm2011 algo(measuredTauLeptons,measuredMET, &tmsig, 0);
+        NSVfitStandaloneAlgorithm2011 algo(measuredTauLeptons,measuredMET, &tmsig, verbose_ ? 2 : 0);
         algo.maxObjFunctionCalls(5000);
         algo.fit();
         massSVFit = algo.fittedDiTauSystem().mass();
@@ -189,7 +189,7 @@ void DiTauWithSVFitProducer<T, U>::produce(edm::Event& iEvent, const edm::EventS
 
         measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(leg2type, diTau.daughter(1)->pt(), diTau.daughter(1)->eta(), diTau.daughter(1)->phi(), leg2Mass, leg2DecayMode));
         measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(leg1type, diTau.daughter(0)->pt(), diTau.daughter(0)->eta(), diTau.daughter(0)->phi(), leg1Mass, leg1DecayMode));
-        SVfitStandaloneAlgorithm algo(measuredTauLeptons, met.px(), met.py(), tmsig, 0);
+        SVfitStandaloneAlgorithm algo(measuredTauLeptons, met.px(), met.py(), tmsig, verbose_ ? 2 : 0);
         algo.addLogM(false);
         
         if (fitAlgo_ == "VEGAS")
