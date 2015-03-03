@@ -16,7 +16,7 @@ namespace svFitStandalone
      \brief   enumeration of all tau decay types
   */
   enum kDecayType {
-    kUndefinedDecayType,
+    kUndefinedDecayType=0,
     kTauToHadDecay,  /* < hadronic tau lepton decay                                                        */ 
     kTauToElecDecay, /* < tau lepton decay to electron                                                     */
     kTauToMuDecay,   /* < tau lepton decay to muon                                                         */
@@ -86,7 +86,7 @@ namespace svFitStandalone
         mass_(roundToNdigits(mass)),
  	decayMode_(decayMode)
     {
-      //std::cout << "<MeasuredTauLepton>: Pt = " << pt_ << ", eta = " << eta_ << ", phi = " << phi_ << ", mass = " << mass_ << std::endl;
+      std::cout << "<MeasuredTauLepton>: Pt = " << pt_ << ", eta = " << eta_ << ", phi = " << phi_ << ", mass = " << mass_ << ", type = " << type << ", decayMode = " << decayMode << std::endl;
       double minVisMass = electronMass;
       double maxVisMass = tauLeptonMass;
       std::string type_string;
@@ -243,8 +243,6 @@ namespace svFitStandalone
     SVfitStandaloneLikelihood(const std::vector<svFitStandalone::MeasuredTauLepton>& measuredTauLeptons, const svFitStandalone::Vector& measuredMET, const TMatrixD& covMET, bool verbose);
     /// default destructor
     ~SVfitStandaloneLikelihood() {}
-    /// static pointer to this (needed for the minuit function calls)
-    static const SVfitStandaloneLikelihood* gSVfitStandaloneLikelihood;
 
     /// add an additional logM(tau,tau) term to the nll to suppress tails on M(tau,tau) (default is false)
     void addLogM(bool value, double power = 1.) { addLogM_ = value; powerLogM_ = power; }

@@ -222,9 +222,11 @@ SVfitStandaloneAlgorithm::SVfitStandaloneAlgorithm(const std::vector<svFitStanda
   covMET_rounded[0][1] = svFitStandalone::roundToNdigits(covMET[0][1]);
   covMET_rounded[1][1] = svFitStandalone::roundToNdigits(covMET[1][1]);
   nll_ = new svFitStandalone::SVfitStandaloneLikelihood(measuredTauLeptons, measuredMET_rounded, covMET_rounded, (verbose_ > 2));
+  standaloneObjectiveFunctionAdapterMINUIT_.setNllPtr(nll_);
+  std::cout << "MEx " << measuredMET_rounded.x() << ", METy " << measuredMET_rounded.y() << ", cov00 " << covMET_rounded[0][0] << ", cov10 " << covMET_rounded[1][0] << ", cov01 " << covMET_rounded[0][1] << ", cov11 " << covMET_rounded[1][1] << std::endl;
   nllStatus_ = nll_->error();
 
-  standaloneObjectiveFunctionAdapterVEGAS_ = new svFitStandalone::ObjectiveFunctionAdapterVEGAS();
+  standaloneObjectiveFunctionAdapterVEGAS_ = new svFitStandalone::ObjectiveFunctionAdapterVEGAS(nll_);
   
   clock_ = new TBenchmark();
 }
@@ -695,7 +697,7 @@ SVfitStandaloneAlgorithm::integrateVEGAS(const std::string& likelihoodFileName)
     double p = ig2.Integral(xl, xh);
     double pErr = ig2.Error();
     if ( verbose_ >= 2 ) {
-      std::cout << "--> scan idx = " << i << ": mtest = " << mtest << ", p = " << p << " +/- " << pErr << " (pMax = " << pMax << ")" << std::endl;
+      std::cout << "--> scan idx = " << i << ": mtest = " << mtest << ", p = " << p << " +/- " << pErr << " (pMax = " << pMax << ")" << " xl = [" << xl[0] << ", " << xl[1] << ", " << xl[2] << ", " <<xl[3] << "], xh = [" << xh[0] << ", " << xh[1] << ", " << xh[2] << ", " <<xh[3] << "], x0 = [" << x0[0] << ", " << x0[1] << ", " << x0[2] << ", " <<x0[3] << "], mvis = " << mvis << std::endl;
     }    
     if ( p > pMax ) {
       mass_ = mtest;
@@ -783,10 +785,10 @@ SVfitStandaloneAlgorithm::integrateMarkovChain()
                          initMode, numIterBurnin, numIterSampling, numIterSimAnnealingPhase1, numIterSimAnnealingPhase2,
 			 T0, alpha, numChains, numBatches, L, epsilon0, nu,
 			 verbose);
-    mcObjectiveFunctionAdapter_ = new MCObjectiveFunctionAdapter();
+    mcObjectiveFunctionAdapter_ = new MCObjectiveFunctionAdapter(nll_);
     integrator2_->setIntegrand(*mcObjectiveFunctionAdapter_);
     integrator2_nDim_ = 0;
-    mcPtEtaPhiMassAdapter_ = new MCPtEtaPhiMassAdapter();
+    mcPtEtaPhiMassAdapter_ = new MCPtEtaPhiMassAdapter(nll_);
     integrator2_->registerCallBackFunction(*mcPtEtaPhiMassAdapter_);
     isInitialized2_ = true;    
   }

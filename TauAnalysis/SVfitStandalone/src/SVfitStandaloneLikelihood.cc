@@ -5,8 +5,6 @@
 
 using namespace svFitStandalone;
 
-/// global function pointer for minuit or VEGAS
-const SVfitStandaloneLikelihood* SVfitStandaloneLikelihood::gSVfitStandaloneLikelihood = 0;
 /// indicate first iteration for integration or fit cycle for debugging
 static bool FIRST = true;
 
@@ -58,8 +56,6 @@ SVfitStandaloneLikelihood::SVfitStandaloneLikelihood(const std::vector<MeasuredT
     std::cout << " >> ERROR: cannot invert MET covariance Matrix (det=0)." << std::endl;
     errorCode_ |= MatrixInversion;
   }
-  // set global function pointer to this
-  gSVfitStandaloneLikelihood = this;
 }
 
 void 
@@ -95,9 +91,9 @@ SVfitStandaloneLikelihood::shiftVisPt(bool value, const TH1* l1lutVisPtRes, cons
 const double*
 SVfitStandaloneLikelihood::transform(double* xPrime, const double* x, bool fixToMtest, double mtest) const
 {
-  if ( verbose_ ) {
-    std::cout << "<SVfitStandaloneLikelihood:transform(double*, const double*)>:" << std::endl;
-  }
+  // if ( verbose_ ) {
+  //   std::cout << "<SVfitStandaloneLikelihood:transform(double*, const double*)>:" << std::endl;
+  // }
   LorentzVector fittedDiTauSystem;
   for ( size_t idx = 0; idx < measuredTauLeptons_.size(); ++idx ) {
     const MeasuredTauLepton& measuredTauLepton = measuredTauLeptons_[idx];
@@ -207,13 +203,13 @@ SVfitStandaloneLikelihood::prob(const double* x, bool fixToMtest, double mtest) 
   if ( error() ) { 
     return 0.;
   }
-  if ( verbose_ ) {
-    std::cout << "<SVfitStandaloneLikelihood:prob(const double*)>:" << std::endl;
-  }
+  // if ( verbose_ ) {
+  //   std::cout << "<SVfitStandaloneLikelihood:prob(const double*)>:" << std::endl;
+  // }
   ++idxObjFunctionCall_;
-  if ( verbose_ && FIRST ) {
-    std::cout << " >> ixdObjFunctionCall : " << idxObjFunctionCall_ << std::endl;  
-  }
+  // if ( verbose_ && FIRST ) {
+  //   std::cout << " >> ixdObjFunctionCall : " << idxObjFunctionCall_ << std::endl;  
+  // }
   // prevent kPhi in the fit parameters (kFitParams) from trespassing the 
   // +/-pi boundaries
   double phiPenalty = 0.;

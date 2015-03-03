@@ -39,25 +39,40 @@ namespace svFitStandalone
   // for "fit" (MINUIT) mode
   class ObjectiveFunctionAdapterMINUIT
   {
+
   public:
+    ObjectiveFunctionAdapterMINUIT()
+    {
+      nllPtr_ = NULL;
+    }
+    void setNllPtr(SVfitStandaloneLikelihood* nllPtr)
+    {
+      nllPtr_ = nllPtr;
+    }
     double operator()(const double* x) const // NOTE: return value = -log(likelihood)
     {
-      double prob = SVfitStandaloneLikelihood::gSVfitStandaloneLikelihood->prob(x);
+      double prob = nllPtr_->prob(x);
       double nll;
       if ( prob > 0. ) nll = -TMath::Log(prob);
       else nll = std::numeric_limits<float>::max();
       return nll;
     }
+  private:
+    SVfitStandaloneLikelihood* nllPtr_;
   };
   // for VEGAS integration
   void map_xVEGAS(const double*, bool, bool, bool, bool, bool, double, double, double*);
   class ObjectiveFunctionAdapterVEGAS
   {
   public:
+    ObjectiveFunctionAdapterVEGAS(SVfitStandaloneLikelihood* nllPtr)
+    {
+      nllPtr_ = nllPtr;
+    }
     double Eval(const double* x) const // NOTE: return value = likelihood, **not** -log(likelihood)
     {
       map_xVEGAS(x, l1isLep_, l2isLep_, marginalizeVisMass_, shiftVisMass_, shiftVisPt_, mvis_, mtest_, x_mapped_);      
-      double prob = SVfitStandaloneLikelihood::gSVfitStandaloneLikelihood->prob(x_mapped_, true, mtest_);
+      double prob = nllPtr_->prob(x_mapped_, true, mtest_);
       if ( TMath::IsNaN(prob) ) prob = 0.;
       return prob;
     }
@@ -77,12 +92,17 @@ namespace svFitStandalone
     bool shiftVisPt_;
     double mvis_;  // mass of visible tau decay products
     double mtest_; // current mass hypothesis
+    SVfitStandaloneLikelihood* nllPtr_;
   };
   // for markov chain integration
   void map_xMarkovChain(const double*, bool, bool, bool, bool, bool, double*);
   class MCObjectiveFunctionAdapter : public ROOT::Math::Functor
   {
    public:
+    MCObjectiveFunctionAdapter(SVfitStandaloneLikelihood* nllPtr)
+    {
+      nllPtr_ = nllPtr;
+    }
     void SetL1isLep(bool l1isLep) { l1isLep_ = l1isLep; }
     void SetL2isLep(bool l2isLep) { l2isLep_ = l2isLep; }
     void SetMarginalizeVisMass(bool marginalizeVisMass) { marginalizeVisMass_ = marginalizeVisMass; }
@@ -94,7 +114,7 @@ namespace svFitStandalone
     virtual double DoEval(const double* x) const
     {
       map_xMarkovChain(x, l1isLep_, l2isLep_, marginalizeVisMass_, shiftVisMass_, shiftVisPt_, x_mapped_);
-      double prob = SVfitStandaloneLikelihood::gSVfitStandaloneLikelihood->prob(x_mapped_);
+      double prob = nllPtr_->prob(x_mapped_);
       if ( TMath::IsNaN(prob) ) prob = 0.;
       return prob;
     } 
@@ -105,11 +125,12 @@ namespace svFitStandalone
     bool marginalizeVisMass_;
     bool shiftVisMass_;
     bool shiftVisPt_;
+    SVfitStandaloneLikelihood* nllPtr_;
   };
   class MCPtEtaPhiMassAdapter : public ROOT::Math::Functor
   {
    public:
-    MCPtEtaPhiMassAdapter() 
+    MCPtEtaPhiMassAdapter(SVfitStandaloneLikelihood* nllPtr) 
     {
       histogramPt_ = makeHistogram("SVfitStandaloneAlgorithm_histogramPt", 1., 1.e+3, 1.025);
       histogramPt_density_ = (TH1*)histogramPt_->Clone(Form("%s_density", histogramPt_->GetName()));
@@ -119,6 +140,7 @@ namespace svFitStandalone
       histogramPhi_density_ = (TH1*)histogramPhi_->Clone(Form("%s_density", histogramPhi_->GetName()));
       histogramMass_ = makeHistogram("SVfitStandaloneAlgorithm_histogramMass", 1.e+1, 1.e+4, 1.025);
       histogramMass_density_ = (TH1*)histogramMass_->Clone(Form("%s_density", histogramMass_->GetName()));
+      nllPtr_ = nllPtr;
     }      
     ~MCPtEtaPhiMassAdapter()
     {
@@ -170,7 +192,7 @@ namespace svFitStandalone
     virtual double DoEval(const double* x) const
     {
       map_xMarkovChain(x, l1isLep_, l2isLep_, marginalizeVisMass_, shiftVisMass_, shiftVisPt_, x_mapped_);
-      SVfitStandaloneLikelihood::gSVfitStandaloneLikelihood->results(fittedTauLeptons_, x_mapped_);
+      nllPtr_->results(fittedTauLeptons_, x_mapped_);
       fittedDiTauSystem_ = fittedTauLeptons_[0] + fittedTauLeptons_[1];
       //std::cout << "<MCPtEtaPhiMassAdapter::DoEval>" << std::endl;
       //std::cout << " Pt = " << fittedDiTauSystem_.pt() << "," 
@@ -201,6 +223,7 @@ namespace svFitStandalone
     bool marginalizeVisMass_;
     bool shiftVisMass_;
     bool shiftVisPt_;
+    SVfitStandaloneLikelihood* nllPtr_;
   };
 }
 
