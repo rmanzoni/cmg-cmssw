@@ -225,8 +225,99 @@ SVfitStandaloneLikelihood::prob(const double* x, bool fixToMtest, double mtest) 
   // nll parameters xPrime. prob is the actual combined likelihood. The
   // phiPenalty prevents the fit to converge to unphysical values beyond
   // +/-pi 
-  double xPrime[kMaxNLLParams + 4];
+
+//   double xPrime[kMaxNLLParams + 4];
+  double xPrime[kMaxNLLParams + 4] = {};
+  
+//   double myxPrime = 0. ; 
+//   double* xPrime = &myxPrime;
+
+
+//   double myx[] = {0.10015, 0.461168, -2.59906, 0., 0., 0.252015, 0., -2.75104, 0., 0., 3.40126e-18, 54.6908, 344.251};
+  
   const double* xPrime_ptr = transform(xPrime, x, fixToMtest, mtest);
+//   const double* xPrime_ptr = transform(xPrime, myx, fixToMtest, mtest);
+
+  // 3031041
+
+//   if (x[12]>344 && x[12]<352){// && idxObjFunctionCall_ > 0 && idxObjFunctionCall_ < 5){
+  if (x[12]>344 && x[12]<352 && idxObjFunctionCall_ > 3031040 && idxObjFunctionCall_ < 3031045){
+    std::cout << "\n\n" << __LINE__ << "]\t" << __PRETTY_FUNCTION__  
+              << "\nidxObjFunctionCall_ " << idxObjFunctionCall_
+              << "\nkMaxNLLParams "       << kMaxNLLParams
+              << "\nx[0] "                << x[0]
+              << "\nx[1] "                << x[1]
+              << "\nx[2] "                << x[2]
+              << "\nx[3] "                << x[3]
+              << "\nx[4] "                << x[4]
+              << "\nx[5] "                << x[5]
+              << "\nx[6] "                << x[6]
+              << "\nx[7] "                << x[7]
+              << "\nx[8] "                << x[8]
+              << "\nx[9] "                << x[9]
+              << "\nx[10] "               << x[10]
+              << "\nx[11] "               << x[11]
+              << "\nx[12] "               << x[12]
+              << "\nxPrime[0] "           << xPrime[0]
+              << "\nxPrime[1] "           << xPrime[1]
+              << "\nxPrime[2] "           << xPrime[2]
+              << "\nxPrime[3] "           << xPrime[3]
+              << "\nxPrime[4] "           << xPrime[4]
+              << "\nxPrime[5] "           << xPrime[5]
+              << "\nxPrime[6] "           << xPrime[6]
+              << "\nxPrime[7] "           << xPrime[7]
+              << "\nxPrime[8] "           << xPrime[8]
+              << "\nxPrime[9] "           << xPrime[9]
+              << "\nxPrime[10] "          << xPrime[10]
+              << "\nxPrime[11] "          << xPrime[11]
+              << "\nxPrime[12] "          << xPrime[12]
+              << "\nxPrime[13] "          << xPrime[13]
+              << "\nxPrime[14] "          << xPrime[14]
+              << "\nxPrime[15] "          << xPrime[15]
+              << "\nxPrime[16] "          << xPrime[16]
+//               << "\nxPrime_ptr[0] "       << xPrime_ptr[0]
+//               << "\nxPrime_ptr[1] "       << xPrime_ptr[1]
+//               << "\nxPrime_ptr[2] "       << xPrime_ptr[2]
+//               << "\nxPrime_ptr[3] "       << xPrime_ptr[3]
+//               << "\nxPrime_ptr[4] "       << xPrime_ptr[4]
+//               << "\nxPrime_ptr[5] "       << xPrime_ptr[5]
+//               << "\nxPrime_ptr[6] "       << xPrime_ptr[6]
+//               << "\nxPrime_ptr[7] "       << xPrime_ptr[7]
+//               << "\nxPrime_ptr[8] "       << xPrime_ptr[8]
+//               << "\nxPrime_ptr[9] "       << xPrime_ptr[9]
+//               << "\nxPrime_ptr[10] "      << xPrime_ptr[10]
+//               << "\nxPrime_ptr[11] "      << xPrime_ptr[11]
+//               << "\nxPrime_ptr[12] "      << xPrime_ptr[12]
+//               << "\nxPrime_ptr[13] "      << xPrime_ptr[13]
+//               << "\nxPrime_ptr[14] "      << xPrime_ptr[14]
+//               << "\nxPrime_ptr[15] "      << xPrime_ptr[15]
+//               << "\nxPrime_ptr[16] "      << xPrime_ptr[16]
+              << "\nfixToMtest "          << fixToMtest
+              << "\nmtest "               << mtest
+              << std::endl;
+  }
+
+//   if (idxObjFunctionCall_== 3031041){  
+//     xPrime[0]  = 0.461168;
+//     xPrime[1]  = 0.10566;
+//     xPrime[2]  = 2.48565;
+//     xPrime[3]  = 0;
+//     xPrime[4]  = 1;
+//     xPrime[5]  = 0;
+//     xPrime[6]  = 0.5585;
+//     xPrime[7]  = 2.29173;
+//     xPrime[8]  = 0;
+//     xPrime[9]  = 1;
+//     xPrime[10] = -3.38972;
+//     xPrime[11] = 30.4944;
+//     xPrime[12] = 344.251;
+//     xPrime[13] = 0.10015;
+//     xPrime[14] = 0.252015;
+//     xPrime[15] = 1;
+//     xPrime[16] = 1;
+//     
+//   }
+
   if ( xPrime_ptr ) {
     return prob(xPrime_ptr, phiPenalty);
   } else {

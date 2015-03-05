@@ -191,6 +191,31 @@ void DiTauWithSVFitProducer<T, U>::produce(edm::Event& iEvent, const edm::EventS
         measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(leg1type, diTau.daughter(0)->pt(), diTau.daughter(0)->eta(), diTau.daughter(0)->phi(), leg1Mass, leg1DecayMode));
         SVfitStandaloneAlgorithm algo(measuredTauLeptons, met.px(), met.py(), tmsig, verbose_ ? 2 : 0);
         algo.addLogM(false);
+
+        // RIC
+        std::cout << __LINE__ << "]\t"
+                              << "\n diTau.daughter(0)->pt()  = " << diTau.daughter(0)->pt() 
+                              << "\n diTau.daughter(0)->eta() = " << diTau.daughter(0)->eta() 
+                              << "\n diTau.daughter(0)->phi() = " << diTau.daughter(0)->phi() 
+                              << "\n leg1Mass                 = " << leg1Mass 
+                              << "\n leg1DecayMode            = " << leg1DecayMode
+                              << std::endl;
+
+        std::cout << __LINE__ << "]\t"
+                              << "\n diTau.daughter(1)->pt()  = " << diTau.daughter(1)->pt() 
+                              << "\n diTau.daughter(1)->eta() = " << diTau.daughter(1)->eta() 
+                              << "\n diTau.daughter(1)->phi() = " << diTau.daughter(1)->phi() 
+                              << "\n leg2Mass                 = " << leg2Mass 
+                              << "\n leg2DecayMode            = " << leg2DecayMode
+                              << std::endl;
+        std::cout << __LINE__ << "]\t"
+                              << "\n met.px()   = " << met.px()  
+                              << "\n met.py()   = " << met.py()   
+                              << "\n tmsig(0,0) = " << tmsig(0,0) 
+                              << "\n tmsig(0,1) = " << tmsig(0,1)
+                              << "\n tmsig(1,0) = " << tmsig(1,0)
+                              << "\n tmsig(1,1) = " << tmsig(1,1)
+                              << std::endl;
         
         if (fitAlgo_ == "VEGAS")
           algo.integrateVEGAS();

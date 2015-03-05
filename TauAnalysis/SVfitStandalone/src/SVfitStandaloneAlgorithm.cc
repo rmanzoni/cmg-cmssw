@@ -3,6 +3,8 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/GSLMCIntegrator.h"
+// #include "GSLRngWrapper.h" // not compiled against mathmore
+// #include "GSLMCIntegrationWorkspace.h"
 #include "Math/LorentzVector.h"
 #include "Math/PtEtaPhiM4D.h"
 
@@ -329,6 +331,21 @@ SVfitStandaloneAlgorithm::setup()
       } 
       std::cout << std::endl;
     }
+    
+//     if (verbose_ >= 1) {
+    std::cout << __LINE__ << "]\t" << __PRETTY_FUNCTION__  
+              << "\nidx                                       " << idx 
+              << "\nsvFitStandalone::tauLeptonMass            " << svFitStandalone::tauLeptonMass     
+              << "\nTMath::Min(measuredTauLepton.mass(), 1.5) " << TMath::Min(measuredTauLepton.mass(), 1.5)
+              << "\nkMNuNu                                    " << kMNuNu                             
+              << "\nkMaxFitParams                             " << kMaxFitParams                      
+              << "\nkXFrac                                    " << kXFrac                             
+              << "\nkVisMassShifted                           " << kVisMassShifted                    
+              << "\nkRecTauPtDivGenTauPt                      " << kRecTauPtDivGenTauPt               
+              << "\nkPhi                                      " << kPhi                               
+              << std::endl;
+//     } 
+    
     // start values for xFrac
     minimizer_->SetLimitedVariable(
       idx*kMaxFitParams + kXFrac, 
@@ -668,6 +685,11 @@ SVfitStandaloneAlgorithm::integrateVEGAS(const std::string& likelihoodFileName)
   // integrator instance
   ROOT::Math::GSLMCIntegrator ig2("vegas", 0., 1.e-6, 10000);
   //ROOT::Math::GSLMCIntegrator ig2("vegas", 0., 1.e-6, 2000);
+  // RIC: set a fixed generator. Can't do this w/o GSLRngWrapper
+  // ROOT::Math::GSLRngWrapper fRng = new ROOT::Math::GSLRngWrapper();
+  // fRng->Allocate();
+  // ig2.SetGenerator(fRng);
+  //
   ROOT::Math::Functor toIntegrate(standaloneObjectiveFunctionAdapterVEGAS_, &ObjectiveFunctionAdapterVEGAS::Eval, nDim); 
   standaloneObjectiveFunctionAdapterVEGAS_->SetL1isLep(l1isLep_);
   standaloneObjectiveFunctionAdapterVEGAS_->SetL2isLep(l2isLep_);

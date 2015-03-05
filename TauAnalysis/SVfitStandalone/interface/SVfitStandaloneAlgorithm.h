@@ -71,8 +71,49 @@ namespace svFitStandalone
     }
     double Eval(const double* x) const // NOTE: return value = likelihood, **not** -log(likelihood)
     {
+      
+//       double my_x[4] = { }         ;
+//       double my_x_mapped_[10] = { };
+// 
+//       for ( int i = 0; i < 3 ; ++i ) {
+//         if (x[i] > 1.e-100) my_x[i] = x[i];
+//       }
+//       
+//       for ( int i = 0; i < 10 ; ++i ) {
+//         if (x_mapped_[i] > 1.e-100) my_x_mapped_[i] = x_mapped_[i];
+//       }
+      
       map_xVEGAS(x, l1isLep_, l2isLep_, marginalizeVisMass_, shiftVisMass_, shiftVisPt_, mvis_, mtest_, x_mapped_);      
+//       map_xVEGAS(my_x, l1isLep_, l2isLep_, marginalizeVisMass_, shiftVisMass_, shiftVisPt_, mvis_, mtest_, my_x_mapped_);      
+      
+//       std::cout << __LINE__ << "]"
+//                             << "\nx[0] = " << x[0] << "\tx_mapped_[0] = " << x_mapped_[0]
+//                             << "\nx[1] = " << x[1] << "\tx_mapped_[1] = " << x_mapped_[1]
+//                             << "\nx[2] = " << x[2] << "\tx_mapped_[2] = " << x_mapped_[2]
+//                             << "\nx[3] = " << x[3] << "\tx_mapped_[3] = " << x_mapped_[3]
+//                             << "\nx_mapped_[4] = " << x_mapped_[4]
+//                             << "\nx_mapped_[5] = " << x_mapped_[5]
+//                             << "\nx_mapped_[6] = " << x_mapped_[6]
+//                             << "\nx_mapped_[7] = " << x_mapped_[7]
+//                             << "\nx_mapped_[8] = " << x_mapped_[8]
+//                             << "\nx_mapped_[9] = " << x_mapped_[9]
+//                             << std::endl;
+// 
+//       std::cout << __LINE__ << "]"
+//                             << "\nmy_x[0] = " << my_x[0] << "\tmy_x_mapped_[0] = " << my_x_mapped_[0]
+//                             << "\nmy_x[1] = " << my_x[1] << "\tmy_x_mapped_[1] = " << my_x_mapped_[1]
+//                             << "\nmy_x[2] = " << my_x[2] << "\tmy_x_mapped_[2] = " << my_x_mapped_[2]
+//                             << "\nmy_x[3] = " << my_x[3] << "\tmy_x_mapped_[3] = " << my_x_mapped_[3]
+//                             << "\nmy_x_mapped_[4] = " << my_x_mapped_[4]
+//                             << "\nmy_x_mapped_[5] = " << my_x_mapped_[5]
+//                             << "\nmy_x_mapped_[6] = " << my_x_mapped_[6]
+//                             << "\nmy_x_mapped_[7] = " << my_x_mapped_[7]
+//                             << "\nmy_x_mapped_[8] = " << my_x_mapped_[8]
+//                             << "\nmy_x_mapped_[9] = " << my_x_mapped_[9]
+//                             << std::endl;
+                            
       double prob = nllPtr_->prob(x_mapped_, true, mtest_);
+//       double prob = nllPtr_->prob(my_x_mapped_, true, mtest_);
       if ( TMath::IsNaN(prob) ) prob = 0.;
       return prob;
     }

@@ -11,14 +11,14 @@ sep_line = '-'*70
 
 process = cms.Process("H2TAUTAU")
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(1))
 
 numberOfFilesToProcess = -1
 debugEventContent = False
 
 # choose from 'tau-mu' 'di-tau' 'tau-ele' 'mu-ele' 'all-separate', 'all'
 # channel = 'all'
-channel = 'all-separate'
+channel = 'tau-mu'
 
 # newSVFit enables the svfit mass reconstruction used for the H->tau tau analysis.
 # if false, much faster processing but mass is wrong. 
@@ -43,7 +43,7 @@ print 'tau scaling =', tauScaling
 dataset_user = 'CMS'
 # dataset_name = '/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/Phys14DR-PU40bx25_PHYS14_25_V1-v1/MINIAODSIM'
 dataset_name = '/GluGluToHToTauTau_M-125_13TeV-powheg-pythia6/Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v1/MINIAODSIM'
-#dataset_name = '/GluGluToHToTauTau_M-125_13TeV-powheg-pythia6/Phys14DR-PU40bx25_PHYS14_25_V1-v2/MINIAODSIM'
+# dataset_name = '/GluGluToHToTauTau_M-125_13TeV-powheg-pythia6/Phys14DR-PU40bx25_PHYS14_25_V1-v2/MINIAODSIM'
 # dataset_name = '/VBF_HToTauTau_M-125_13TeV-powheg-pythia6/Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/MINIAODSIM'
 # dataset_name = '/VBF_HToTauTau_M-125_13TeV-powheg-pythia6/Phys14DR-PU40bx25_PHYS14_25_V1-v1/MINIAODSIM'
 # dataset_name = '/TTbarH_M-125_13TeV_amcatnlo-pythia8-tauola/Phys14DR-PU20bx25_tsg_PHYS14_25_V1-v2/MINIAODSIM' ## also in Marias request
@@ -61,6 +61,9 @@ process.source = datasetToSource(
 process.source.inputCommands=cms.untracked.vstring(
     'keep *'
     )
+
+# process.source.eventsToProcess = cms.untracked.VEventRange('1:373:37231')
+process.source.eventsToProcess = cms.untracked.VEventRange('1:23:2295')
 
 process.options = cms.untracked.PSet(
         allowUnscheduled = cms.untracked.bool(True)
@@ -190,6 +193,8 @@ else:
     process.cmgTauEleCorSVFitPreSel.SVFitVersion = 1
     process.cmgDiTauCorSVFitPreSel.SVFitVersion = 1
     process.cmgMuEleCorSVFitPreSel.SVFitVersion = 1
+
+process.cmgTauMuCorSVFitPreSel.verbose = True
 
 print sep_line
 print 'INPUT:'

@@ -1,6 +1,8 @@
 <use   name="root"/>
+<use   name="rootcore"/>
 <use   name="rootcintex"/>
 <use   name="roofit"/>
+<use   name="rootrflx"/>
 <use   name="rootminuit"/>
 <use   name="rootminuit2"/>
 <export>
