@@ -11,44 +11,44 @@ from event import Event
 import timeit
 
 class Setup(object):
-    '''The Looper creates a Setup object to hold information relevant during 
-    the whole process, such as the process configuration obtained from 
+    '''The Looper creates a Setup object to hold information relevant during
+    the whole process, such as the process configuration obtained from
     the configuration file, or services that can be used by several analyzers.
 
-    The user may freely attach new information to the setup object, 
-    as long as this information is relevant during the whole process. 
-    If the information is event specific, it should be attached to the event 
+    The user may freely attach new information to the setup object,
+    as long as this information is relevant during the whole process.
+    If the information is event specific, it should be attached to the event
     object instead.
-    ''' 
+    '''
     def __init__(self, config, services):
         '''
-        Create a Setup object. 
-        
-        parameters: 
-        
+        Create a Setup object.
+
+        parameters:
+
         config: configuration object from the configuration file
-        
+
         services: dictionary of services indexed by service name.
-        The service name has the form classObject_instanceLabel 
-        as in this example: 
+        The service name has the form classObject_instanceLabel
+        as in this example:
         <base_heppy_path>.framework.services.tfile.TFileService_myhists
-        To find out about the service name of a given service, 
-        load your configuration file in python, and print the service. 
+        To find out about the service name of a given service,
+        load your configuration file in python, and print the service.
         '''
         self.config = config
         self.services = services
-        
+
     def close(self):
         '''Stop all services'''
         for service in self.services.values():
             service.stop()
-        
+
 
 class Looper(object):
     """Creates a set of analyzers, and schedules the event processing."""
 
     def __init__( self, name,
-                  config, 
+                  config,
                   nEvents=None,
                   firstEvent=0,
                   nPrint=0,
@@ -72,8 +72,9 @@ class Looper(object):
         self.logger = logging.getLogger( self.name )
         self.logger.addHandler(logging.FileHandler('/'.join([self.name,
                                                              'log.txt'])))
+        self.logger.setLevel(logging.INFO)
         self.logger.propagate = False
-        if not quiet: 
+        if not quiet:
             self.logger.addHandler( logging.StreamHandler(sys.stdout) )
 
         self.cfg_comp = config.components[0]
@@ -105,7 +106,7 @@ class Looper(object):
                 self.nEvents = int(ceil(totevents/float(fineSplitFactor)))
                 self.firstEvent = firstEvent + fineSplitIndex * self.nEvents
                 if self.firstEvent + self.nEvents >= totevents:
-                    self.nEvents = totevents - self.firstEvent 
+                    self.nEvents = totevents - self.firstEvent
                 #print "For component %s will process %d events starting from the %d one, ending at %d excluded" % (self.cfg_comp.name, self.nEvents, self.firstEvent, self.nEvents + self.firstEvent)
         # self.event is set in self.process
         self.event = None
@@ -114,7 +115,7 @@ class Looper(object):
             service = self._build(cfg_serv)
             services[cfg_serv.name] = service
         # would like to provide a copy of the config to the setup,
-        # so that analyzers cannot modify the config of other analyzers. 
+        # so that analyzers cannot modify the config of other analyzers.
         # but cannot copy the autofill config.
         self.setup = Setup(config, services)
 
@@ -122,7 +123,7 @@ class Looper(object):
         theClass = cfg.class_object
         obj = theClass( cfg, self.cfg_comp, self.outDir )
         return obj
-        
+
     def _prepareOutput(self, name):
         index = 0
         tmpname = name
@@ -142,7 +143,7 @@ class Looper(object):
     def loop(self):
         """Loop on a given number of events.
 
-        At the beginning of the loop, 
+        At the beginning of the loop,
         Analyzer.beginLoop is called for each Analyzer.
         At each event, self.process is called.
         At the end of the loop, Analyzer.endLoop is called.
@@ -186,7 +187,7 @@ class Looper(object):
         info('number of events processed: {nEv}'.format(nEv=iEv+1))
         info('')
         info( self.cfg_comp )
-        info('')        
+        info('')
         for analyzer in self.analyzers:
             analyzer.endLoop(self.setup)
         if self.timeReport:
@@ -239,7 +240,7 @@ class Looper(object):
         """
         for analyzer in self.analyzers:
             analyzer.write(self.setup)
-        self.setup.close() 
+        self.setup.close()
 
 
 if __name__ == '__main__':
