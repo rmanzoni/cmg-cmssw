@@ -1,5 +1,6 @@
 import PhysicsTools.HeppyCore.framework.config as cfg
 from PhysicsTools.HeppyCore.framework.config import printComps
+from PhysicsTools.HeppyCore.framework.heppy  import getHeppyOption
 
 # Tau-tau analyzers
 from CMGTools.H2TauTau.proto.analyzers.TauTauAnalyzer             import TauTauAnalyzer
@@ -8,13 +9,19 @@ from CMGTools.H2TauTau.proto.analyzers.TauDecayModeWeighter       import TauDeca
 from CMGTools.H2TauTau.proto.analyzers.LeptonWeighter             import LeptonWeighter
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer              import SVfitProducer
 
+from CMGTools.H2TauTau.proto.samples.phys14.connector import httConnector
+
 # common configuration and sequence
 from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJetsFakeAna, puFileData, puFileMC, eventSelector
+
+# Get all heppy options; set via "-o production" or "-o production=True"
+
+# production = True run on batch, production = False (or unset) run locally
+production = getHeppyOption('production')
 
 # local switches
 syncntuple   = True
 computeSVfit = True
-production   = False  # production = True run on batch, production = False run locally
 
 dyJetsFakeAna.channel = 'tt'
 
@@ -95,7 +102,6 @@ svfitProducer = cfg.Analyzer(
 ###################################################
 ### CONNECT SAMPLES TO THEIR ALIASES AND FILES  ###
 ###################################################
-from CMGTools.H2TauTau.proto.samples.phys14.connector import httConnector
 my_connect = httConnector('htt_6mar15_manzoni_nom', 'htautau_group',
                           '.*root', 'tt', production=production)
 my_connect.connect()
