@@ -3,52 +3,54 @@ import PhysicsTools.HeppyCore.framework.config as cfg
 from CMGTools.H2TauTau.tauMu_2015_base_cfg import sequence
 from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence
 
-from CMGTools.H2TauTau.proto.analyzers.L1TriggerAnalyzer import L1TriggerAnalyzer
+from CMGTools.H2TauTau.proto.analyzers.L1TriggerAnalyzer     import L1TriggerAnalyzer
 
-from PhysicsTools.HeppyCore.framework.config import printComps
-from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
+from PhysicsTools.HeppyCore.framework.config                 import printComps
+from PhysicsTools.HeppyCore.framework.heppy_loop             import getHeppyOption
 
-from CMGTools.RootTools.utils.splitFactor import splitFactor
-from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
-from CMGTools.RootTools.samples.samples_13TeV_74X import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop
-from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015B_17Jul, SingleMuon_Run2015B
-from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauMu import mc_triggers as mc_triggers_mt
+from CMGTools.RootTools.utils.splitFactor                    import splitFactor
+from CMGTools.RootTools.samples.ComponentCreator             import ComponentCreator
+from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauMu import mc_triggers   as mc_triggers_mt
 from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauMu import data_triggers as data_triggers_mt
-from CMGTools.H2TauTau.proto.samples.spring15.higgs import HiggsGGH125, HiggsVBF125, HiggsTTH125
 
 from CMGTools.H2TauTau.htt_ntuple_base_cff import puFileData, puFileMC, eventSelector
 
-# Get all heppy options; set via "-o production" or "-o production=True"
+# Get all heppy options; set via '-o production' or '-o production=True'
 # production = True run on batch, production = False (or unset) run locally
 production = getHeppyOption('production')
 
-production = True
+production  = True
 pick_events = False
-syncntuple = False
+syncntuple  = False
+
+json25ns = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-257599_13TeV_PromptReco_Collisions15_25ns_JSON.txt'
 
 creator = ComponentCreator()
-ggh160   = creator.makeMCComponent("GGH160" , "/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 1.0)
-qcd_flat = creator.makeMCComponent("QCDflat", "/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/RunIISpring15DR74-Asympt25nsRaw_MCRUN2_74_V9-v3/MINIAODSIM"    , "CMS", ".*root", 2022100000.)
-ggh125   = creator.makeMCComponent("GGH125" , "/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"             , "CMS", ".*root", 1.0)
+run2015D = creator.makeDataComponent(
+    'DataRun2015D'                       ,
+    '/SingleMuon/Run2015D-PromptReco-v3/MINIAOD',
+#     '/Tau/Run2015D-PromptReco-v3/MINIAOD', # need to run on the dataset that contains the *tag* trigger
+    'CMS'                                , 
+    '.*root'                             , 
+    json25ns
+)
 
-# samples = [qcd_flat, TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf]
-# samples = [TT_pow, DYJetsToLL_M50, WJetsToLNu, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8]
-# samples = [HiggsGGH125, HiggsVBF125, HiggsTTH125] + SingleTop
 
-samples = [ggh125, ggh160]
+samples = []
 
 split_factor = 1e5
 
 for sample in samples:
-    sample.triggers = ['HLT_IsoMu20_eta2p1_v1'] #mc_triggers_mt
+    sample.triggers = ['HLT_IsoMu17_eta2p1_v1', 'HLT_IsoMu17_eta2p1_v2', 'HLT_IsoMu17_eta2p1_v3', 'HLT_IsoMu18_v1', 'HLT_IsoMu18_v2', 'HLT_IsoMu18_v3']
     sample.splitFactor = splitFactor(sample, split_factor)
 
-data_list = [SingleMuon_Run2015B_17Jul, SingleMuon_Run2015B]
+data_list = [run2015D]
 
 for sample in data_list:
-    sample.triggers = data_triggers_mt
+    #sample.triggers    = ['HLT_IsoMu17_eta2p1_v1', 'HLT_IsoMu17_eta2p1_v2', 'HLT_IsoMu17_eta2p1_v3', 'HLT_IsoMu18_v1', 'HLT_IsoMu18_v2', 'HLT_IsoMu18_v3']
+    sample.triggers    = ['HLT_IsoMu18_v1', 'HLT_IsoMu18_v2', 'HLT_IsoMu18_v3']
     sample.splitFactor = splitFactor(sample, split_factor)
-    sample.json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-251883_13TeV_PromptReco_Collisions15_JSON_v2.txt'
+    sample.json = json25ns
     sample.lumi = 40.03
 
 
@@ -63,8 +65,8 @@ for mc in samples:
 ###             SET COMPONENTS BY HAND          ###
 ###################################################
 # selectedComponents = samples + data_list
-# selectedComponents = data_list
-selectedComponents = samples
+selectedComponents = data_list
+# selectedComponents = samples
 
 
 ###################################################
@@ -74,6 +76,8 @@ L1TriggerAnalyzer = cfg.Analyzer(
     L1TriggerAnalyzer,
     name='L1TriggerAnalyzer',
     collections=['IsoTau', 'Tau', 'Muon'],
+    #label='hltL1extraParticles',
+    label='l1extraParticles',
     dR=0.5
 )
 
@@ -99,11 +103,11 @@ if not production:
     # comp = selectedComponents[0]
     # comp = data_list[0]
     #comp = QCD_Mu15
-    comp = ggh125
+    comp = run2015D
     selectedComponents = [comp]
     comp.splitFactor = 1
     comp.fineSplitFactor = 1
-    # comp.files = comp.files[]
+    comp.files = comp.files[:2]
 
 ###################################################
 ###                  SEQUENCE                   ###
@@ -112,12 +116,16 @@ if not production:
 for i, module in enumerate(sequence):
   
     if module.name == 'TriggerAnalyzer':
+#         module.usePrescaled = True
         module.requireTrigger = True
-#         module.extraTrig = ['HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v1']
-#         module.extraTrig = ['HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v1']
-        module.extraTrig = ['HLT_IsoMu17_eta2p1_MediumIsoPFTau40_Trk1_eta2p1_Reg_v1']
+#         module.extraTrig = ['HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v2']
+#         module.extraTrig = ['HLT_IsoMu17_eta2p1_LooseIsoPFTau20_SingleL1_v2']
+        module.extraTrig = ['HLT_IsoMu17_eta2p1_MediumIsoPFTau35_Trk1_eta2p1_Reg_v1', 'HLT_IsoMu17_eta2p1_MediumIsoPFTau35_Trk1_eta2p1_Reg_v2']
         # module.verbose = False
         module.saveFlag = True
+#         module.triggerResultsHandle = ('TriggerResults', '', 'HLT25NSV4L1V5')
+#         module.triggerObjectsHandle = ('selectedPatTriggerCustom', '', 'HLT25NSV4L1V5')
+#         module.triggerPrescalesHandle = ('patTrigger', '', 'RECO')
     
     if module.name == 'H2TauTauTreeProducerTauMu':
         module.addTnPInfo = True

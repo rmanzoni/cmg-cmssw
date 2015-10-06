@@ -293,6 +293,7 @@ class DiLeptonAnalyzer(Analyzer):
             matchedIds = []
             allMatched = True
             
+#             import pdb ; pdb.set_trace()
             for to in info.objects:
                 if self.trigObjMatched(to, legs):
                     matchedIds.append(abs(to.pdgId()))
@@ -323,6 +324,8 @@ class DiLeptonAnalyzer(Analyzer):
                (pdgId == 0 and abs(leg.pdgId()) == 11) or \
                (pdgId == 0 and abs(leg.pdgId()) == 15):
                 if deltaR2(eta, phi, leg.eta(), leg.phi()) < dR2Max:
-                    to.matched = True                  
+                    to.matched = True
+#                     import pdb ; pdb.set_trace()
+                    leg.to = to
 
         return to.matched
