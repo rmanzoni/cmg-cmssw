@@ -35,12 +35,12 @@ ggh125   = creator.makeMCComponent("GGH125" , "/GluGluHToTauTau_M125_13TeV_powhe
 # samples = [TT_pow, DYJetsToLL_M50, WJetsToLNu, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8]
 # samples = [HiggsGGH125, HiggsVBF125, HiggsTTH125] + SingleTop
 
-samples = [ggh125, ggh160]
+samples = [TT_pow, DYJetsToLL_M50, WJetsToLNu, WWTo2L2Nu, ZZp8, WZp8]#, SingleTop]
 
 split_factor = 1e5
 
 for sample in samples:
-    sample.triggers = ['HLT_IsoMu20_eta2p1_v1'] #mc_triggers_mt
+    sample.triggers = ['HLT_IsoMu17_eta2p1_v1'] #mc_triggers_mt
     sample.splitFactor = splitFactor(sample, split_factor)
 
 data_list = [SingleMuon_Run2015B_17Jul, SingleMuon_Run2015B]
@@ -74,6 +74,8 @@ L1TriggerAnalyzer = cfg.Analyzer(
     L1TriggerAnalyzer,
     name='L1TriggerAnalyzer',
     collections=['IsoTau', 'Tau', 'Muon'],
+    label='L1extraParticles',
+#     label='hltL1extraParticles',
     dR=0.5
 )
 
@@ -99,11 +101,11 @@ if not production:
     # comp = selectedComponents[0]
     # comp = data_list[0]
     #comp = QCD_Mu15
-    comp = ggh125
+    comp = DYJetsToLL_M50
     selectedComponents = [comp]
     comp.splitFactor = 1
     comp.fineSplitFactor = 1
-    # comp.files = comp.files[]
+    comp.files = comp.files[:1]
 
 ###################################################
 ###                  SEQUENCE                   ###
@@ -118,12 +120,15 @@ for i, module in enumerate(sequence):
         module.extraTrig = ['HLT_IsoMu17_eta2p1_MediumIsoPFTau40_Trk1_eta2p1_Reg_v1']
         # module.verbose = False
         module.saveFlag = True
+#         module.triggerResultsHandle = ('TriggerResults', '', 'HLT25NSV4L1V5')
+#         module.triggerObjectsHandle = ('selectedPatTriggerCustom', '', 'HLT25NSV4L1V5')
     
     if module.name == 'H2TauTauTreeProducerTauMu':
         module.addTnPInfo = True
-        
-    if module.name == 'TauMuAnalyzer':
-        sequence.insert(i+1, L1TriggerAnalyzer)
+    
+    # Comment if you're running on a pre Stage-1 L1 sample    
+#     if module.name == 'TauMuAnalyzer':
+#         sequence.insert(i+1, L1TriggerAnalyzer)
     
 print sequence
 

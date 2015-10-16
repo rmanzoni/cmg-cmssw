@@ -22,7 +22,7 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import puFileData, puFileMC, eventSel
 # production = True run on batch, production = False (or unset) run locally
 production = getHeppyOption('production')
 
-production = True
+# production = True
 pick_events = False
 syncntuple = False
 
@@ -32,7 +32,7 @@ qcd_flat = creator.makeMCComponent("QCDflat", "/QCD_Pt-15to7000_TuneCUETP8M1_Fla
 ggh125   = creator.makeMCComponent("GGH125" , "/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM"             , "CMS", ".*root", 1.0)
 
 
-# RIC: super nasty, this is actually a relval file I ran on
+# RIC: super nasty, will I update the ComponentCreator, eventually?
 # prior to the V2 calibration
 ggh125.files = [
 'root://eoscms//eos/cms/store/group/phys_tau/HLT2015/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15DR74-AsymptFlat10to50bx25Raw_MCRUN2_74_V9-v1_25ns14e33_HLT_v4p0_L1_v5_9sept15/150909_104612/0000/outputFULL_1.root',
@@ -1449,7 +1449,6 @@ ggh125.files = [
 'root://eoscms//eos/cms/store/group/phys_tau/HLT2015/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15DR74-AsymptFlat10to50bx25Raw_MCRUN2_74_V9-v1_25ns14e33_HLT_v4p0_L1_v5_1oct15/151001_125918/0000/outputFULL_99.root',
 ]
 
-
 # samples = [qcd_flat, TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf]
 # samples = [TT_pow, DYJetsToLL_M50, WJetsToLNu, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8]
 # samples = [HiggsGGH125, HiggsVBF125, HiggsTTH125] + SingleTop
@@ -1523,7 +1522,7 @@ if not production:
     selectedComponents = [comp]
     comp.splitFactor = 1
     comp.fineSplitFactor = 1
-    # comp.files = comp.files[]
+    comp.files = comp.files[:1]
 
 ###################################################
 ###                  SEQUENCE                   ###
@@ -1545,6 +1544,8 @@ for i, module in enumerate(sequence):
         module.addTnPInfo = True
         
     if module.name == 'TauMuAnalyzer':
+        module.filtersToMatch = (['hltL2Tau30eta2p2'], 2)
+        module.triggerObjectsHandle = ('selectedPatTriggerCustom', '', 'HLT25NSV4L1V5')
         sequence.insert(i+1, L1TriggerAnalyzer)
     
 print sequence

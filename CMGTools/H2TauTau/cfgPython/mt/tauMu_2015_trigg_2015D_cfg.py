@@ -23,13 +23,13 @@ production  = True
 pick_events = False
 syncntuple  = False
 
-json25ns = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-257599_13TeV_PromptReco_Collisions15_25ns_JSON.txt'
+json25ns = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-258159_13TeV_PromptReco_Collisions15_25ns_JSON_v3.txt'
 
 creator = ComponentCreator()
 run2015D = creator.makeDataComponent(
     'DataRun2015D'                       ,
-    '/SingleMuon/Run2015D-PromptReco-v3/MINIAOD',
-#     '/Tau/Run2015D-PromptReco-v3/MINIAOD', # need to run on the dataset that contains the *tag* trigger
+#     '/SingleMuon/Run2015D-PromptReco-v3/MINIAOD',
+    '/SingleMuon/Run2015D-05Oct2015-v1/MINIAOD',
     'CMS'                                , 
     '.*root'                             , 
     json25ns

@@ -16,9 +16,10 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJets
 
 # production = True run on batch, production = False (or unset) run locally
 production = getHeppyOption('production')
+# production = True
 
 # local switches
-syncntuple   = True
+syncntuple   = False
 computeSVfit = False
 pick_events  = False
 
@@ -99,39 +100,65 @@ svfitProducer = cfg.Analyzer(
 
 ###################################################
 ### CONNECT SAMPLES TO THEIR ALIASES AND FILES  ###
-###################################################
-from CMGTools.RootTools.utils.splitFactor import splitFactor
-from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
-from CMGTools.RootTools.samples.samples_13TeV_74X import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop
-from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015B_17Jul, SingleMuon_Run2015B
-from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauTau import mc_triggers as mc_triggers_tt
+# ###################################################
+# from CMGTools.RootTools.utils.splitFactor import splitFactor
+# from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
+# from CMGTools.RootTools.samples.samples_13TeV_74X import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop
+# from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015B_17Jul, SingleMuon_Run2015B
+# from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauTau import mc_triggers as mc_triggers_tt
+# 
+# creator = ComponentCreator()
+# 
+# ggh160   = creator.makeMCComponent  ("GGH160", 
+#                                      "/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
+#                                      "CMS", 
+#                                      ".*root", 
+#                                      1.0)
+# 
+# run2015A = creator.makeDataComponent("DataRun2015A", 
+#                                      "/Tau/Run2015A-PromptReco-v1/MINIAOD", 
+#                                      "CMS", 
+#                                      ".*root", 
+#                                      "Cert_246908-255031_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
+#                                      )
+# 
+# run2015B = creator.makeDataComponent("DataRun2015B", 
+#                                      "/Tau/Run2015B-PromptReco-v1/MINIAOD", 
+#                                      "CMS", 
+#                                      ".*root", 
+#                                      "Cert_246908-255031_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
+#                                      )
+# 
+# run2015C = creator.makeDataComponent("DataRun2015C", 
+#                                      "/Tau/Run2015C-PromptReco-v1/MINIAOD", 
+#                                      "CMS", 
+#                                      ".*root", 
+#                                      "Cert_246908-255031_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
+#                                      )
+# 
+# 
+# 
+# 
+# MC_list = []
+# 
+# run2015B.intLumi  = '2.0' # in pb
+# run2015B.triggers = mc_triggers_tt
+# 
+# split_factor = 1e5
+# 
+# for sample in MC_list:
+#     sample.triggers = mc_triggers_tt
+#     sample.splitFactor = splitFactor(sample, split_factor)
+# 
+# data_list = [run2015B, run2015C]
+# 
+# for sample in data_list:
+#     sample.triggers = data_triggers_tt
+#     sample.splitFactor = splitFactor(sample, split_factor)
 
-creator = ComponentCreator()
 
-ggh160   = creator.makeMCComponent  ("GGH160", 
-                                     "/SUSYGluGluToHToTauTau_M-160_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", 
-                                     "CMS", 
-                                     ".*root", 
-                                     1.0)
-run2015B = creator.makeDataComponent("DataRun2015B", 
-                                     "/Tau/Run2015B-PromptReco-v1/MINIAOD", 
-                                     "CMS", 
-                                     ".*root", 
-                                     "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/DCSOnly/json_DCSONLY_Run2015B.txt"
-                                     )
-
-MC_list = [ggh160]
-
-run2015B.intLumi  = '2.0' # in pb
-run2015B.triggers = mc_triggers_tt
-
-split_factor = 1e5
-
-for sample in MC_list:
-    sample.triggers = mc_triggers_tt
-    sample.splitFactor = splitFactor(sample, split_factor)
-    
-data_list = [run2015B]
+from CMGTools.H2TauTau.proto.samples.spring15.components_25ns import *
+# from CMGTools.H2TauTau.proto.samples.spring15.components_50ns import *
 
 ###################################################
 ###              ASSIGN PU to MC                ###
@@ -143,7 +170,8 @@ for mc in MC_list:
 ###################################################
 ###             SET COMPONENTS BY HAND          ###
 ###################################################
-selectedComponents = MC_list #+ data_list
+# selectedComponents = MC_list + data_list
+selectedComponents = data_list
 # selectedComponents = mc_dict['HiggsGGH125']
 for c in selectedComponents : 
     c.splitFactor *= 10
@@ -186,10 +214,7 @@ if pick_events:
 ###################################################
 if not production:
   cache                = True
-#   comp                 = my_connect.mc_dict['HiggsGGH125']
-#   comp                 = DYJetsToLL_M50
-#   comp                 = run2015B
-  comp                 = ggh160
+  comp                 = run2015D
   selectedComponents   = [comp]
   comp.splitFactor     = 1
   comp.fineSplitFactor = 1
