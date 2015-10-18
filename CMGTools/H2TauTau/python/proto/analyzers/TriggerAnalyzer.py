@@ -78,7 +78,6 @@ class TriggerAnalyzer(Analyzer):
         self.counters.counter('Trigger').register('All events')
         self.counters.counter('Trigger').register('HLT')
         
-
     def process(self, event):        
         self.readCollections(event.input)
         
