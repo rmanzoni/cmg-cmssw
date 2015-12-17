@@ -18,8 +18,8 @@ from CMGTools.H2TauTau.proto.analyzers.NJetsAnalyzer import NJetsAnalyzer
 from CMGTools.H2TauTau.proto.analyzers.HiggsPtWeighter import HiggsPtWeighter
 from CMGTools.H2TauTau.proto.analyzers.VBFAnalyzer import VBFAnalyzer
 
-puFileMC = None
-puFileData = None
+puFileData = '/afs/cern.ch/work/a/adewit/public/pileup-hists/Data_Pileup_2015D_Nov17.root'
+puFileMC = '/afs/cern.ch/work/a/adewit/public/pileup-hists/MC_Spring15_PU25_Startup.root'
 
 eventSelector = cfg.Analyzer(
     EventSelector,
