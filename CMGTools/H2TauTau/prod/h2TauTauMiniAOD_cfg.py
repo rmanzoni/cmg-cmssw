@@ -11,22 +11,28 @@ sep_line = '-'*70
 
 process = cms.Process("H2TAUTAU")
 
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(40000))
 
 numberOfFilesToProcess = -1
 debugEventContent = False
 
 # choose from 'tau-mu' 'di-tau' 'tau-ele' 'mu-ele' 'all-separate', 'all'
 # channel = 'all'
-channel = 'tau-mu'
+channel = 'di-tau'
 
 # runSVFit enables the svfit mass reconstruction used for the H->tau tau analysis.
 # if false, no mass calculation is carried out
 runSVFit = False
 
+# decide whether
+p4TransferFunctionFile = 'TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root' # Christians's default
+# p4TransferFunctionFile = 'CMGTools/H2TauTau/data/tauEnergyResponse.root' # Riccardo
+integrateOverP4 = False
+
+
 # increase to 1000 before running on the batch, to reduce size of log files
 # on your account
-reportInterval = 100
+reportInterval = 5000
 
 print sep_line
 print 'channel', channel
@@ -38,11 +44,12 @@ print 'runSVFit', runSVFit
 # dataset_name = '/VBF_HToTauTau_M-125_13TeV-powheg-pythia6/Spring14dr-PU20bx25_POSTLS170_V5-v1/AODSIM/SS14/'
 # dataset_files = 'miniAOD-prod_PAT_.*root'
 
-local_run = False
+local_run = True
 if local_run:
 
     dataset_user = 'CMS'
-    dataset_name = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM'
+#     dataset_name = '/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v3/MINIAODSIM'
+    dataset_name = '/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM'
 
     dataset_files = '.*root'
 
@@ -248,6 +255,18 @@ else:
     process.cmgTauEleCorSVFitPreSel.SVFitVersion = 0
     process.cmgDiTauCorSVFitPreSel.SVFitVersion = 0
     process.cmgMuEleCorSVFitPreSel.SVFitVersion = 0
+
+if integrateOverP4:
+    process.cmgTauMuCorSVFitPreSel.integrateOverP4  = integrateOverP4
+    process.cmgTauEleCorSVFitPreSel.integrateOverP4 = integrateOverP4
+    process.cmgDiTauCorSVFitPreSel.integrateOverP4  = integrateOverP4
+    process.cmgMuEleCorSVFitPreSel.integrateOverP4  = integrateOverP4
+
+if p4TransferFunctionFile:
+    process.cmgTauMuCorSVFitPreSel.p4TransferFunctionFile = p4TransferFunctionFile
+    process.cmgTauEleCorSVFitPreSel.p4TransferFunctionFile = p4TransferFunctionFile
+    process.cmgDiTauCorSVFitPreSel.p4TransferFunctionFile = p4TransferFunctionFile
+    process.cmgMuEleCorSVFitPreSel.p4TransferFunctionFile = p4TransferFunctionFile
 
 print sep_line
 print 'INPUT:'
