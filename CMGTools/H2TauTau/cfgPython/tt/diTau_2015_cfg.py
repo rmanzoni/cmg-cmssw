@@ -1,3 +1,4 @@
+import os
 import PhysicsTools.HeppyCore.framework.config as cfg
 from PhysicsTools.HeppyCore.framework.config import printComps
 from PhysicsTools.HeppyCore.framework.heppy_loop import getHeppyOption
@@ -7,6 +8,7 @@ from CMGTools.H2TauTau.proto.analyzers.TauTauAnalyzer             import TauTauA
 from CMGTools.H2TauTau.proto.analyzers.H2TauTauTreeProducerTauTau import H2TauTauTreeProducerTauTau
 from CMGTools.H2TauTau.proto.analyzers.TauDecayModeWeighter       import TauDecayModeWeighter
 from CMGTools.H2TauTau.proto.analyzers.LeptonWeighter             import LeptonWeighter
+from CMGTools.H2TauTau.proto.analyzers.TauP4Scaler                import TauP4Scaler
 from CMGTools.H2TauTau.proto.analyzers.SVfitProducer              import SVfitProducer
 
 # common configuration and sequence
@@ -16,10 +18,11 @@ from CMGTools.H2TauTau.htt_ntuple_base_cff import commonSequence, genAna, dyJets
 
 # production = True run on batch, production = False (or unset) run locally
 production = getHeppyOption('production')
+# production = True
 
 # local switches
-syncntuple   = True
-computeSVfit = False
+syncntuple   = False
+computeSVfit = True
 pick_events  = False
 
 dyJetsFakeAna.channel = 'tt'
@@ -45,7 +48,23 @@ tauTauAna = cfg.Analyzer(
   jetEta              = 4.7                                       ,
   relaxJetId          = False                                     ,
   verbose             = False                                     ,
-  from_single_objects = True                                      ,
+  from_single_objects = False                                     ,
+  )
+
+tau1Calibration = cfg.Analyzer(
+  TauP4Scaler       ,
+  'TauP4Scaler_tau1',
+  leg      = 'leg1' ,
+  scaleMET = False  ,
+  verbose  = False  ,
+  )
+
+tau2Calibration = cfg.Analyzer(
+  TauP4Scaler       ,
+  'TauP4Scaler_tau2',
+  leg      = 'leg2' ,
+  scaleMET = False  ,
+  verbose  = False  ,
   )
 
 tauDecayModeWeighter = cfg.Analyzer(
@@ -88,13 +107,14 @@ syncTreeProducer = cfg.Analyzer(
 
 svfitProducer = cfg.Analyzer(
   SVfitProducer,
-  name        = 'SVfitProducer',
-  # integration = 'VEGAS'        ,
-  integration = 'MarkovChain'  ,
-  # verbose     = True           ,
-  # order       = '21'           , # muon first, tau second
-  l1type      = 'tau'          ,
-  l2type      = 'tau'
+  name                       = 'SVfitProducer',
+  integration                = 'MarkovChain'  , # 'VEGAS'
+  integrateOverVisPtResponse = True           ,
+#   visPtResponseFile          = os.environ['CMSSW_BASE']+'/src/TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root',
+  visPtResponseFile          = os.environ['CMSSW_BASE']+'/src/TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF_new.root',
+  verbose                    = False          ,
+  l1type                     = 'tau'          ,
+  l2type                     = 'tau'
   )
 
 ###################################################
@@ -110,6 +130,20 @@ from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauTau import mc_triggers
 MC_list = [ggh160]
 data_list = [SingleMuon_Run2015D_05Oct, SingleMuon_Run2015D_Promptv4]
 
+creator = ComponentCreator()
+
+ggh125 = creator.makeMCComponent(
+    'GGH125', 
+    '/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM', 
+    'CMS', 
+    '.*root', 
+    1.0
+)
+
+ggh125.files = ['file:/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_4_3/src/CMGTools/H2TauTau/prod/diTau_fullsel_tree_CMG.root']
+
+MC_list = [ggh125]
+
 split_factor = 1e5
 
 for sample in data_list:
@@ -121,7 +155,7 @@ for sample in MC_list:
     sample.triggers = mc_triggers
     sample.triggerobjects = mc_triggerfilters
     sample.splitFactor = splitFactor(sample, split_factor)
-    
+
 ###################################################
 ###              ASSIGN PU to MC                ###
 ###################################################
@@ -132,17 +166,17 @@ for mc in MC_list:
 ###################################################
 ###             SET COMPONENTS BY HAND          ###
 ###################################################
-selectedComponents = MC_list #+ data_list
+selectedComponents = MC_list
 # selectedComponents = mc_dict['HiggsGGH125']
-for c in selectedComponents : 
-    c.splitFactor *= 10
-#     c.fineSplitFactor = 4
+# for c in selectedComponents : c.splitFactor *= 5
 
 ###################################################
 ###                  SEQUENCE                   ###
 ###################################################
 sequence = commonSequence
 sequence.insert(sequence.index(genAna), tauTauAna)
+sequence.append(tau1Calibration)
+sequence.append(tau2Calibration)
 sequence.append(tauDecayModeWeighter)
 sequence.append(tau1Weighter)
 sequence.append(tau2Weighter)
@@ -176,9 +210,7 @@ if pick_events:
 if not production:
   cache                = True
 #   comp                 = my_connect.mc_dict['HiggsGGH125']
-#   comp                 = DYJetsToLL_M50
-#   comp                 = run2015B
-  comp                 = ggh160
+  comp                 = ggh125
   selectedComponents   = [comp]
   comp.splitFactor     = 4
   comp.fineSplitFactor = 1

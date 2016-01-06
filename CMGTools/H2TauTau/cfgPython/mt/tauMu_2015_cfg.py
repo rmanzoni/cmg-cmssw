@@ -107,6 +107,14 @@ if not production:
     cache = True
     # comp = samples[0]
     comp = sync_list[0]
+    # comp = my_connect.mc_dict['HiggsSUSYGG160']
+    # selectedComponents = [comp]
+    # comp = selectedComponents[0]
+    # comp = data_list[0]
+#     comp = ggh125
+#     comp.files = ['../../prod/tauMu_fullsel_tree_CMG_noPtIntegration.root']
+#     comp.files = ['../../prod/tauMu_fullsel_tree_CMG_uncalibPtIntegration.root']
+#     comp.files = ['../../prod/tauMu_fullsel_tree_CMG.root']
     selectedComponents = [comp]
     comp.splitFactor = 100
     comp.fineSplitFactor = 1

@@ -75,130 +75,121 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
 #       event.leg2 = event.diLepton.leg1()
 #       event.selectedLeptons = [event.leg2, event.leg1]
 
-        # RIC: agreed with Adinda to sort taus by isolation
-        iso = self.cfg_ana.isolation
-        if event.leg1.tauID(iso) > event.leg2.tauID(iso):
-            event.leg1 = event.diLepton.leg2()
-            event.leg2 = event.diLepton.leg1()
-            event.selectedLeptons = [event.leg2, event.leg1]
+    # RIC: agreed with Adinda to sort taus by isolation
+    iso = self.cfg_ana.isolation
+    if event.leg1.tauID(iso) > event.leg2.tauID(iso) :
+      event.leg1 = event.diLepton.leg2()
+      event.leg2 = event.diLepton.leg1()
+      event.selectedLeptons = [event.leg2, event.leg1]
 
-        event.pfmet = self.handles['met'].product()[0]
-        event.puppimet = self.handles['puppiMET'].product()[0]
+    return True
 
-        return True
+  def buildDiLeptons(self, cmgDiLeptons, event):
+    '''Build di-leptons, associate best vertex to both legs.'''
+    diLeptons = []
+    for index, dil in enumerate(cmgDiLeptons):
+      pydil = TauTau(dil)
+      pydil.leg1().associatedVertex = event.goodVertices[0]
+      pydil.leg2().associatedVertex = event.goodVertices[0]
+      diLeptons.append( pydil )
+      pydil.mvaMetSig = pydil.met().getSignificanceMatrix()
+    return diLeptons
 
-    def buildDiLeptons(self, cmgDiLeptons, event):
-        '''Build di-leptons, associate best vertex to both legs.'''
-        diLeptons = []
-        for index, dil in enumerate(cmgDiLeptons):
-            pydil = TauTau(dil)
-            pydil.leg1().associatedVertex = event.goodVertices[0]
-            pydil.leg2().associatedVertex = event.goodVertices[0]
-            diLeptons.append(pydil)
-            pydil.mvaMetSig = pydil.met().getSignificanceMatrix()
-        return diLeptons
+  def buildDiLeptonsSingle(self, leptons, event):
+    '''
+    '''
+    # RIC: patch to adapt it to the di-tau case. Need to talk to Jan
+    di_objects = []
+    taus = self.handles['taus'].product()
+    met  = self.handles['met' ].product()[0]
+    for leg1 in taus:
+      for leg2 in taus:
+        if leg1 != leg2:
+          di_tau = DirectDiTau(Tau(leg1), Tau(leg2), met)
+          di_tau.leg2().associatedVertex = event.goodVertices[0]
+          di_tau.leg1().associatedVertex = event.goodVertices[0]
+          di_tau.mvaMetSig = None
+          di_objects.append(di_tau)
+    return di_objects
 
-    def buildDiLeptonsSingle(self, leptons, event):
-        '''
-        '''
-        # RIC: patch to adapt it to the di-tau case. Need to talk to Jan
-        di_objects = []
-        taus = self.handles['taus'].product()
-        met = self.handles['met'].product()[0]
-        for leg1 in taus:
-            for leg2 in taus:
-                if leg1 != leg2:
-                    di_tau = DirectDiTau(Tau(leg1), Tau(leg2), met)
-                    di_tau.leg2().associatedVertex = event.goodVertices[0]
-                    di_tau.leg1().associatedVertex = event.goodVertices[0]
-                    di_tau.mvaMetSig = None
-                    di_objects.append(di_tau)
-        return di_objects
+  def buildLeptons(self, cmgLeptons, event):
+    '''Build muons for veto, associate best vertex, select loose ID muons.
+    The loose ID selection is done to ensure that the muon has an inner track.'''
+    leptons = []
+    for index, lep in enumerate(cmgLeptons):
+      pyl = Muon(lep)
+      pyl.associatedVertex = event.goodVertices[0]
+      if not pyl.muonID('POG_ID_Medium')                             : continue
+      if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3 : continue
+      if not self.testLegKine(pyl, ptcut=10, etacut=2.4)             : continue
+      leptons.append( pyl )
+    return leptons
 
-    def buildOtherLeptons(self, cmgLeptons, event):
-        '''Build muons for veto, associate best vertex, select loose ID muons.
-        The loose ID selection is done to ensure that the muon has an inner track.'''
-        leptons = []
-        for index, lep in enumerate(cmgLeptons):
-            pyl = Muon(lep)
-            pyl.associatedVertex = event.goodVertices[0]
-            if not pyl.muonID('POG_ID_Medium'):
-                continue
-            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3:
-                continue
-            if not self.testLegKine(pyl, ptcut=10, etacut=2.4):
-                continue
-            leptons.append(pyl)
-        return leptons
+  def buildOtherLeptons(self, cmgOtherLeptons, event):
+    '''Build electrons for third lepton veto, associate best vertex.'''
+    otherLeptons = []
+    for index, lep in enumerate(cmgOtherLeptons):
+      pyl = Electron(lep)
+      pyl.associatedVertex = event.goodVertices[0]
+      pyl.rho = event.rho
+      if not pyl.cutBasedId('POG_PHYS14_25ns_v1_Veto')               : continue
+      if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3 : continue
+      if not self.testLegKine(pyl, ptcut=10, etacut=2.5)             : continue
+      otherLeptons.append( pyl )
+    return otherLeptons
 
-    def buildLeptons(self, cmgOtherLeptons, event):
-        '''Build electrons for third lepton veto, associate best vertex.'''
-        otherLeptons = []
-        for index, lep in enumerate(cmgOtherLeptons):
-            pyl = Electron(lep)
-            pyl.associatedVertex = event.goodVertices[0]
-            pyl.rho = event.rho
-            pyl.event = event
-            if not pyl.mvaIDRun2('NonTrigSpring15', 'POG90'):
-                continue
-            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3:
-                continue
-            if not self.testLegKine(pyl, ptcut=10, etacut=2.5):
-                continue
-            otherLeptons.append(pyl)
-        return otherLeptons
+  def testLeg(self, leg, leg_pt, leg_eta, iso, isocut):
+    '''requires loose isolation, pt, eta and minimal tauID cuts'''
+#     return ( self.testTauVertex(leg)                          and
+#              leg.tauID(iso)                         < isocut  and
+#              leg.pt()                               > leg_pt  and
+#              abs(leg.eta())                         < leg_eta and
+#              (leg.tauID('decayModeFinding')         > 0.5     or
+#               leg.tauID('decayModeFindingNewDMs')   > 0.5)    and
+#              leg.tauID('againstElectronVLooseMVA5') > 0.5     and
+#              leg.tauID('againstMuonLoose3')         > 0.5       )
+#              leg.tauID('againstElectronVLooseMVA5') > 0.5     and
+#              leg.tauID('againstMuonLoose3')         > 0.5       )
+    
+    # RIC: relaxed
+    return ( abs(leg.charge())                  == 1       and # RIC: ensure that taus have abs(charge) == 1
+             self.testTauVertex(leg)                       and
+             leg.tauID(iso)                      < isocut  and
+             leg.pt()                            > leg_pt  and
+             abs(leg.eta())                      < leg_eta and
+             leg.tauID('decayModeFindingNewDMs') > 0.5     )
 
-    def testLeg(self, leg, leg_pt, leg_eta, iso, isocut):
-        '''requires loose isolation, pt, eta and minimal tauID cuts'''
-        # RIC: relaxed
-        return (abs(leg.charge()) == 1 and  # RIC: ensure that taus have abs(charge) == 1
-                self.testTauVertex(leg) and
-                leg.tauID(iso) < isocut and
-                leg.pt() > leg_pt and
-                abs(leg.eta()) < leg_eta and
-                leg.tauID('decayModeFindingNewDMs') > 0.5)
+  def testLeg1(self, leg, isocut):
+    leg_pt  = self.cfg_ana.pt1
+    leg_eta = self.cfg_ana.eta1
+    iso     = self.cfg_ana.isolation
+    return self.testLeg(leg, leg_pt, leg_eta, iso, isocut)
 
-    def testLeg1(self, leg, isocut):
-        leg_pt = self.cfg_ana.pt1
-        leg_eta = self.cfg_ana.eta1
-        iso = self.cfg_ana.isolation
-        return self.testLeg(leg, leg_pt, leg_eta, iso, isocut)
+  def testLeg2(self, leg, isocut):
+    leg_pt  = self.cfg_ana.pt2
+    leg_eta = self.cfg_ana.eta2
+    iso     = self.cfg_ana.isolation
+    return self.testLeg(leg, leg_pt, leg_eta, iso, isocut)
 
-    def testLeg2(self, leg, isocut):
-        leg_pt = self.cfg_ana.pt2
-        leg_eta = self.cfg_ana.eta2
-        iso = self.cfg_ana.isolation
-        return self.testLeg(leg, leg_pt, leg_eta, iso, isocut)
+  def testTauVertex(self, tau):
+    '''Tests vertex constraints, for tau'''
+    # Just checks if the primary vertex the tau was reconstructed with
+    # corresponds to the one used in the analysis
+    # isPV = abs(tau.vertex().z() - tau.associatedVertex.z()) < 0.2
+    isPV = abs(tau.leadChargedHadrCand().dz()) < 0.2
+    return isPV
 
-    def testTauVertex(self, tau):
-        '''Tests vertex constraints, for tau'''
-        # Just checks if the primary vertex the tau was reconstructed with
-        # corresponds to the one used in the analysis
-        # isPV = abs(tau.vertex().z() - tau.associatedVertex.z()) < 0.2
-        isPV = abs(tau.leadChargedHadrCand().dz()) < 0.2
-        return isPV
+  def testVertex(self, lepton, dxy = 0.045, dz = 0.2):
+    '''Tests vertex constraints, for mu, e and tau'''
+    return abs(lepton.dxy()) < dxy and \
+           abs(lepton.dz())  < dz
 
-    def testVertex(self, lepton, dxy=0.045, dz=0.2):
-        '''Tests vertex constraints, for mu, e and tau'''
-        return abs(lepton.dxy()) < dxy and \
-            abs(lepton.dz()) < dz
-
-    def otherLeptonVeto(self, electrons, muons, isocut=None):
-        '''Second electron veto '''
-        return len(electrons) == 0
-
-    def thirdLeptonVeto(self, electrons, muons, isocut=None):
-        '''Second muon veto'''
-        return len(muons) == 0
-
-    def bestDiLepton(self, diLeptons):
-        '''Returns the best diLepton (1st precedence most isolated opposite-sign,
-        2nd precedence most isolated).'''
-        # osDiLeptons = [dl for dl in diLeptons if dl.leg1().charge() != dl.leg2().charge()]
-        # least_iso_highest_pt = lambda dl : min((dl.leg1().tauID(self.cfg_ana.isolation), -dl.leg1().pt()), (dl.leg2().tauID(self.cfg_ana.isolation), -dl.leg2().pt()))
-        least_iso_highest_pt = lambda dl: (dl.leg1().tauID(self.cfg_ana.isolation), -dl.leg1().pt(), dl.leg2().tauID(self.cfg_ana.isolation), -dl.leg2().pt())
-        # set reverse = True in case the isolation changes to MVA
-        # in that case the least isolated is the one with the lowest MVAscore
-        # if osDiLeptons : return sorted(osDiLeptons, key=lambda dl : least_iso(dl), reverse=False)[0]
-        # else           :
-        return sorted(diLeptons, key=lambda dl: least_iso_highest_pt(dl), reverse=False)[0]
+  def bestDiLepton(self, diLeptons):
+    '''Returns the best diLepton (1st precedence most isolated opposite-sign,
+    2nd precedence most isolated).'''
+    osDiLeptons = [dl for dl in diLeptons if dl.leg1().charge() != dl.leg2().charge()]
+    least_iso = lambda dl : max(dl.leg1().tauID(self.cfg_ana.isolation), dl.leg2().tauID(self.cfg_ana.isolation))
+    # set reverse = True in case the isolation changes to MVA
+    # in that case the least isolated is the one with the lowest MVAscore
+    if osDiLeptons : return sorted(osDiLeptons, key=lambda dl : least_iso(dl), reverse=False)[0]
+    else           : return sorted(  diLeptons, key=lambda dl : least_iso(dl), reverse=False)[0]
