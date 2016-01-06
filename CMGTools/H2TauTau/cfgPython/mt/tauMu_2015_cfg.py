@@ -31,7 +31,6 @@ qcd_flat = creator.makeMCComponent("QCDflat", "/QCD_Pt-15to7000_TuneCUETP8M1_Fla
 ggh125 = creator.makeMCComponent("GGH125", "//GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 1.0)
 
 
-
 samples = [qcd_flat, TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf]
 
 samples = [TT_pow, DYJetsToLL_M50, WJetsToLNu, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8]
@@ -88,7 +87,10 @@ if not production:
     # selectedComponents = [comp]
     # comp = selectedComponents[0]
     # comp = data_list[0]
-    comp = QCD_Mu15
+    comp = ggh125
+#     comp.files = ['../../prod/tauMu_fullsel_tree_CMG_noPtIntegration.root']
+#     comp.files = ['../../prod/tauMu_fullsel_tree_CMG_uncalibPtIntegration.root']
+    comp.files = ['../../prod/tauMu_fullsel_tree_CMG.root']
     selectedComponents = [comp]
     comp.splitFactor = 1
     comp.fineSplitFactor = 1
