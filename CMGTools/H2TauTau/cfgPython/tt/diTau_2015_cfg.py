@@ -131,8 +131,8 @@ svfitProducer = cfg.Analyzer(
 ### CONNECT SAMPLES TO THEIR ALIASES AND FILES  ###
 ###################################################
 from CMGTools.RootTools.utils.splitFactor import splitFactor
-from CMGTools.RootTools.samples.samples_13TeV_RunIISpring15MiniAODv2 import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop, WJetsToLNu_LO, QCD_Mu5, DYJetsToLL_M50_LO
-from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015D_05Oct, SingleMuon_Run2015B_05Oct, SingleMuon_Run2015D_Promptv4
+# from CMGTools.RootTools.samples.samples_13TeV_RunIISpring15MiniAODv2 import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop, WJetsToLNu_LO, QCD_Mu5, DYJetsToLL_M50_LO
+# from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015D_05Oct, SingleMuon_Run2015B_05Oct, SingleMuon_Run2015D_Promptv4
 from CMGTools.H2TauTau.proto.samples.spring15.higgs import HiggsGGH125 as ggh125
 from CMGTools.H2TauTau.proto.samples.spring15.higgs_susy import HiggsSUSYGG160 as ggh160
 from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauTau import mc_triggers, mc_triggerfilters, data_triggers, data_triggerfilters

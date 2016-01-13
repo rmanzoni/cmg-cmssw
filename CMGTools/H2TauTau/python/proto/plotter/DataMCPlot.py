@@ -486,6 +486,7 @@ class DataMCPlot(object):
 
     def _ApplyPrefs(self):
         for hist in self.histos:
+            import pdb ; pdb.set_trace()
             pref = self._GetHistPref(hist.name)
             hist.layer = pref['layer']
             hist.SetStyle(pref['style'])

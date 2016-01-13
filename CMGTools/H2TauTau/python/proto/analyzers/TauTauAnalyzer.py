@@ -17,10 +17,10 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         super(TauTauAnalyzer, self).declareHandles()
         if hasattr(self.cfg_ana, 'from_single_objects') and self.cfg_ana.from_single_objects:
             self.handles['taus'] = AutoHandle('slimmedTaus', 'std::vector<pat::Tau>')
-            self.handles['met'] = AutoHandle('slimmedMETs', 'std::vector<pat::MET>')
         else:
             self.handles['diLeptons'] = AutoHandle('cmgDiTauCorSVFitFullSel', 'std::vector<pat::CompositeCandidate>')
 
+        self.handles['met'] = AutoHandle('slimmedMETs', 'std::vector<pat::MET>')
         self.handles['leptons'] = AutoHandle('slimmedElectrons', 'std::vector<pat::Electron>')
         self.handles['otherLeptons'] = AutoHandle('slimmedMuons', 'std::vector<pat::Muon>')
         self.handles['jets'] = AutoHandle('slimmedJets', 'std::vector<pat::Jet>')
@@ -81,6 +81,9 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
           event.leg1 = event.diLepton.leg2()
           event.leg2 = event.diLepton.leg1()
           event.selectedLeptons = [event.leg2, event.leg1]
+
+        event.pfmet = self.handles['met'].product()[0]
+        event.puppimet = self.handles['puppiMET'].product()[0]
     
         return True
 
@@ -111,33 +114,40 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
                     di_tau.mvaMetSig = None
                     di_objects.append(di_tau)
         return di_objects
-  
-    def buildLeptons(self, cmgLeptons, event):
+
+    def buildOtherLeptons(self, cmgLeptons, event):
         '''Build muons for veto, associate best vertex, select loose ID muons.
         The loose ID selection is done to ensure that the muon has an inner track.'''
         leptons = []
         for index, lep in enumerate(cmgLeptons):
             pyl = Muon(lep)
             pyl.associatedVertex = event.goodVertices[0]
-            if not pyl.muonID('POG_ID_Medium')                             : continue
-            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3 : continue
-            if not self.testLegKine(pyl, ptcut=10, etacut=2.4)             : continue
-            leptons.append( pyl )
+            if not pyl.muonID('POG_ID_Medium'):
+                continue
+            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3:
+                continue
+            if not self.testLegKine(pyl, ptcut=10, etacut=2.4):
+                continue
+            leptons.append(pyl)
         return leptons
-  
-    def buildOtherLeptons(self, cmgOtherLeptons, event):
+
+    def buildLeptons(self, cmgOtherLeptons, event):
         '''Build electrons for third lepton veto, associate best vertex.'''
         otherLeptons = []
         for index, lep in enumerate(cmgOtherLeptons):
             pyl = Electron(lep)
             pyl.associatedVertex = event.goodVertices[0]
             pyl.rho = event.rho
-            if not pyl.cutBasedId('POG_PHYS14_25ns_v1_Veto')               : continue
-            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3 : continue
-            if not self.testLegKine(pyl, ptcut=10, etacut=2.5)             : continue
-            otherLeptons.append( pyl )
+            pyl.event = event
+            if not pyl.mvaIDRun2('NonTrigSpring15', 'POG90'):
+                continue
+            if not pyl.relIsoR(R=0.3, dBetaFactor=0.5, allCharged=0) < 0.3:
+                continue
+            if not self.testLegKine(pyl, ptcut=10, etacut=2.5):
+                continue
+            otherLeptons.append(pyl)
         return otherLeptons
-  
+
     def testLeg(self, leg, leg_pt, leg_eta, iso, isocut):
         '''requires loose isolation, pt, eta and minimal tauID cuts'''
 #         return ( self.testTauVertex(leg)                          and
@@ -183,6 +193,14 @@ class TauTauAnalyzer(DiLeptonAnalyzer):
         '''Tests vertex constraints, for mu, e and tau'''
         return abs(lepton.dxy()) < dxy and \
                abs(lepton.dz())  < dz
+
+    def otherLeptonVeto(self, electrons, muons, isocut=None):
+        '''Second electron veto '''
+        return len(electrons) == 0
+
+    def thirdLeptonVeto(self, electrons, muons, isocut=None):
+        '''Second muon veto'''
+        return len(muons) == 0
   
     def bestDiLepton(self, diLeptons):
         '''Returns the best diLepton (1st precedence most isolated opposite-sign,

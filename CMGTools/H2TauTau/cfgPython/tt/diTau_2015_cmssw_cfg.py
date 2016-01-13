@@ -55,6 +55,7 @@ tau1Calibration = cfg.Analyzer(
   TauP4Scaler       ,
   'TauP4Scaler_tau1',
   leg      = 'leg1' ,
+  method   = 'peak' ,
   scaleMET = True   ,
   verbose  = False  ,
   )
@@ -63,6 +64,7 @@ tau2Calibration = cfg.Analyzer(
   TauP4Scaler       ,
   'TauP4Scaler_tau2',
   leg      = 'leg2' ,
+  method   = 'peak' ,
   scaleMET = True   ,
   verbose  = False  ,
   )
@@ -119,28 +121,32 @@ svfitProducer = cfg.Analyzer(
 
 ###################################################
 ### CONNECT SAMPLES TO THEIR ALIASES AND FILES  ###
-# ###################################################
+###################################################
+from CMGTools.RootTools.utils.splitFactor import splitFactor
+from CMGTools.RootTools.samples.samples_13TeV_RunIISpring15MiniAODv2 import TT_pow, DYJetsToLL_M50, WJetsToLNu, WJetsToLNu_HT100to200, WJetsToLNu_HT200to400, WJetsToLNu_HT400to600, WJetsToLNu_HT600toInf, QCD_Mu15, WWTo2L2Nu, ZZp8, WZp8, SingleTop, WJetsToLNu_LO, QCD_Mu5, DYJetsToLL_M50_LO
+from CMGTools.RootTools.samples.samples_13TeV_DATA2015 import SingleMuon_Run2015D_05Oct, SingleMuon_Run2015B_05Oct, SingleMuon_Run2015D_Promptv4
+from CMGTools.H2TauTau.proto.samples.spring15.higgs import HiggsGGH125 as ggh125
+from CMGTools.H2TauTau.proto.samples.spring15.higgs_susy import HiggsSUSYGG160 as ggh160
+from CMGTools.H2TauTau.proto.samples.spring15.triggers_tauTau import mc_triggers, mc_triggerfilters, data_triggers, data_triggerfilters
 
-from CMGTools.H2TauTau.proto.samples.spring15.components_25ns import *
 
-creator = ComponentCreator()
+MC_list = [ggh160]
+data_list = [SingleMuon_Run2015D_05Oct, SingleMuon_Run2015D_Promptv4]
 
-ggh125 = creator.makeMCComponent(
-    'GGH125', 
-    '/GluGluHToTauTau_M125_13TeV_powheg_pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM', 
-    'CMS', 
-    '.*root', 
-    1.0
-)
+ggh160.files = ['file:/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_4_3/src/CMGTools/H2TauTau/prod/diTau_fullsel_tree_CMG.root']
 
-# ggh125.files = ['file:/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_4_3/src/CMGTools/H2TauTau/prod/diTau_fullsel_tree_CMG.root']
-
-MC_list = [ggh125]
+MC_list = [ggh160]
 
 split_factor = 1e5
 
+for sample in data_list:
+    sample.triggers = data_triggers
+    sample.triggerobjects = data_triggerfilters
+    sample.splitFactor = splitFactor(sample, split_factor)
+
 for sample in MC_list:
-    sample.triggers = mc_triggers_tt
+    sample.triggers = mc_triggers
+    sample.triggerobjects = mc_triggerfilters
     sample.splitFactor = splitFactor(sample, split_factor)
 
 ###################################################
@@ -162,8 +168,8 @@ selectedComponents = MC_list
 ###################################################
 sequence = commonSequence
 sequence.insert(sequence.index(genAna), tauTauAna)
-sequence.append(tau1Calibration)
-sequence.append(tau2Calibration)
+# sequence.insert(sequence.index(tauTauAna), tau1Calibration) # calibrate before selection
+# sequence.insert(sequence.index(tauTauAna), tau2Calibration) # calibrate before selection
 sequence.append(tauDecayModeWeighter)
 sequence.append(tau1Weighter)
 sequence.append(tau2Weighter)
@@ -177,7 +183,18 @@ if syncntuple:
 ###             CHERRY PICK EVENTS              ###
 ###################################################
 if pick_events:
-    eventSelector.toSelect = []
+
+    import csv
+    fileName = '/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_4_3/src/CMGTools/H2TauTau/cfgPython/2015-sync/Imperial.csv'
+#     fileName = '/afs/cern.ch/work/m/manzoni/diTau2015/CMSSW_7_4_3/src/CMGTools/H2TauTau/cfgPython/2015-sync/CERN.csv'
+    f = open(fileName, 'rb')
+    reader = csv.reader(f)
+    evtsToPick = []
+
+    for i, row in enumerate(reader):
+        evtsToPick += [int(j) for j in row]
+
+    eventSelector.toSelect = evtsToPick
     sequence.insert(0, eventSelector)
 
 ###################################################
@@ -186,7 +203,7 @@ if pick_events:
 if not production:
   cache                = True
 #   comp                 = my_connect.mc_dict['HiggsGGH125']
-  comp                 = ggh125
+  comp                 = ggh160
   selectedComponents   = [comp]
   comp.splitFactor     = 1
   comp.fineSplitFactor = 1

@@ -22,7 +22,7 @@ channel = 'di-tau'
 
 # runSVFit enables the svfit mass reconstruction used for the H->tau tau analysis.
 # if false, no mass calculation is carried out
-runSVFit = True
+runSVFit = False
 
 # decide whether
 p4TransferFunctionFile = 'TauAnalysis/SVfitStandalone/data/svFitVisMassAndPtResolutionPDF.root' # Christians's default
@@ -47,6 +47,7 @@ print 'runSVFit', runSVFit
 local_run = True
 if local_run:
     from CMGTools.H2TauTau.proto.samples.spring15.higgs_susy import HiggsSUSYGG160 as ggh160
+    from CMGTools.H2TauTau.proto.samples.spring15.higgs import HiggsGGH125 as ggh125
     process.source = cms.Source(
         "PoolSource",
         noEventSort = cms.untracked.bool(True),

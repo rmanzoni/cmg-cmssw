@@ -12,7 +12,8 @@ from RecoMET.METPUSubtraction.mvaPFMET_cff     import pfMVAMEt
 # tau pre-selection
 tauPreSelectionDiTau = tauPreSelection.clone(
   #cut = 'pt > 40. && abs(eta) < 2.5 && tauID("decayModeFinding") > 0.5')
-  cut = 'pt > 40. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5') # RIC: new DM. Probably we'd want to save both with an OR and decide later, useful for studying new tauID
+#   cut = 'pt > 40. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5') # RIC: new DM. Probably we'd want to save both with an OR and decide later, useful for studying new tauID
+  cut = 'pt > 20. && abs(eta) < 2.5 && tauID("decayModeFindingNewDMs") > 0.5') # RIC: for tau calibration study
 
 # 2012 preselection:
 # cut = 'leg1().pt()>40. && leg2().pt()>40. && leg1().tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 10. &&  leg2().tauID("byCombinedIsolationDeltaBetaCorrRaw3Hits") < 10.',
@@ -38,7 +39,8 @@ cmgDiTauCor = cmgDiTauCor.clone()
 cmgDiTauTauPtSel = cms.EDFilter(
   "PATCompositeCandidateSelector",
   src = cms.InputTag("cmgDiTauCor"),
-  cut = cms.string("daughter(0).pt()>45. && daughter(1).pt()>45.")
+#   cut = cms.string("daughter(0).pt()>45. && daughter(1).pt()>45.")
+  cut = cms.string("daughter(0).pt()>20. && daughter(1).pt()>20.")
   )
 
 # recoil correction ----------------------------------------------------
