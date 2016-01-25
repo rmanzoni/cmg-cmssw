@@ -70,8 +70,8 @@ class TauP4Scaler(Analyzer):
         
         if self.cfg_ana.scaleMET:
             metP4 = event.diLepton.met().p4()
-            metP4 += modifiedP4LV
-            metP4 -= tau.p4()
+            metP4 -= modifiedP4LV
+            metP4 += tau.p4()
             event.diLepton.met().setP4(metP4)
 
         if self.cfg_ana.leg == 'leg1':
