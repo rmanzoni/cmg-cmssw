@@ -199,6 +199,8 @@ steps['RunSingleMu2016B']={'INPUT':InputInfo(dataSet='/SingleMuon/Run2016B-v2/RA
 steps['RunSinglePh2016B']={'INPUT':InputInfo(dataSet='/SinglePhoton/Run2016B-v2/RAW',label='sigPh2016B',events=100000,location='STD', ls=Run2016B)}
 steps['RunZeroBias2016B']={'INPUT':InputInfo(dataSet='/ZeroBias/Run2016B-v2/RAW',label='zb2016B',events=100000,location='STD', ls=Run2016B)}
 steps['RunMuOnia2016B']={'INPUT':InputInfo(dataSet='/MuOnia/Run2016B-v2/RAW',label='muOnia2016B',events=100000,location='STD', ls=Run2016B)}
+steps['RunNoBPTX2016B']={'INPUT':InputInfo(dataSet='/NoBPTX/Run2016B-v2/RAW',label='noBptx2016B',events=100000,location='STD', ls=Run2016B)}
+steps['RunZeroBias2016BnewL1repack']={'INPUT':InputInfo(dataSet='/ZeroBias/Run2016B-v2/RAW',label='zb2016BnewL1rep',events=100000,location='STD', ls=Run2016B)}
 
 # Highstat HLTPhysics 
 Run2015DHS=selectedLS([258712,258713,258714,258741,258742,258745,258749,258750,259626,259637,259683,259685,259686,259721,259809,259810,259818,259820,259821,259822,259862,259890,259891])
@@ -981,7 +983,7 @@ dataReco={ '--runUnscheduled':'',
           '--scenario':'pp',
           }
 
-dataRecoAlCaCalo=merge([{'-s':'RAW2DIGI,L1Reco,RECO,EI,ALCA:SiStripCalZeroBias+SiStripCalMinBias+TkAlMinBias+EcalCalZElectron+EcalCalWElectron+EcalUncalZElectron+EcalUncalWElectron+HcalCalIsoTrk,DQM'}, dataReco])
+dataRecoAlCaCalo=merge([{'-s':'RAW2DIGI,L1Reco,RECO,EI,ALCA:SiStripCalZeroBias+SiStripCalMinBias+TkAlMinBias+EcalCalZElectron+EcalCalWElectron+EcalUncalZElectron+EcalUncalWElectron+EcalTrg+HcalCalIsoTrk,DQM'}, dataReco])
 
 
 hltKey='fake'
@@ -1011,6 +1013,7 @@ steps['HLTDR2_25ns']=merge( [ {'-s':'L1REPACK:GT2,HLT:@%s'%hltKey25ns,},{'--cond
 hltKey2016='relval2016'
 menuR2_2016 = autoHLT[hltKey2016]
 steps['HLTDR2_2016']=merge( [ {'-s':'L1REPACK:Full,HLT:@%s'%hltKey2016,},{'--conditions':'auto:run2_hlt_relval'},{'--era' : 'Run2_2016'},steps['HLTD'] ] )
+steps['HLTDR2newL1repack_2016']=merge( [ {'-s':'L1REPACK:FullSimTP,HLT:@%s'%hltKey2016,},{'--conditions':'auto:run2_hlt_relval'},{'--era' : 'Run2_2016'},steps['HLTD'] ] )
 
 
 # custom function to be put back once the CSC tracked/untracked will have been fixed.. :-)
@@ -1109,7 +1112,7 @@ step3Up2015Defaults = {
 
 step3Up2015Defaults50ns = merge([{'-s':'RAW2DIGI,L1Reco,RECO,EI,PAT,VALIDATION:@standardValidation+@miniAODValidation,DQM:@standardDQMFakeHLT+@miniAODDQM','--conditions':'auto:run2_mc_50ns','--era':'Run2_50ns'},step3Up2015Defaults])
 
-step3Up2015DefaultsAlCaCalo = merge([{'-s':'RAW2DIGI,L1Reco,RECO,EI,ALCA:EcalCalZElectron+EcalCalWElectron+EcalUncalZElectron+EcalUncalWElectron+HcalCalIsoTrk,VALIDATION,DQM'},step3Up2015Defaults])
+step3Up2015DefaultsAlCaCalo = merge([{'-s':'RAW2DIGI,L1Reco,RECO,EI,ALCA:EcalCalZElectron+EcalCalWElectron+EcalUncalZElectron+EcalUncalWElectron+EcalTrg+HcalCalIsoTrk,VALIDATION,DQM'},step3Up2015Defaults])
 step3Up2015DefaultsAlCaCalo50ns = merge([{'--conditions':'auto:run2_mc_50ns','--era':'Run2_50ns'},step3Up2015DefaultsAlCaCalo])
 
 step3Up2015Hal = {'-s'            :'RAW2DIGI,L1Reco,RECO,EI,VALIDATION,DQM',
@@ -1137,8 +1140,9 @@ steps['RECODreHLTAlCaCalo']=merge([{'--hltProcess':'reHLT','--conditions':'auto:
 steps['RECODR2_25nsreHLT']=merge([{'--hltProcess':'reHLT'},steps['RECODR2_25ns']])
 steps['RECODR2_50nsreHLT']=merge([{'--hltProcess':'reHLT'},steps['RECODR2_50ns']])
 steps['RECODR2_2016reHLT']=merge([{'--hltProcess':'reHLT'},steps['RECODR2_2016']])
+steps['RECODR2newL1repack_2016reHLT']=merge([{'-s':'L1REPACK:FullSimTP,RAW2DIGI,L1Reco,RECO,EI,PAT,ALCA:SiStripCalZeroBias+SiStripCalMinBias+TkAlMinBias+EcalESAlign,DQM:@standardDQM+@miniAODDQM','--hltProcess':'reHLT'},steps['RECODR2_2016']])
 steps['RECODR2reHLTAlCaEle']=merge([{'--hltProcess':'reHLT','--conditions':'auto:run2_data_relval'},steps['RECODR2AlCaEle']])
-
+steps['RECODR2reHLTAlCaTkCosmics']=merge([{'--hltProcess':'reHLT','--conditions':'auto:run2_data_relval','-s':'RAW2DIGI,L1Reco,RECO,EI,PAT,ALCA:TkAlCosmicsInCollisions,DQM:@standardDQM+@miniAODDQM'},steps['RECODR2_2016']])
 
 steps['RECODR2_2016reHLT_skimSingleMu']=merge([{'-s':'RAW2DIGI,L1Reco,RECO,SKIM:ZMu+MuTau,EI,PAT,ALCA:SiStripCalZeroBias+SiStripCalMinBias+TkAlMinBias+EcalESAlign,DQM:@standardDQM+@miniAODDQM'},steps['RECODR2_2016reHLT']])
 steps['RECODR2_2016reHLT_skimDoubleEG']=merge([{'-s':'RAW2DIGI,L1Reco,RECO,SKIM:ZElectron,EI,PAT,ALCA:SiStripCalZeroBias+SiStripCalMinBias+TkAlMinBias+EcalESAlign,DQM:@standardDQM+@miniAODDQM'},steps['RECODR2_2016reHLT']])
@@ -1251,7 +1255,7 @@ step4Defaults = {
                   '--eventcontent': 'ALCARECO',
                   }
 step4Up2015Defaults = { 
-                        '-s'            : 'ALCA:TkAlMuonIsolated+TkAlMinBias+MuAlOverlaps+EcalESAlign',
+                        '-s'            : 'ALCA:TkAlMuonIsolated+TkAlMinBias+MuAlOverlaps+EcalESAlign+EcalTrg',
                         '-n'            : 1000,
                         '--conditions'  : 'auto:run2_mc',
                         '--era'         : 'Run2_2016',
