@@ -17,8 +17,12 @@ def haddPck(file, odir, idirs):
     sum = None
     for dir in idirs:
         fileName = file.replace( idirs[0], dir )
+        print fileName
         pckfile = open(fileName)
-        obj = pickle.load(pckfile)
+        try:
+            obj = pickle.load(pckfile)
+        except:
+            import pdb ; pdb.set_trace()
         if sum is None:
             sum = obj
         else:
