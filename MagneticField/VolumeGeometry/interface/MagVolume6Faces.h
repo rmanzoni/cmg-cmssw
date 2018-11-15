@@ -27,6 +27,9 @@ class MagneticFieldProvider;
 class MagVolume6Faces : public MagVolume {
 public:
 
+  // Dummy constructor for ROOT
+  MagVolume6Faces(){};
+
   MagVolume6Faces( const PositionType& pos, const RotationType& rot, 
 		   DDSolidShape shape, const std::vector<VolumeSide>& faces,
 		   const MagneticFieldProvider<float> * mfp,

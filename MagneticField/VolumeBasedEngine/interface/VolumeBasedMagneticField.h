@@ -21,6 +21,8 @@ class VolumeBasedMagneticField : public MagneticField {
   friend class testMagGeometryAnalyzer;
 
  public:
+  // for ROOT
+  VolumeBasedMagneticField(){};
   //  VolumeBasedMagneticField(const DDCompactView & cpv);
   VolumeBasedMagneticField( int geomVersion,
 			    const std::vector<MagBLayer *>& theBLayers,

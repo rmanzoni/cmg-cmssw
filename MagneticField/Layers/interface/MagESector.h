@@ -17,6 +17,9 @@ class MagELayer;
 
 class MagESector {
 public:
+  /// Constructor for ROOT
+  MagESector(){};
+
   /// Constructor
   MagESector(std::vector<MagELayer*>& layers, Geom::Phi<float> phiMin);
 

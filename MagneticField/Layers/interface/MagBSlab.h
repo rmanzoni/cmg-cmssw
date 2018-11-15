@@ -22,6 +22,9 @@ class MagVolume;
 
 class MagBSlab {
 public:
+  /// Constructor for ROOT
+  MagBSlab(){};
+
   /// Constructor
   MagBSlab(const std::vector<MagVolume*>& volumes, double zMin);
 

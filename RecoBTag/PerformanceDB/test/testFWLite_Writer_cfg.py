@@ -2,9 +2,14 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("myprocess")
 
-process.load("CondCore.DBCommon.CondDBCommon_cfi") 
-process.load ("RecoBTag.PerformanceDB.PoolBTagPerformanceDB062012")
-process.load ("RecoBTag.PerformanceDB.BTagPerformanceDB062012")
+# process.load("CondCore.DBCommon.CondDBCommon_cfi") 
+process.load ("CondCore.CondDB.CondDB_cfi")
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag.globaltag = '94X_dataRun2_v6'
+
+#process.load ("RecoBTag.PerformanceDB.PoolBTagPerformanceDB062012")
+#process.load ("RecoBTag.PerformanceDB.BTagPerformanceDB062012")
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(1)

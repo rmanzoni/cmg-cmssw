@@ -15,6 +15,9 @@ class MagVolume;
 
 class MagELayer {
 public:
+  /// Constructor for ROOT
+  MagELayer(){};
+
   /// Constructor
   MagELayer(const std::vector<MagVolume*>& volumes, double zMin, double zMax);
 

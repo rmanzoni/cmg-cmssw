@@ -20,6 +20,9 @@ public:
   typedef GloballyPositioned<float>::GlobalPoint    GlobalPoint;
   typedef GloballyPositioned<float>::GlobalVector   GlobalVector;
 
+  // DUmmy constructor for ROOT
+  MagVolume(){};
+  
   MagVolume( const PositionType& pos, const RotationType& rot, 
 	     DDSolidShape shape, const MagneticFieldProvider<float> * mfp,
 	     double sf=1.) :

@@ -22,6 +22,9 @@ template <class T> class PeriodicBinFinderInPhi;
 
 class MagBLayer {
 public:
+  /// Constructor for ROOT
+  MagBLayer(){};
+
   /// Constructor
   MagBLayer(std::vector<MagBSector*>& sectors, double rMin);
 

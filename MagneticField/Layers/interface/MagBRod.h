@@ -24,6 +24,9 @@ class MagVolume;
 
 class MagBRod {
 public:
+  /// Constructor for ROOT
+  MagBRod(){};
+
   /// Constructor
   MagBRod(std::vector<MagBSlab*>& slabs, Geom::Phi<float> phiMin);
 

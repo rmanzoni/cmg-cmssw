@@ -23,6 +23,9 @@ class MagVolume;
 
 class MagBSector {
 public:
+  /// Constructor for ROOT
+  MagBSector(){};
+
   /// Constructor
   MagBSector(std::vector<MagBRod*>& rods, Geom::Phi<float> phiMin);
 
