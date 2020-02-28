@@ -77,9 +77,12 @@ class Event(object):
                     entries
                     stripped_attrs[name] = dict(entries)
                 else:
-                    stripped_attrs[name] = [ val for val in value[:self.__class__.print_nstrip] ]
-                    stripped_attrs[name].append('...')
-                    stripped_attrs[name].append(value[-1])
+                    try:
+                        stripped_attrs[name] = [ val for val in value[:self.__class__.print_nstrip] ]
+                        stripped_attrs[name].append('...')
+                        stripped_attrs[name].append(value[-1])
+                    except:
+                        print 'this is wrong'
         return stripped_attrs
 
     def _print_elements(self, name, value):

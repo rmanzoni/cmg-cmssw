@@ -42,10 +42,24 @@ fi;
 
 scriptName=${1:-./batchScript.sh}
 
+# cat > $jobdesc <<EOF
+# Universe = vanilla
+# Executable = ${prefix}${scriptName}
+# use_x509userproxy = \$ENV(X509_USER_PROXY)
+# Log        = ${prefix}condor_job_\$(ProcId).log
+# Output     = ${prefix}condor_job_\$(ProcId).out
+# Error      = ${prefix}condor_job_\$(ProcId).error
+# getenv      = True
+# environment = "LS_SUBCWD=${here}"
+# request_memory = 2000
+# EOF
+
+# change the argument of use_x509userproxy to comply to condor >= 8.0.0
+# see https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookXrootdService
 cat > $jobdesc <<EOF
 Universe = vanilla
 Executable = ${prefix}${scriptName}
-use_x509userproxy = \$ENV(X509_USER_PROXY)
+use_x509userproxy = true
 Log        = ${prefix}condor_job_\$(ProcId).log
 Output     = ${prefix}condor_job_\$(ProcId).out
 Error      = ${prefix}condor_job_\$(ProcId).error
