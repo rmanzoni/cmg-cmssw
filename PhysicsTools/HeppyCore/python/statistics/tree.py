@@ -70,6 +70,8 @@ class Tree(object):
     def var(self, varName,type=float, default=-99, title=None, storageType="default", filler=None, zipper=None ):
         if type in [int, float]:
             self.branch_(self.vars, varName, type, 1, title=title, storageType=storageType, zipper=zipper)
+            if default==-99:
+                default = ROOT.std.numeric_limits('float').quiet_NaN() if type==float else ROOT.std.numeric_limits('int').quiet_NaN()
             self.defaults[varName] = default
         elif __builtins__['type'](type) == str:
             # create a value, looking up the type from ROOT and calling the default constructor
@@ -109,6 +111,7 @@ class Tree(object):
             if name in self.fillers:
                 self.fillers[name](value, self.defaults[name])
             else:
+                # import pdb ; pdb.set_trace()
                 value[0]=self.defaults[name]
         for name,value in six.iteritems(self.vecvars):
             if isinstance(value, numpy.ndarray):
